@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- INSERT NULL 값 설정  -->
+	<settings> 
+		<setting name="jdbcTypeForNull" value="VARCHAR"/>
+		
+		<!-- sql 콘솔 출력 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+
+        <!-- 언더스코어(_)를 자동으로 제거하고 다음 문자를 대문자로 바꿔 DTO의 필드명에 자동 매핑  -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/> 
+	</settings>	
+	<typeAliases>
+		<!-- 클래스 단위 -->
+<!-- 		<typeAlias type="com.kh.ex02.vo.BoardVo" -->
+<!-- 			alias="BoardVo"/> -->
+		<!-- 패키지 단위 -->
+		<package name="com.my.ex.dto"/>
+	</typeAliases>
+</configuration>
