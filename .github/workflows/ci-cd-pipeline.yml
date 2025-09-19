@@ -1,0 +1,103 @@
+name: CI/CD Pipeline to GCP VM
+
+on:
+  push:
+    branches:
+      - master  # master 브랜치에 푸시될 때
+  pull_request:
+    branches:
+      - master  # master 브랜치로 PR이 생성될 때
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 리포지토리 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. JDK 설정
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      # 3. Maven 의존성 캐시
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      # 4. Maven 빌드
+      - name: Build with Maven
+        run: mvn clean package -DskipTests=true
+
+      # 5. 빌드된 아티팩트 업로드
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-boot-artifact
+          path: target/*.war  # 빌드된 .war 파일
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # 빌드 작업이 완료된 후에 실행
+
+    steps:
+      # 1. 리포지토리 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 빌드된 아티팩트 다운로드
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: spring-boot-artifact
+          path: ./artifacts
+
+      # 3. SSH Agent 설정 및 개인 키 로드 (암호화된 키 사용 시)
+      - name: Setup SSH Agent with Passphrase
+        run: |
+          set -euxo pipefail
+          # ~/.ssh 디렉토리 생성
+          mkdir -p ~/.ssh
+
+          # SSH Agent 시작 및 환경 변수 설정
+          # ssh-agent를 시작하고 그 결과를 GITHUB_ENV에 추가하여 다음 스텝에서도 사용 가능하게 함
+          eval "$(ssh-agent -s)" >> $GITHUB_ENV
+
+          # 개인 키 파일 생성 및 권한 설정
+          echo "Writing SSH private key to file..."
+          echo "${{ secrets.HOMETALK_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519_github_actions
+          chmod 600 ~/.ssh/id_ed25519_github_actions
+          echo "Setting permissions for private key..."
+
+          # 개인 키를 ssh-agent에 추가 (passphrase 자동 입력)
+          echo "Adding SSH private key to agent..."
+          echo "${{ secrets.HOMETALK_SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_ed25519_github_actions
+          echo "SSH private key added to agent."
+
+          # 개인 키 파일 내용 확인 (마스킹)
+          echo "Verifying private key file content (first few lines, masked):"
+          head -n 5 ~/.ssh/id_ed25519_github_actions | sed 's/./*/g' || true
+
+      # 4. SSH Known Hosts 설정
+      - name: Setup SSH Known Hosts
+        run: |
+          set -euxo pipefail
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519 34.64.199.61 >> ~/.ssh/known_hosts
+          echo "ssh-keyscan completed. Contents of known_hosts:"
+          cat ~/.ssh/known_hosts || true
+
+      # 5. GCP VM에 애플리케이션 배포
+      - name: Deploy to GCP VM
+        run: |
+          echo "Deploying to GCP VM..."
+          # ssh-agent가 키를 관리하므로 -i 옵션 불필요
+          scp ./artifacts/*.war kia20250626@34.64.199.61:/opt/apache-tomcat-9.0.106/webapps/  # Tomcat 경로 수정
+          ssh kia20250626@34.64.199.61 "mv /opt/apache-tomcat-9.0.106/webapps/*.war /opt/apache-tomcat-9.0.106/webapps/ROOT.war"  # WAR 파일 이름 변경
+          ssh kia20250626@34.64.199.61 "sudo /opt/apache-tomcat-9.0.106/bin/shutdown.sh && sudo /opt/apache-tomcat-9.0.106/bin/startup.sh"  # Tomcat 재시작
