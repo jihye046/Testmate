@@ -1,0 +1,43 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<link href="<c:url value="/resources/css/main.css"/>" rel="stylesheet">
+<!-- axios -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<div class="container">
+        <h1 class="main-title">자동 채점 서비스</h1>
+        <p class="subtitle">응시할 시험 정보(종류, 회차, 과목)를 선택하세요.</p>
+        <div class="selection-form">
+            <div class="select-wrapper">
+                <label for="examType" class="select-label">시험 종류</label>
+                <select id="examType" class="styled-select">
+                    <option value="" selected disabled>시험을 선택하세요</option>
+                    <option value="middle">중졸 검정고시</option>
+                    <option value="high">고졸 검정고시</option>
+                    <option value="other">기타 시험</option>
+                </select>
+            </div>
+            <div class="select-wrapper">
+                <label for="examRound" class="select-label">시험 회차</label>
+                <select id="examRound" class="styled-select" disabled>
+                    <option value="" selected disabled>시험 종류를 먼저 선택하세요</option>
+                </select>
+            </div>
+            <div class="select-wrapper">
+                <label for="examSubject" class="select-label">시험 과목</label>
+                <select id="examSubject" class="styled-select" disabled>
+                    <option value="" selected disabled>시험 종류를 먼저 선택하세요</option>
+                </select>
+            </div>
+        </div>
+        <button id="nextButton" class="next-button" disabled>다음</button>
+    </div>
+</body>
+</html>
