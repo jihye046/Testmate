@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.ex.ExamSelectionMapper">
+	<select id="getExamTypes" resultType="ExamTypeDto">
+		SELECT exam_type_code,
+			   exam_type_name
+		  FROM exam_type
+		 WHERE is_deleted = 0
+		 ORDER BY exam_type_name
+	</select>
+	
+	<select id="getExamRounds" resultType="String">
+		SELECT distinct exam_round
+		  FROM exam_info
+		 WHERE exam_type_id = (
+		 	SELECT exam_type_id
+			  FROM exam_type
+			 WHERE exam_type_code = #{examTypeCode}
+		 )
+		 ORDER BY exam_round
+	</select>
+	
+	<select id="getExamSubjects" parameterType="java.util.HashMap" resultType="String">
+		SELECT distinct exam_subject
+		  FROM exam_info
+		 WHERE exam_type_id = (
+		 	SELECT exam_type_id
+			  FROM exam_type
+			 WHERE exam_type_code = #{examTypeCode}
+		 )
+		   AND exam_round = #{examRound}
+		 ORDER BY exam_subject
+	</select>
+</mapper>

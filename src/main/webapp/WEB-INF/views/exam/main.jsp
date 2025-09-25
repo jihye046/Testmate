@@ -19,9 +19,9 @@
                 <label for="examType" class="select-label">시험 종류</label>
                 <select id="examType" class="styled-select">
                     <option value="" selected disabled>시험을 선택하세요</option>
-                    <option value="middle">중졸 검정고시</option>
-                    <option value="high">고졸 검정고시</option>
-                    <option value="other">기타 시험</option>
+                    <c:forEach items="${examtypes}" var="type">
+	                    <option value="${type.examTypeCode}">${type.examTypeName}</option>
+                    </c:forEach>
                 </select>
             </div>
             <div class="select-wrapper">
@@ -39,5 +39,7 @@
         </div>
         <button id="nextButton" class="next-button" disabled>다음</button>
     </div>
+    
+    <script src="<c:url value="/resources/js/examInfo.js"/>"></script>
 </body>
 </html>
