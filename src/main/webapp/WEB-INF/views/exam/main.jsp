@@ -12,7 +12,11 @@
 </head>
 <body>
 	<div class="container">
+		<div class="top-utility">
+			<a href="<c:url value='/user/login'/>" class="login-link">로그인</a>
+		</div>
         <h1 class="main-title">자동 채점 서비스</h1>
+		
         <p class="subtitle">응시할 시험 정보(종류, 회차, 과목)를 선택하세요.</p>
         <div class="selection-form">
             <div class="select-wrapper">
