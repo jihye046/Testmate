@@ -23,6 +23,11 @@ body {
 }
 
 /* 제목 및 부제 */
+.top-utility {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
 .main-title {
     font-size: 2.5em;
     margin-bottom: 10px;
@@ -34,6 +39,23 @@ body {
     font-size: 1em;
     color: #7f8c8d;
     margin-bottom: 30px;
+}
+
+/* 로그인 링크 스타일 */
+.login-link {
+    font-size: 0.9em;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.login-link:hover {
+    color: #2980b9;
+    background-color: #ecf0f1;
 }
 
 /* 폼 컨테이너 */
@@ -116,6 +138,10 @@ body {
     }
     .main-title {
         font-size: 2em;
+    }
+    .login-link {
+        font-size: 0.8em;
+        padding: 3px 6px;
     }
     .styled-select, .next-button {
         font-size: 1em;

@@ -1,0 +1,125 @@
+@charset "UTF-8";
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #eef1f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    color: #333;
+}
+
+.login-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+    box-sizing: border-box;
+}
+
+.home-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.login-title {
+    font-size: 1.8em;
+    margin-bottom: 0px;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.login-subtitle {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    text-align: left;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-field:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #3498db;
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 링크 영역 스타일 */
+.link-area {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.link-area a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.link-area a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 450px) {
+    .login-container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+    .login-title {
+        font-size: 1.5em;
+    }
+}
