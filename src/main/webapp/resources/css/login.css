@@ -142,7 +142,18 @@ body {
     background-color: #7f8c8d;
 }
 
-/* 반응형 디자인 */
+/* 요구사항 및 실시간 유효성 검사 메시지 영역 스타일 */
+.validation-message {
+	color: #7f8c8d;
+    display: block;
+    font-size: 0.8em;
+    margin-top: 5px;
+    padding-left: 2px;
+    min-height: 15px; /* 메시지가 없을 때 공간이 완전히 사라지는 것을 방지 */
+}
+
+/* 반응형 디자인
+================================================== */
 @media (max-width: 450px) {
     .login-container {
         padding: 30px 20px;

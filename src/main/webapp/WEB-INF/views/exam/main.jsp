@@ -11,9 +11,16 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
+	<!-- URL: 로그인페이지 또는 로그아웃 -->
+	<c:set var="loginUrl" value="${pageContext.request.contextPath}${empty sessionScope.userId ? '/user/loginPage' : '/user/logout'}"></c:set>
+	<!-- TEXT: 로그인 또는 로그아웃 텍스트 -->
+	<c:set var="loginText" value="${empty sessionScope.userId ? '로그인' : '로그아웃'}"></c:set>
+	
 	<div class="container">
 		<div class="top-utility">
-			<a href="<c:url value='/user/login'/>" class="login-link">로그인</a>
+			<a href="${loginUrl}" class="login-link">
+				${loginText}
+			</a>
 		</div>
         <h1 class="main-title">자동 채점 서비스</h1>
 		
