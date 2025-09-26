@@ -130,7 +130,8 @@ body {
     box-shadow: none;
 }
 
-/* 반응형 디자인 */
+/* 반응형 디자인
+================================================== */
 @media (max-width: 600px) {
     .container {
         padding: 20px;
