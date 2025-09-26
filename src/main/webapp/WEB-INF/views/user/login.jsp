@@ -21,12 +21,27 @@
         <form action="login" method="post" class="login-form">
             <div class="input-group">
                 <label for="userId" class="input-label">아이디</label>
-                <input type="text" id="userId" name="userId" class="input-field" placeholder="아이디 입력" required>
+                <input 
+                    type="text" 
+                    value="${userId}" 
+                    id="userId" 
+                    name="userId" 
+                    class="input-field" 
+                    placeholder="아이디 입력" 
+                    required
+                >
             </div>
             
             <div class="input-group">
                 <label for="password" class="input-label">비밀번호</label>
-                <input type="password" id="password" name="password" class="input-field" placeholder="비밀번호 입력" required>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="userPw" 
+                    class="input-field" 
+                    placeholder="비밀번호 입력" 
+                    required
+                >
             </div>
             
             <button type="submit" class="login-button">로그인</button>
@@ -38,6 +53,8 @@
         </div>
     </div>
     
+    <div class="hidden-data" id="loginFail" data-loginFail="${loginFail}"></div>
+    <div class="hidden-data" id="singupResult" data-singup-result="${singupResult}"></div>
     <script src="<c:url value="/resources/js/login.js"/>"></script>
 </body>
 </html>
