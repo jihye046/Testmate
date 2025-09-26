@@ -33,7 +33,7 @@
         </form>
         
         <div class="link-area">
-            <a href="#" class="signup-link">회원가입</a> |
+            <a href="/user/signupPage" class="signup-link">회원가입</a> |
             <a href="#" class="find-link">아이디/비밀번호 찾기</a>
         </div>
     </div>

@@ -113,6 +113,35 @@ body {
     text-decoration: underline;
 }
 
+/* 회원가입 */
+.signup-container {
+    max-width: 450px; 
+}
+
+/* 아이디 중복 확인 버튼을 포함하는 입력 그룹 */
+.input-with-button {
+    display: flex;
+    gap: 8px; /* 입력창과 버튼 사이 간격 */
+}
+
+/* 중복 확인 버튼 스타일 */
+.check-button {
+    flex-shrink: 0; 
+    padding: 12px 15px;
+    border: none;
+    border-radius: 6px;
+    background-color: #95a5a6;
+    color: #fff;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.check-button:hover {
+    background-color: #7f8c8d;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 450px) {
     .login-container {
@@ -121,5 +150,12 @@ body {
     }
     .login-title {
         font-size: 1.5em;
+    }
+    .input-with-button {
+        flex-direction: column;
+    }
+    .check-button {
+        width: 100%;
+        margin-top: 5px;
     }
 }
