@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class ExamTypeDto {
-	private int examTypeId;
-	private String examTypeCode;
-	private String examTypeName;
-	private int isDeleted;
+	private int examTypeId; // pk
+	private String examTypeCode; // 시험 종류 코드
+	private String examTypeName;  // 시험 종류 이름
+	private int isDeleted; // 삭제 여부(관리자용)
 }

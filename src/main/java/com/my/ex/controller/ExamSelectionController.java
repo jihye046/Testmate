@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.my.ex.dto.ExamInfoGroup;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.parser.GedExamParser;
 import com.my.ex.service.ExamSelectionService;
 
 @Controller
@@ -60,7 +61,10 @@ public class ExamSelectionController {
 	@ResponseBody
 	public String uploadPdfText(@RequestBody Map<String, String> payload) {
 		String text = payload.get("text");
-		System.out.println("text: " + text);
+//		System.out.println("text: " + text);
+		GedExamParser parse = new GedExamParser();
+		parse.parse(text);
+		
 		return "success";
 	}
 	

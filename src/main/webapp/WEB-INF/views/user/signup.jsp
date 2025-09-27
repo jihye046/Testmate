@@ -74,7 +74,7 @@
         </form>
         
         <div class="link-area">
-            이미 계정이 있으신가요? <a href="<c:url value='/user/login'/>" class="signup-link">로그인</a>
+            이미 계정이 있으신가요? <a href="<c:url value='/user/loginPage'/>" class="signup-link">로그인</a>
         </div>
     </div>
 
