@@ -1,6 +1,5 @@
 package com.my.ex.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamInfoGroup;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.parser.ExamInfo;
 import com.my.ex.parser.GedExamParser;
 import com.my.ex.service.ExamSelectionService;
 
@@ -61,11 +62,31 @@ public class ExamSelectionController {
 	@ResponseBody
 	public String uploadPdfText(@RequestBody Map<String, String> payload) {
 		String text = payload.get("text");
-//		System.out.println("text: " + text);
-		GedExamParser parse = new GedExamParser();
-		parse.parse(text);
 		
-		return "success";
+		if(text == null || text.trim().isEmpty()) {
+			return "error: PDF 텍스트 내용이 비어있습니다.";
+		}
+		
+		GedExamParser parse = new GedExamParser();
+		List<Map<String, Object>> questions = parse.parse(text);
+		// 파싱된 시험 정보 및 문제 리스트 추출
+		ExamInfoDto examInfo = parse.getExamInfo();
+		examInfo.setExamTypeId(1); // 시험 종류 코드: 중졸 1, 고졸 2
+		
+		boolean result = service.saveParsedExamData(examInfo, questions);
+		if(result) {
+			return "✅" + result + ": 총 " + questions.size() + "개의 문제가 저장되었습니다.";
+		} else {
+			return "❌ 이미 저장된 문제지입니다.";
+		}
+		
+	}
+	
+	@GetMapping("/showExamPage")
+	public String showExamPage(ExamInfo params) {
+		System.out.println(params);
+		
+		return "/exam/exam_page";
 	}
 	
 }

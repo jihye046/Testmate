@@ -1,6 +1,5 @@
 const axios = require("axios");
-const pdf = require("pdf-parse");
-// const fs = require("fs");
+const pdf = require("pdf-parse"); // pdf-parse 라이브러리 불러옴
 
 const pdfUrl = "https://www.gumsi.or.kr/ged/cmmn/brd/fileDownload.do?flId=1128&flSn=1";
 // const pdfUrl1 = "https://www.kice.re.kr/boardCnts/fileDown.do"
@@ -26,14 +25,14 @@ function getPdfTextWithAxios(url) {
     })
     .then((response) => {
         const buffer = Buffer.from(response.data);
-        return pdf(buffer);
+        return pdf(buffer); // 다운로드한 pdf 텍스트 추출
     })
     .then((data) => {
         console.log("✅ PDF 텍스트 추출 성공!");
         console.log("----------------------------------");
         console.log(data.text);
 
-      // Java 서버에 POST 요청으로 텍스트 전송
+        // Java 서버에 POST 요청으로 텍스트 전송
         return axios.post(javaApiUrl, { text: data.text });
     })
     .then((response) => {

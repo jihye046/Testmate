@@ -93,12 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ================================================== */
     nextButton.addEventListener('click', (e) => {
         e.preventDefault()
-        const obj = {
+        const params = new URLSearchParams({
             examType: examTypeSelect.value,
             examRound: examRoundSelect.value,
             examSubject: examSubjectSelect.value
-        }
+        }).toString()
 
-        console.log(obj)
+        window.location.href = `/exam/showExamPage?${params}`
     })
 })

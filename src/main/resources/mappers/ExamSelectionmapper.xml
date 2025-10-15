@@ -33,4 +33,84 @@
 		   AND exam_round = #{examRound}
 		 ORDER BY exam_subject
 	</select>
+	
+	<!-- 중복 시험 여부 확인 -->
+	<select id="checkExistingExamInfo" parameterType="ExamInfoDto" resultType="Integer">
+		SELECT COUNT(*)
+		  FROM exam_info
+		 WHERE exam_type_id = #{examTypeId}
+		   AND exam_round = #{examRound}
+		   AND exam_subject = #{examSubject}
+	</select>
+	
+	<!-- 시험 정보 저장 -->
+	<insert id="saveParsedExamInfo" parameterType="ExamInfoDto">
+		<selectKey resultType="int" keyProperty="examId" order="BEFORE" >
+			SELECT seq_exam_info.nextval FROM dual
+		</selectKey>
+		INSERT INTO exam_info
+			(
+			exam_id,
+			exam_type_id,
+			exam_round,
+			exam_subject,
+			sessionNo
+			)
+		 VALUES
+		 	(
+		 	#{examId},
+		 	#{examTypeId},
+		 	#{examRound},
+		 	#{examSubject},
+		 	#{sessionNo}
+		 	)
+	</insert>
+	
+	<!-- 시험 문제 저장 -->
+	<insert id="saveParsedQuestionInfo" parameterType="java.util.HashMap">
+		<selectKey keyProperty="questionId" resultType="int" order="BEFORE">
+			SELECT seq_exam_question.nextval FROM dual
+		</selectKey>
+		INSERT INTO exam_question
+			(
+			question_id,
+			exam_id,
+			question_num,
+			question_text,
+			question_image,
+			question_passage,
+			passage_scope
+			)
+		VALUES
+			(
+			#{questionId},
+			#{examId},
+			#{questionNum},
+			#{questionText},
+			null,
+			#{questionPassage},
+			#{passageScope}
+			)
+	</insert>
+	
+	<!-- 시험 선택지 저장 -->
+	<insert id="saveParsedChoiceInfo" parameterType="ExamChoiceDto">
+		INSERT INTO exam_choice
+			(
+			choice_id,
+			question_id,
+			choice_label,
+			choice_text,
+			choice_image
+			)
+		VALUES
+			(
+			seq_exam_choice.nextval,
+			#{questionId},
+			#{choiceLabel},
+			#{choiceText},
+			#{choiceImage}
+			)
+	</insert>
+	
 </mapper>
