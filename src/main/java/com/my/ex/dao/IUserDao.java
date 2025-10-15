@@ -1,5 +1,6 @@
 package com.my.ex.dao;
 
+
 import com.my.ex.dto.UserDto;
 
 public interface IUserDao {
