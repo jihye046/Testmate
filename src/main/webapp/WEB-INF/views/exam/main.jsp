@@ -31,7 +31,7 @@
                 <select id="examType" class="styled-select">
                     <option value="" selected disabled>시험을 선택하세요</option>
                     <c:forEach items="${examtypes}" var="type">
-	                    <option value="${type.examTypeCode}">${type.examTypeName}</option>
+                        <option value="${type.examTypeCode}">${type.examTypeName}</option>
                     </c:forEach>
                 </select>
             </div>

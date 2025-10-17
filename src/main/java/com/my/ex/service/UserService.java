@@ -26,5 +26,5 @@ public class UserService implements IUserService {
 	public boolean checkIdDuplicate(String checkId) {
 		return dao.checkIdDuplicate(checkId) > 0;
 	}
-	
+
 }

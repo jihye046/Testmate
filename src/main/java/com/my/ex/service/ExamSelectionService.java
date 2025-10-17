@@ -1,15 +1,22 @@
 package com.my.ex.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.my.ex.config.EnvironmentConfig;
+import com.my.ex.controller.ExamSelectionController;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamChoiceDto;
+import com.my.ex.dto.ExamCommonpassageDto;
 import com.my.ex.dto.ExamInfoDto;
+import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 
 @Service
@@ -66,6 +73,54 @@ public class ExamSelectionService implements IExamSelectionService {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public String getExamtypename(String examType) {
+		return dao.getExamtypename(examType);
+	}
+	
+	@Override
+	public List<ExamQuestionDto> getExamQuestions(String examType, String examRound, String examSubject) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("examType", examType);
+		map.put("examRound", examRound);
+		map.put("examSubject", examSubject);
+		
+		return dao.getExamQuestions(map);
+	}
+
+	@Override
+	public List<ExamChoiceDto> getExamChoices() {
+		return dao.getExamChoices();
+	}
+	
+	@Override
+	public Set<ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("examType", examType);
+		map.put("examRound", examRound);
+		map.put("examSubject", examSubject);
+		List<ExamQuestionDto> questionDto = dao.getCommonPassageInfo(map);
+		
+		ExamCommonpassageDto commonpassageDto; 
+//		List<ExamCommonpassageDto> distinctPassageList = new ArrayList<>();
+		Set<ExamCommonpassageDto> distinctPassageSet = new HashSet<>();
+		
+		for(ExamQuestionDto dto: questionDto) {
+			commonpassageDto = new ExamCommonpassageDto();
+			String scope = dto.getPassageScope(); // 11~13
+			
+			commonpassageDto.setCommonPassageStartNum(Integer.parseInt(scope.split("~")[0])); // 11
+			commonpassageDto.setCommonPassageEndNum(Integer.parseInt(scope.split("~")[1])); // 13
+			commonpassageDto.setCommonPassageText(dto.getCommonPassage()); // 공통 지문
+			distinctPassageSet.add(commonpassageDto);
+//			distinctPassageList.add(commonpassageDto);
+		}
+//		System.out.println("Set size: " + distinctPassageSet.size()); // Set size: 5
+//		System.out.println("List size: " + distinctPassageList.size()); // List size: 15
+		
+		return distinctPassageSet;
 	}
 
 }

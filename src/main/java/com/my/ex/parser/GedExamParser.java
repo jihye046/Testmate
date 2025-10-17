@@ -194,8 +194,8 @@ public class GedExamParser implements IExamParser {
 						nextCommonPassage = finalPassageContent; // **다음 문제에 사용될 지문 저장**
                         
                         // 공통 지문이 바뀌었으므로 현재 지문 정보 초기화
-                        currentCommonPassage = "";
-                        currentPassageScope = "";
+//                        currentCommonPassage = "";
+//                        currentPassageScope = "";
 	            	}
 	            	
 	            	// 4. 공통 지문 부분을 제거하여 contentPart를 정리 (현재 문제 내용만 남김)
@@ -218,6 +218,7 @@ public class GedExamParser implements IExamParser {
 	            questions.add(questionData);
 	            
 	            // 해당 문제가 지문의 마지막 문제였는지 확인하고, 맞다면 공통 지문 정보를 초기화
+	            /*
                 if (!currentPassageScope.isEmpty()) {
                     try {
                         String[] range = currentPassageScope.split("~");
@@ -232,6 +233,7 @@ public class GedExamParser implements IExamParser {
                         // 숫자로 파싱 실패 시, 무시하고 다음 문제로 진행
                     }
                 }
+                */
 	        }
 	    }
 
@@ -341,16 +343,24 @@ public class GedExamParser implements IExamParser {
 
 	    // 개별 지문이 있으면 무조건 개별 지문을 사용하고 (문제 13번),
 	    // 개별 지문이 없을 때만 공통 지문을 사용 (문제 11, 12, 14, 15, 16번)
-	    String finalPassage;
-	    if (!questionPassageText.isEmpty()) {
-	        finalPassage = questionPassageText; // 개별 지문(보기) 우선
-	    } else {
-	        finalPassage = commonPassageText; // 개별 지문이 없으면 공통 지문 사용
-	    }
 	    
-	    questionData.put("questionPassage", finalPassage);
+	    // 개별지문, 공통지문 분리 수정
+//	    String finalPassage;
+//	    
+//	    if (!questionPassageText.isEmpty()) {
+//	        finalPassage = questionPassageText; // 개별 지문(보기) 우선
+//	    } else if (!commonPassageText.isEmpty()) { // 추가: 공통 지문이 있을 때만 사용
+//	        finalPassage = commonPassageText; 
+//	    } else {
+//	        finalPassage = "";
+//	    }
+	    
+	    questionData.put("individualPassage", questionPassageText);
+	    questionData.put("commonPassage", commonPassageText);
+//	    questionData.put("questionPassage", finalPassage);
 	    questionData.put("passageScope", passageScope);
 	    questionData.put("options", optionsList);
+	    
 
 	    // 디버깅 출력
 	    /*
