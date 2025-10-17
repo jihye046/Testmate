@@ -78,7 +78,8 @@
 			question_num,
 			question_text,
 			question_image,
-			question_passage,
+			individualPassage,
+			commonPassage,
 			passage_scope
 			)
 		VALUES
@@ -88,7 +89,8 @@
 			#{questionNum},
 			#{questionText},
 			null,
-			#{questionPassage},
+			#{individualPassage},
+			#{commonPassage},
 			#{passageScope}
 			)
 	</insert>
@@ -112,5 +114,53 @@
 			#{choiceImage}
 			)
 	</insert>
+	
+	<!-- 시험 종류 가져오기 -->
+	<select id="getExamtypename" resultType="String">
+		SELECT exam_type_name
+		  FROM exam_type
+		 WHERE exam_type_code = #{examType}
+	</select>
+	
+	<!-- 시험 문제 가져오기 -->
+	<select id="getExamQuestions" parameterType="java.util.HashMap" resultType="ExamQuestionDto">
+		SELECT Q.question_id,
+			   Q.question_num,
+		       Q.question_text,
+		       Q.question_image,
+		       Q.individualPassage,
+		       Q.commonPassage,
+		       Q.passage_scope
+		  FROM exam_question Q
+		  JOIN exam_info I on Q.exam_id = I.exam_id
+		  JOIN exam_type T on I.exam_type_id = T.exam_type_id
+		 WHERE T.exam_type_code = #{examType}
+		   AND I.exam_round = #{examRound}
+		   AND I.exam_subject = #{examSubject}
+		 ORDER BY Q.question_num asc
+	</select>
+	
+	<!-- 선택지 가져오기 -->
+	<select id="getExamChoices" resultType="ExamChoiceDto">
+		SELECT question_id,
+			   choice_id,
+		       choice_label,
+		       choice_text,
+		       choice_image
+		  FROM exam_choice
+		 ORDER BY question_id ASC, choice_label ASC
+	</select>
+	
+	<!-- 공통 지문 시작번호 추출 -->
+	<select id="getCommonPassageInfo" parameterType="java.util.HashMap" resultType="ExamQuestionDto">
+		SELECT Q.passage_scope, Q.commonpassage
+		  FROM exam_question Q
+		  JOIN exam_info I on Q.exam_id = I.exam_id
+		  JOIN exam_type T on I.exam_type_id = T.exam_type_id
+		 WHERE T.exam_type_code = #{examType}
+		   AND I.exam_round = #{examRound}
+		   AND I.exam_subject = #{examSubject}
+		   AND Q.passage_scope IS NOT NULL
+	</select>
 	
 </mapper>

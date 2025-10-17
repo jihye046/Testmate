@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
+import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 
 @Repository
@@ -52,6 +53,26 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	@Override
 	public int saveParsedChoiceInfo(ExamChoiceDto option) {
 		return session.insert(NAMESPACE + "saveParsedChoiceInfo", option);
+	}
+
+	@Override
+	public String getExamtypename(String examType) {
+		return session.selectOne(NAMESPACE + "getExamtypename", examType);
+	}
+	
+	@Override
+	public List<ExamQuestionDto> getExamQuestions(Map<String, Object> map) {
+		return session.selectList(NAMESPACE + "getExamQuestions", map);
+	}
+
+	@Override
+	public List<ExamChoiceDto> getExamChoices() {
+		return session.selectList(NAMESPACE + "getExamChoices");
+	}
+
+	@Override
+	public List<ExamQuestionDto> getCommonPassageInfo(Map<String, Object> map) {
+		return session.selectList(NAMESPACE + "getCommonPassageInfo", map);
 	}
 
 }
