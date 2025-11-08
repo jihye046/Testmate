@@ -48,9 +48,15 @@ public class UserController {
 		
 		if(isPasswordMatch) {
 			session.setAttribute("userId", userId);
-			String targetLocation = (String)session.getAttribute("targetLocation");
-			return "redirect:/exam/main";
+			
+			if(userId.equals("admin")) {
+				return "redirect:/admin/main";
+			} else {
+				String targetLocation = (String)session.getAttribute("targetLocation");
+				return "redirect:/exam/main";
 //			return (targetLocation != null) ? "redirect:" + targetLocation : "redirect:/exam/main";
+			}
+			
 		} else {
 			rttr.addFlashAttribute("loginFail", true);
 			return "redirect:loginPage";

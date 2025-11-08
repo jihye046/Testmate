@@ -14,10 +14,11 @@ import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.controller.ExamSelectionController;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamChoiceDto;
-import com.my.ex.dto.ExamCommonpassageDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.response.ExamCommonpassageDto;
+import com.my.ex.dto.response.ExamTitleDto;
 
 @Service
 public class ExamSelectionService implements IExamSelectionService {
@@ -43,6 +44,11 @@ public class ExamSelectionService implements IExamSelectionService {
 		
 		return dao.getExamSubjects(map);
 	}
+	
+	@Override
+	public List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId) {
+		return dao.getAllExamTitlesByFolderId(folderId);
+	}
 
 	@Override
 	public boolean saveParsedExamData(ExamInfoDto examInfo, List<Map<String, Object>> questions) {
@@ -65,6 +71,7 @@ public class ExamSelectionService implements IExamSelectionService {
 			@SuppressWarnings("unchecked")
 			List<ExamChoiceDto> options = (List<ExamChoiceDto>) question.get("options");
 			for(ExamChoiceDto choiceDto : options) {
+				choiceDto.setExamId(examId);
 				choiceDto.setQuestionId(questionId);
 				
 				int insertResult = dao.saveParsedChoiceInfo(choiceDto);
@@ -89,10 +96,15 @@ public class ExamSelectionService implements IExamSelectionService {
 		
 		return dao.getExamQuestions(map);
 	}
+	
+	@Override
+	public List<ExamQuestionDto> getExamQuestionsByExamId(int examId) {
+		return dao.getExamQuestionsByExamId(examId);
+	}
 
 	@Override
-	public List<ExamChoiceDto> getExamChoices() {
-		return dao.getExamChoices();
+	public List<ExamChoiceDto> getExamChoices(int examId) {
+		return dao.getExamChoices(examId);
 	}
 	
 	@Override
@@ -122,5 +134,16 @@ public class ExamSelectionService implements IExamSelectionService {
 		
 		return distinctPassageSet;
 	}
+
+	@Override
+	public int getTotalQuestionCount(int examId) {
+		return dao.getTotalQuestionCount(examId);
+	}
+
+	@Override
+	public boolean deleteExams(List<Integer> examIds) {
+		return dao.deleteExams(examIds) > 0;
+	}
+
 
 }

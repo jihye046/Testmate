@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,15 +21,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamChoiceDto;
-import com.my.ex.dto.ExamCommonpassageDto;
 import com.my.ex.dto.ExamInfoDto;
-import com.my.ex.dto.ExamInfoGroup;
-import com.my.ex.dto.ExamPageDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.request.MoveExamsToFolderDto;
+import com.my.ex.dto.response.ExamCommonpassageDto;
+import com.my.ex.dto.response.ExamInfoGroup;
+import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.parser.GedExamParser;
 import com.my.ex.service.ExamSelectionService;
 
+// 시험지 선택/조회 등 관리 영역 
 @Controller
 @RequestMapping("/exam")
 public class ExamSelectionController {
@@ -96,27 +99,39 @@ public class ExamSelectionController {
 	}
 
 	/**
-	 * 시험 조건에 해당하는 시험 정보를 조회
+	 * 사용자 시험 응시 페이지
+	 * 
 	 * @param examType 시험 종류 (예: "middle-geomjeong")
 	 * @param examRound 시험 회차 정보 (예: "2025년도 제1회")
 	 * @param examSubject 과목명 (예: "국어")
-	 * @return
+	 * 
+	 * @return ExamPageDto 시험정보 Dto
+	 * 		(시험 문제들, 시험지 한글 타입, 시험지 회차, 시험 과목, 선택지, 중복제거된 공통지문 Dto)
 	 */
 	@GetMapping("/showExamPage")
 //	@ResponseBody
 	public String showExamPage (
 //	public Map<String, Object> showExamPage (
-		@RequestParam String examType,
+		@RequestParam String examTypeEng,
 		@RequestParam String examRound,
 		@RequestParam String examSubject,
 		Model model) 
 	{
 		
-		String examTypename = service.getExamtypename(examType);
-		List<ExamQuestionDto> questions = service.getExamQuestions(examType, examRound, examSubject);
-		List<ExamChoiceDto> choices = service.getExamChoices();
-		Set<ExamCommonpassageDto> distinctPassageDto = service.getCommonPassageInfo(examType, examRound, examSubject); // 공통지문 시작번호 추출
-		ExamPageDto response = new ExamPageDto(questions, examTypename, examRound, examSubject, choices, distinctPassageDto);
+		String examTypeKor = service.getExamtypename(examTypeEng);
+		List<ExamQuestionDto> questions = service.getExamQuestions(examTypeEng, examRound, examSubject);
+		if(questions == null || questions.isEmpty()) {
+			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
+		}
+		
+		// 데이터 추출
+		List<ExamChoiceDto> choices = service.getExamChoices(questions.get(0).getExamId());
+		Set<ExamCommonpassageDto> distinctPassageDto =
+				service.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
+		
+		// 데이터 담기
+		ExamPageDto response = 
+				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
 		model.addAttribute("examPageDto", response);
 		
 		return "/exam/exam_page";
@@ -155,6 +170,21 @@ public class ExamSelectionController {
 		} else {
 			throw new RuntimeException("File not found: " + file.getAbsolutePath());
 		}
+	}
+	
+	/**
+	 * 시험지 삭제 요청 처리
+	 * - 단일 삭제와 일괄 삭제 요청을 동일한 엔드포인트로 처리하기 위해 
+	 * 	 단일 삭제 요청도 List<Integer>로 받음
+	 * 
+	 * @param MoveExamToFolderDto 삭제할 시험지 ID 리스트를 담은 DTO 
+	 * 
+	 * @return true/false
+	 */
+	@PatchMapping("/deleteExams")
+	@ResponseBody
+	public boolean deleteExams(@RequestBody MoveExamsToFolderDto dto) {
+		return service.deleteExams(dto.getExamIds());
 	}
 	
 }

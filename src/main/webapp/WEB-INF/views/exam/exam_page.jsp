@@ -53,8 +53,7 @@
                             <c:choose>
                             	<c:when test="${not empty questionDto.questionImage}">
                             		<div class="question-media-box">
-                                        <img src=
-                                            "/exam/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${questionDto.questionImage}" 
+                                        <img src="/exam/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${questionDto.questionImage}" 
 											alt="문제 이미지" 
 											class="question-image"
 										>
@@ -66,17 +65,20 @@
 								    </div>                            	
                             	</c:when>
                             </c:choose>
+                            
+                    		<!-- 선택지들 -->
                     		<div class="options-group">
-                    		
-                    			<!-- 선택지들 -->
                     			<c:forEach items="${examPageDto.examChoices}" var="choiceDto">
-                    				<c:choose>
-                    					<c:when test="${choiceDto.questionId == questionDto.questionId}">
+<%--                     				<c:choose> --%>
+                    					<c:if test="${choiceDto.questionId == questionDto.questionId}">
                     						<label class="option-label full-click">
                     						
                     							<!-- 선택지 번호 -->
-                                                <input type="radio" name="question_${questionDto.questionId}" value="${choiceDto.choiceId}">
-                                                <span class="omr-bubble">${choiceDto.choiceLabel}</span>
+                    							<c:if test="${not empty choiceDto.choiceLabel}">
+                    								<input type="radio" name="question_${questionDto.questionId}" value="${choiceDto.choiceId}">
+                                                	<span class="omr-bubble">${choiceDto.choiceLabel}</span>
+                    							</c:if>
+                                                
                                                 
                                                 <!-- 선택지 내용 -->
                                                 <c:if test="${not empty choiceDto.choiceText}">
@@ -89,8 +91,8 @@
                                                 </c:if>
                                                 
                                             </label>
-                    					</c:when>				
-                    				</c:choose>			
+                    					</c:if>				
+<%--                     				</c:choose>			 --%>
                     			</c:forEach>
                     			
                     		</div>        

@@ -9,6 +9,7 @@ public class ExamInfoDto {
 	private String examRound; 	// 시험 회차
 	private String examSubject; // 시험 과목
 	private String sessionNo; 	// 시험 교시
+	private char isDeleted;		// 시험지 삭제 여부
 	
 	public ExamInfoDto(String examRound, String examSubject, String sessionNo) {
 		this.examRound = examRound;

@@ -1,0 +1,795 @@
+@charset "UTF-8";
+
+/* =================================================================
+ * GLOBAL FIXES & BASE STYLES
+ * ================================================================= */
+
+/* 클릭 시 커서 움직임 (텍스트 입력 포커스) 방지 조치: 입력 요소 외 텍스트 선택 방지 */
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    box-sizing: border-box; /* 레이아웃 안정성 확보 */
+}
+
+input, textarea, .form-control {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+
+/* 기본 설정 및 폰트 */
+body {
+    font-family: 'Pretendard', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    background-color: #f4f6f9;
+    color: #34495e;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s;
+}
+
+.admin-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* =================================================================
+ * 2. ACTION HEADERS & BUTTONS (Enhanced)
+ * ================================================================= */
+
+/* Header */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+.header-title {
+    font-size: 2.3em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    border-left: 5px solid #3498db; /* 타이틀에 액센트 라인 */
+    padding-left: 15px;
+}
+
+/* Dashboard Content Areas */
+.dashboard-content-area {
+    min-height: 500px;
+}
+
+.actions-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+.exam-list-header {
+    justify-content: flex-start;
+}
+
+/* Buttons (General) */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* 새 시험지 등록 */
+.btn-create-exam {
+	display: none;
+    background-color: #2ecc71;
+    color: white;
+}
+.btn-create-exam:hover {
+    background-color: #27ae60;
+}
+
+/* 새 폴더 만들기 */
+.btn-create-folder {
+    background-color: #f39c12;
+    color: white;
+}
+.btn-create-folder:hover {
+    background-color: #d38b0e;
+}
+
+/* 모달 생성 버튼 */
+.btn-create-modal {
+    background-color: #2ecc71;
+    color: white;
+}
+.btn-create-modal:hover {
+    background-color: #27ae60;
+}
+
+/* 폴더 목록으로 돌아가기 */
+.btn-back-to-folders {
+    background-color: #bdc3c7;
+    color: #34495e;
+}
+.btn-back-to-folders:hover {
+    background-color: #95a5a6;
+}
+
+
+/* =================================================================
+ * 3. FILTER BOX (Enhanced)
+ * ================================================================= */
+
+.filter-box {
+    background-color: #fff;
+    padding: 30px; /* 패딩 증가 */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 35px;
+    border: 1px solid #e0e0e0;
+}
+
+.filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.main-search {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fcfcfc;
+}
+
+.search-icon {
+    padding: 0 15px;
+    color: #95a5a6;
+    font-size: 1.2em;
+}
+
+.form-control {
+    padding: 14px 10px;
+    border: none;
+    font-size: 1em;
+    flex-grow: 1;
+    background-color: transparent;
+}
+
+.form-control:focus {
+    border-color: #3498db; 
+    outline: none;
+}
+
+.btn-search-go {
+    background-color: #3498db;
+    color: white;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 25px;
+    box-shadow: none; /* 컨테이너 내 버튼 그림자 제거 */
+}
+
+.btn-search-go:hover {
+    background-color: #2980b9;
+    transform: none; /* 부모 컨테이너 내에서는 움직임 제거 */
+}
+
+.select-group {
+    display: flex;
+    gap: 15px;
+}
+
+.select-filter {
+    flex-grow: 1;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    background-color: #fff;
+    appearance: none;
+    padding: 14px 30px 14px 15px;
+    font-size: 1em;
+    color: #555;
+    background-image: url("data:image:svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%2334495e%22%20d%3D%22M8%2011l-4-4h8l-4%204z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    transition: border-color 0.2s;
+}
+.select-filter:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* =================================================================
+ * 4. FOLDER VIEW STYLES (Enhanced)
+ * ================================================================= */
+
+.folder-list-area {
+    display: grid;
+    /* 화면 크기에 따라 최소 300px을 유지하며, 공간을 균등하게 채움 */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.folder-card {
+    /* 카드 디자인 */
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-left: 6px solid #f39c12;
+    cursor: pointer;
+    
+    /* 카드 전체 레이아웃 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    transition: all 0.3s ease-in-out;
+}
+
+.folder-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* 폴더 정보 (아이콘, 제목, 메타 정보) */
+.folder-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 나머지 공간을 채워서 버튼이 하단에 붙도록 함 */
+    margin-bottom: 15px;
+}
+
+.folder-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.folder-icon {
+    font-size: 1.6em;
+    color: #f39c12;
+    margin-right: 10px;
+}
+
+.folder-title {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 8px 0;
+}
+
+/* 문항 수 태그 스타일 */
+.folder-meta {
+    margin-top: 10px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.tag-count {
+    background-color: #e9f5ff;
+    color: #3498db;
+}
+
+.tag-count i {
+    margin-right: 5px;
+    font-size: 0.8em;
+}
+
+
+/* 폴더 액션 버튼 영역 (보기/삭제 버튼) */
+.folder-actions {
+    display: flex;
+    justify-content: flex-end; /* 버튼을 오른쪽으로 배치 */
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.folder-actions .btn-action-view,
+.folder-actions .btn-action-delete {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.folder-actions .btn-action-view {
+    background-color: #f39c12;
+    color: white;
+}
+
+.folder-actions .btn-action-view:hover {
+    background-color: #e67e22;
+}
+
+.folder-actions .btn-action-delete {
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+}
+
+.folder-actions .btn-action-delete:hover {
+    background-color: #bdc3c7;
+    color: #34495e;
+}
+
+
+/* 폴더 목록 없을 때 메시지 */
+.no-exams-message,
+.no-content {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 80px 20px;
+    background-color: #f9f9f9;
+    border: 2px dashed #d5dbdb;
+    border-radius: 12px;
+    color: #868e96;
+}
+
+.no-exams-message i,
+.no-content i {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    color: #bdc3c7;
+}
+
+.no-exams-message p,
+.no-content p {
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* =================================================================
+ * 5. EXAM LIST VIEW STYLES (Enhanced)
+ * ================================================================= */
+
+/* Exam Card Grid */
+.exam-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.exam-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-in-out;
+    border-left: 6px solid #3498db;
+}
+
+.exam-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.tag {
+    font-size: 0.85em;
+    font-weight: 700;
+    padding: 5px 12px; /* 패딩 증가 */
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.tag-국어 { background-color: #FFEBB7; color: #7B4F00; } 
+.tag-수학 { background-color: #D0F0C0; color: #006400; } 
+.tag-영어 { background-color: #D6EAF8; color: #1A5276; } 
+.tag-사회 { background-color: #FADBD8; color: #922B21; } 
+.tag-과학 { background-color: #E8DAEF; color: #6C3483; }
+
+.card-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.card-meta p {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin: 8px 0;
+}
+
+/* 액션 버튼 세부 조정 */
+.btn-action {
+	margin-top: 10px;
+    flex-grow: 1;
+    padding: 10px 20px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    box-shadow: none; /* 카드 내부 버튼은 그림자 제거 */
+}
+
+.btn-action:hover {
+    transform: none; /* 카드 내부 버튼은 움직임 제거 */
+    opacity: 0.9;
+}
+
+/* =================================================================
+ * MODAL STYLES (새 폴더 만들기 모달)
+ * ================================================================= */
+
+/* 모달 오버레이 (배경) */
+.modal-overlay {
+    display: none; /* JS로 'flex'로 변경하여 모달을 보이게 함 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    justify-content: center; 
+    align-items: center; 
+    transition: opacity 0.3s ease; /* 투명도 전환 효과 */
+}
+
+/* 모달 콘텐츠 (본체) */
+.modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 18px; 
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); 
+    transform: scale(1); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 모달 헤더 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0; 
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.modal-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.3em;
+    cursor: pointer;
+    color: #95a5a6;
+    padding: 5px;
+    transition: color 0.2s;
+}
+.modal-close-btn:hover {
+    color: #e74c3c;
+}
+
+/* 모달 바디 */
+.modal-body label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #34495e;
+    font-size: 1em;
+}
+
+.modal-body .form-control {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box; 
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.modal-body .form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); 
+    outline: none;
+}
+
+.modal-body .folder-option.selected {
+    background-color: #e9f5ff;
+    color: #3498db;          
+    font-weight: 600;
+/*     border-left: 4px solid #3498db; */
+/*     padding-left: 11 px; */
+}
+
+.input-description {
+    font-size: 0.88em;
+    color: #7f8c8d;
+    line-height: 1.5;
+    margin-top: 5px;
+}
+
+/* 모달 푸터 (버튼 영역) */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 25px;
+    margin-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* 취소 버튼 (Secondary) */
+.modal-footer .btn-cancel {
+    background-color: #ecf0f1;
+    color: #34495e;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: none;
+}
+.modal-footer .btn-cancel:hover {
+    background-color: #dce0e3;
+    transform: none; 
+}
+
+/* 생성 버튼 (Primary) */
+.modal-footer #btn-save-folder {
+    background-color: #2ecc71;
+    color: white;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(46, 204, 113, 0.4);
+}
+.modal-footer #btn-save-folder:hover {
+    background-color: #27ae60;
+    box-shadow: 0 5px 12px rgba(46, 204, 113, 0.5);
+    transform: translateY(-1px);
+}
+
+.registration-option {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.option-title {
+    font-size: 1.2em;
+    color: #34495e;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.option-description {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin-bottom: 15px;
+}
+
+.file-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-name-display {
+    font-size: 0.9em;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+}
+
+.btn-upload-trigger {
+    flex-shrink: 0; /* 버튼 크기 고정 */
+}
+
+/* 구분선 스타일 */
+#createExamModal hr {
+    border: none;
+    border-top: 1px dashed #e0e0e0;
+    margin: 20px 0;
+}
+
+
+/* =================================================================
+ * BULK ACTION BAR STYLES (하단 일괄 처리 바)
+ * ================================================================= */
+
+.bulk-action-bar {
+    position: fixed; /* 화면 하단에 고정 */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    
+    /* 디자인 */
+    background-color: #34495e; /* 어두운 배경색으로 강조 */
+    color: white;
+    padding: 15px 30px;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bulk-action-bar .action-summary {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+#selected-count {
+    color: #f39c12; /* 강조 색상 */
+    margin-right: 5px;
+}
+
+.bulk-action-bar .action-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+
+/* =================================================================
+ * EXAM CHECKBOX STYLES
+ * ================================================================= */
+
+.exam-select-checkbox {
+    display: none;
+    width: 20px;
+    height: 20px;
+    
+    /* 클릭 영역 확보 및 다른 요소와의 간격 조정 */
+    margin: 5px 10px 15px 0;
+    
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box; 
+    vertical-align: middle; /* 텍스트나 다른 요소와 세로 중앙 정렬 */
+    position: relative;
+}
+
+
+/* =================================================================
+ * 7. RESPONSIVE (MOBILE)
+ * ================================================================= */
+
+@media (max-width: 768px) {
+    .admin-container {
+        margin: 20px auto;
+    }
+    
+    .header-title {
+        font-size: 2em;
+    }
+
+    .filter-box {
+        padding: 15px;
+    }
+    
+    .select-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .main-search {
+        flex-direction: column;
+        border: none;
+        overflow: visible;
+        background-color: transparent;
+        gap: 10px;
+    }
+
+    .main-search .form-control {
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        width: 100%;
+    }
+
+    .btn-search-go {
+        width: 100%;
+        border-radius: 10px;
+        padding: 12px 25px;
+    }
+    
+    .exam-card-grid,
+    .folder-list-area {
+        grid-template-columns: 1fr;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn {
+        padding: 10px 15px;
+    }
+    
+    /* 폴더 */
+    .folder-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .folder-info {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    
+    .folder-title {
+        margin: 5px 0 8px 0;
+    }
+    
+    .folder-icon {
+        display: none;
+    }
+    
+    .folder-actions {
+        width: 100%;
+        justify-content: space-between; 
+        padding-top: 10px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    /* 모달 */
+    .modal-content {
+        width: 95%; 
+        max-width: none; 
+        margin: 0 15px; 
+        padding: 20px; 
+        border-radius: 12px;
+    }
+
+    .modal-title {
+        font-size: 1.4em; 
+    }
+    
+    .modal-footer {
+        flex-direction: column; 
+        gap: 10px; 
+        padding-top: 15px;
+    }
+    
+    /* 버튼 너비를 꽉 채워서 터치 영역을 확보 */
+    .modal-footer .btn,
+    .modal-footer #btn-save-folder,
+    .modal-footer .btn-cancel {
+        width: 100%; 
+        justify-content: center;
+    }
+
+}

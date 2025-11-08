@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.ex.AdminMapper">
+
+	<!-- 새 폴더 생성 -->
+	<insert id="saveFolder">
+		INSERT INTO exam_folder 
+			(
+			folder_id,
+			folder_name
+			)
+		VALUES 
+			(
+			seq_exam_folder.nextval,
+			#{folderName}
+			)
+	</insert>
+	
+	<!-- 입력된 폴더명 중복 여부 확인 -->
+	<select id="isFolderNameExists" parameterType="String" resultType="int">
+		SELECT count(*)
+		  FROM exam_folder
+		 WHERE folder_name = #{folderName}
+	</select>
+	
+	<!-- 삭제된 폴더인지 확인 -->
+	<select id="isDeleted" parameterType="String" resultType="int">
+		SELECT count(*)
+		  FROM exam_folder
+		 WHERE folder_name = #{folderName}
+		   AND isDeleted = 'Y'
+	</select>
+	
+	<!-- 삭제된 폴더 복구 -->
+	<update id="restoreFolder" parameterType="String">
+		UPDATE exam_folder
+		   SET isDeleted = 'N'
+		 WHERE folder_name = #{folderName}
+	</update>
+	
+	<!-- 폴더 리스트 조회 -->
+	<select id="getFolderList" resultType="ExamFolderDto">
+		SELECT f.*,
+		(
+			SELECT count(*)
+			  FROM exam_info i
+			 WHERE f.folder_id = i.folder_id
+			   AND i.isDeleted = 'N'
+		) AS examCount
+		FROM exam_folder f
+	   WHERE f.isDeleted = 'N'
+	</select>
+	
+	<!-- 현재 폴더를 제외한 폴더 리스트 조회 -->
+	<select id="getFolderListExcluding" parameterType="int" resultType="ExamFolderDto">
+		SELECT f.*,
+		(
+			SELECT count(*)
+			  FROM exam_info i
+			 WHERE f.folder_id = i.folder_id
+		) AS examCount
+		  FROM exam_folder f
+		 WHERE f.folder_id != #{excludeFolderId}
+		   AND isDeleted = 'N'
+	</select>
+	
+	<!-- 선택된 시험지를 지정된 폴더로 이동 -->
+	<update id="moveExamsToFolder" parameterType="MoveExamsToFolderDto">
+		UPDATE exam_info
+		   SET folder_id = #{folderId}
+		 WHERE exam_id IN
+		 <foreach item="id" collection="examIds" open="(" separator="," close=")">
+		 	#{id}
+		 </foreach>
+	</update>
+	
+	<!-- 폴더 삭제 요청 시 isDeleted 값 업데이트 -->
+	<update id="deleteFolder" parameterType="int">
+		UPDATE exam_folder
+		   SET isDeleted = 'Y'
+		 WHERE folder_id = #{folderId}
+	</update>
+	
+	<!-- 선택된 시험지의 폴더ID와 폴더Name 조회 -->
+	<select id="getFolderInfoByExamId" parameterType="int" resultType="ExamFolderDto">
+		SELECT f.folder_id,
+		       f.folder_name
+		  FROM exam_folder f
+		  JOIN exam_info i ON i.folder_id = f.folder_id
+		 WHERE i.exam_id = #{examId}
+	</select>
+</mapper>

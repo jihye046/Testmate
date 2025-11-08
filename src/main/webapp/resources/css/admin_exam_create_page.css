@@ -1,0 +1,690 @@
+@charset "UTF-8";
+
+/* =================================================================
+ * EXAM CREATION UI STYLES
+ * ================================================================= */
+
+#exam-creation-form {
+    /* 전체 폼의 최대 너비 설정 */
+    max-width: 900px; /* 예시: 900px로 제한. 원하는 너비로 조절 가능 */
+    
+    /* 화면 중앙에 배치 */
+    margin-left: auto;
+    margin-right: auto;
+    
+    padding: 0 15px; /* 좌우 화면 가장자리에 너무 붙지 않도록 여백 추가 */
+}
+
+/* 시험지 기본 정보 헤더 */
+.exam-info-header {
+    background-color: #ffffff;
+    padding: 20px 25px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.exam-info-header h2 {
+    font-size: 1.8em;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* 문항 목록 컨테이너 */
+#question-list-container {
+    padding: 0 15px;
+}
+
+/* 개별 문항 카드 스타일 */
+.question-item {
+    background-color: #fcfcfc;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+/* 문항 헤더 (제목 및 삭제 버튼) */
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #e9e9e9;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 [추가된 부분] 공통 지문 체크박스 크기 조정 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+/* .question-item 내의 모든 체크박스에 적용 (공통 지문 체크박스라고 가정) */
+.question-item input[type="checkbox"] {
+    transform: scale(1.4); /* 1.4배 크기로 확대 */
+    margin-right: 7px; /* 텍스트와의 간격 조정 */
+}
+
+
+.question-header h4 {
+    font-size: 1.4em;
+    color: #34495e;
+    margin: 0;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 [최종 수정] 문항 삭제 버튼 (.btn-remove-question) 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+.btn-remove-question {
+    font-size: 0.9em;
+    padding: 5px 10px;
+    /* 깔끔한 아웃라인 스타일 적용 */
+    background-color: #fff !important; 
+    color: #6c757d !important; 
+    border: 2px solid #adb5bd !important;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-remove-question:hover {
+    background-color: #f8f9fa !important;
+    color: #dc3545 !important; /* 삭제 버튼이므로 호버 시 빨간색 강조 */
+    border-color: #dc3545 !important;
+}
+
+/* 폼 그룹 (일반적인 입력 필드) */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #34495e;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #5D9CEC;
+    box-shadow: 0 0 0 3px rgba(93, 156, 236, 0.1);
+    outline: none;
+}
+
+.no-resize {
+    resize: none; /* 크기 조절 비활성화 */
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 모달 (Modal) 기본 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+
+#commonPassageModal {
+    /* 1. 최상위 레이어에 고정 (스크롤 무시) */
+    position: fixed; 
+    left: 0;
+    top: 0;
+    
+    /* 2. 화면 전체를 덮음 */
+    width: 100%; 
+    height: 100%;
+    
+    /* 3. 배경색 설정 (반투명 검정색) */
+    background-color: rgba(0, 0, 0, 0.6);
+    
+    /* 4. 모든 요소 위에 표시 */
+    z-index: 1050; 
+    
+    /* 5. 콘텐츠 중앙 정렬 */
+    display: flex; /* JavaScript에서 'block' 대신 'flex'로 열어야 중앙 정렬됨 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center;  /* 세로 중앙 정렬 */
+}
+
+/* 모달 콘텐츠 박스 스타일 */
+#commonPassageModal .modal-content {
+    background-color: #fefefe;
+    padding: 30px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    
+    /* 콘텐츠 박스 최대 너비 제한 */
+    max-width: 800px;
+    width: 90%; 
+    
+    /* 모달이 화면보다 클 경우 대비 스크롤 가능하게 함 */
+    max-height: 90vh;
+    overflow-y: auto;
+    
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 닫기 버튼 스타일 */
+#commonPassageModal .close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    margin-top: -10px;
+    margin-right: -10px;
+}
+
+#commonPassageModal .close-button:hover,
+#commonPassageModal .close-button:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+
+/* 공통 지문 모달 사용법 안내 스타일 */
+.usage-tip-box {
+    background-color: #f7f9fc; /* 아주 연한 배경색 */
+    border: 1px solid #e0e6f0;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 25px; /* 다음 폼 그룹과의 간격 */
+}
+
+.usage-tip-text {
+    font-size: 0.95em;
+    color: #34495e;
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.usage-tip-text i {
+    color: #f39c12; /* 전구 아이콘 색상 (노란색 계열) */
+    margin-right: 5px;
+}
+
+.usage-steps-text {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin: 0;
+    padding-top: 5px;
+    border-top: 1px dashed #e0e6f0;
+}
+
+/* 등록된 공통 지문 목록 */
+#commonPassageModal #commonPassageListContainer{
+    display: none;
+}
+
+#commonPassageModal #commonPassageListContainer.show{
+    display: block;
+    margin-top: 20px; 
+    border-top: 1px solid #eee; 
+    padding-top: 15px;
+}
+
+#commonPassageModal .common-passage-list-item {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 8px 0; 
+    border-bottom: 1px dashed #ddd;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 [추가된 부분] 공통 지문 목록 내 '적용', '삭제' 버튼 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+#commonPassageModal .common-passage-list-item .btn {
+    padding: 6px 8px; /* 테두리 제거 후 클릭 영역 확보를 위해 padding 조정 */
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9em;
+    background-color: transparent !important; /* 배경색 투명하게 유지 */
+    
+    /* 🚨 테두리 제거 */
+    border: none !important; 
+    border-width: 0 !important;
+    box-shadow: none !important;
+    
+    transition: all 0.2s;
+    margin-left: 5px; 
+    cursor: pointer;
+}
+
+/* 아이콘 크기 조정 */
+#commonPassageModal .common-passage-list-item .btn i {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+/* '적용' 버튼 */
+#commonPassageModal .common-passage-list-item .btn-apply-common-passage {
+    color: gray !important;
+}
+#commonPassageModal .common-passage-list-item .btn-apply-common-passage:hover {
+    background-color: #f0f8ff !important;
+    color: #4A89DC !important;
+}
+
+/* '삭제' 버튼 */
+#commonPassageModal .common-passage-list-item .btn-delete-common-passage {
+    color: gray !important;
+}
+#commonPassageModal .common-passage-list-item .btn-delete-common-passage:hover {
+    background-color: #fcecec !important;
+    color: #c82333 !important;
+}
+
+/* 🌟 모달 푸터 배치 및 스타일 (이전 코드 유지) */
+#commonPassageModal .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+#commonPassageModal .modal-footer .left-group {
+    display: flex; 
+    gap: 10px;
+}
+
+/* 토스트 메시지 스타일 */
+.toast-message {
+    position: fixed;
+    top: 50px;       
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    
+    opacity: 0; 
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* 메시지를 보여줄 때의 투명도 */
+.toast-message.show {
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 [최종 수정] 선택지 (Option) 스타일 및 삭제 버튼 (.btn-remove-option) 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+
+/* option-inputs: 모든 보기 쌍(.option-item)을 담는 컨테이너 */
+.options-group .option-inputs {
+    display: flex;
+    flex-direction: column; /* 보기 쌍을 세로로 정렬 */
+    gap: 10px; /* 각 보기 쌍(.option-item) 간의 세로 간격 */
+    margin-bottom: 15px;
+}
+
+/* 🌟 각 보기 쌍 컨테이너 (.option-item) 🌟 */
+.options-group .option-item {
+    display: flex;
+    align-items: stretch; /* 높이 맞추기 */
+}
+
+/* 입력 필드 */
+.options-group .option-item .option-input {
+    flex-grow: 1; 
+    border-radius: 8px 0 0 8px;
+    margin-right: -1px; /* 버튼과 겹치도록 설정 */
+    width: auto; 
+    min-width: 150px;
+    border-right-color: transparent; /* 오른쪽 테두리를 숨겨 버튼과 연결 */
+    /* 보기 입력 필드 높이 수정 */
+    padding: 12px 15px; /* 기본 form-control과 동일한 높이 유지 */
+}
+
+/* 🌟 삭제 버튼 (깔끔한 아웃라인 스타일로 변경) 🌟 */
+.options-group .option-item .btn-remove-option {
+    border-radius: 0 8px 8px 0 !important;
+    padding: 12px 15px; /* 입력 필드와 높이 맞춤 */
+    line-height: 1; 
+    
+    /* 아웃라인 스타일로 변경 */
+    background-color: #fff !important; 
+    border: 1px solid #ced4da; /* 연한 테두리 */
+    border-left: none; /* 왼쪽 테두리 제거 */
+    
+    color: #e74c3c; /* 텍스트(아이콘) 색상: 빨간색 유지 */
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* 아이콘에 직접 색상 및 크기 부여 (Font Awesome) */
+.options-group .option-item .btn-remove-option i {
+    color: #e74c3c;
+    font-size: 1.1em;
+}
+
+.options-group .option-item .btn-remove-option:hover {
+    background-color: #fcecec !important; /* 호버 시 아주 연한 빨간색 배경 */
+    border-color: #e74c3c; /* 호버 시 테두리 색상 강조 */
+}
+
+/* 보기 추가 버튼 스타일 */
+.btn-add-option {
+    margin-top: 5px;
+    padding: 8px 12px;
+    background-color: #fff;
+    color: #5D9CEC;
+    border: 1px solid #5D9CEC; 
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    font-weight: 600;
+}
+
+.btn-add-option:hover {
+    background-color: #f0f8ff;
+}
+
+/* --------------------------------------------------------------- */
+/* 메인 버튼 스타일 (중앙 배열 및 색상 개선) */
+/* --------------------------------------------------------------- */
+
+#btnAddQuestion,
+#btnSaveExam {
+    /* 중앙 배열 및 너비 제한 */
+    width: 90%; 
+    max-width: 450px; 
+    margin: 10px auto; 
+    display: block; 
+
+    font-size: 1.1em;
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    color: white;
+}
+
+/* 문항 추가 버튼 (산뜻한 하늘색) */
+#btnAddQuestion {
+    background-color: #5D9CEC; 
+}
+
+#btnAddQuestion:hover {
+    background-color: #4A89DC; 
+    transform: translateY(-1px);
+}
+
+/* 시험지 최종 등록 버튼 (부드러운 녹색) */
+#btnSaveExam {
+    background-color: #8CC152; 
+}
+
+#btnSaveExam:hover {
+    background-color: #7DB84C; 
+    transform: translateY(-1px);
+}
+
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 포커스 (커서 깜빡임) 제거를 위한 스타일 추가 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+
+/* 모든 버튼 요소에 대해 포커스 시 아웃라인/테두리 제거 */
+button:focus,
+.btn:focus {
+    outline: none;
+    box-shadow: none; /* box-shadow도 포커스 링으로 사용될 수 있으므로 제거 */
+}
+
+/* 폼 그룹의 라벨(label)을 클릭했을 때 커서가 깜빡이는 경우 방지 */
+.form-group label:focus {
+    outline: none;
+}
+
+/* 삭제 버튼과 문항 추가/저장 버튼에 포커스 제거 적용 */
+#btnAddQuestion:focus,
+#btnSaveExam:focus,
+.btn-remove-question:focus,
+.btn-add-option:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 지문(Passage) 관련 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+
+.passage-group {
+    border: 1px dashed #cccccc;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 25px; /* 문항 내용과 분리 */
+}
+
+.passage-group label {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 텍스트/이미지 유형 선택 버튼 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+.passage-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+}
+
+/* 일반적인 지문 유형 버튼 스타일 (.btn-passage-type 및 .modal-btn-passage-type 모두 포함) */
+.btn-passage-type,
+.modal-btn-passage-type {
+    font-size: 0.95em;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    background-color: #fff; /* 배경 흰색 */
+    color: #6c757d; /* 텍스트 진한 회색 */
+    border: 2px solid #ced4da; /* 연한 테두리 (2px로 강조) */
+    transition: all 0.2s;
+    /* Bootstrap의 btn-outline-secondary를 덮어쓰기 위해 !important 사용 */
+    border-color: #ced4da !important; 
+    color: #6c757d !important;
+}
+
+/* 활성화되지 않은 버튼 호버 효과 */
+.btn-passage-type:hover:not(.active),
+.modal-btn-passage-type:hover:not(.active) {
+    background-color: #f8f9fa;
+    border-color: #adb5bd !important;
+    color: #495057 !important;
+}
+
+/* 선택된 버튼 스타일 (.active 클래스가 붙을 때) */
+.btn-passage-type.active,
+.modal-btn-passage-type.active {
+    background-color: #5D9CEC !important; /* 활성화 시 메인 색상 */
+    color: white !important;
+    border-color: #5D9CEC !important;
+}
+
+.btn-passage-type.active:hover,
+.modal-btn-passage-type.active:hover {
+    background-color: #4A89DC !important;
+    border-color: #4A89DC !important;
+}
+
+/* 지문 입력/첨부 컨테이너 */
+.passage-content {
+    margin-top: 10px;
+}
+
+.passage-content .placeholder-text {
+    text-align: center;
+    color: #999;
+    padding: 20px 0;
+    margin: 0;
+    font-style: italic;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+}
+
+.passage-content .form-control {
+    width: 100%;
+}
+
+.passage-content .image-preview {
+    margin-top: 10px;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* =================================================================
+ * 🌟🌟🌟 [최종 수정] 모달 푸터 버튼 디자인 (깔끔한 회색 아웃라인 통일) 🌟🌟🌟
+ * ================================================================= */
+
+/* 모달 푸터 내 모든 버튼의 기본 아웃라인 스타일 설정 */
+#commonPassageModal .modal-footer .btn {
+    padding: 10px 18px; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1em;
+    transition: all 0.2s;
+    background-color: #fff !important; /* 배경을 흰색으로 강제 (깔끔한 디자인) */
+    border-width: 2px; /* 테두리를 두껍게 */
+    box-shadow: none !important; /* 그림자 제거 */
+}
+
+/* 1. 임시 저장 버튼 (.btn-primary) & 2. 목록 보기 버튼 (.btn-outline-info)
+   : 튀지 않는 은은한 회색 계열로 통일 */
+#commonPassageModal .modal-footer .btn-primary,
+#commonPassageModal .modal-footer .btn-outline-info {
+    color: #6c757d !important; /* 텍스트 색상: 진한 회색 */
+    border-color: #adb5bd !important; /* 테두리 색상: 연한 회색 */
+}
+
+/* 호버 효과 통일 */
+#commonPassageModal .modal-footer .btn-primary:hover,
+#commonPassageModal .modal-footer .btn-outline-info:hover {
+    background-color: #f8f9fa !important; /* 호버 시 아주 연한 회색 배경 */
+    color: #495057 !important; /* 텍스트 색상 강조 */
+    border-color: #6c757d !important; /* 테두리 색상 강조 */
+}
+
+
+/* 3. 작성 완료 버튼 (기존: .btn-success) - Success Green 스타일은 유지 */
+#commonPassageModal .modal-footer .btn-success {
+    color: #8CC152 !important; 
+    border-color: #8CC152 !important;
+}
+
+#commonPassageModal .modal-footer .btn-success:hover {
+    background-color: #f5fff0 !important;
+    color: #7DB84C !important;
+    border-color: #7DB84C !important;
+}
+
+/* =================================================================
+ * RESPONSIVE STYLES (for screens <= 768px, tablets and phones)
+ * ================================================================= */
+@media (max-width: 768px) {
+    #exam-creation-form {
+        max-width: none; /* 모바일에서는 너비 제한을 해제하여 화면을 꽉 채움 */
+        padding: 0 10px; /* 기존 모바일 패딩과 일치시킴 */
+    }
+
+    /* 전체 레이아웃 패딩 조정 */
+    #question-list-container {
+/* padding: 0 10px; */
+    }
+
+    /* 시험지 기본 정보 헤더 */
+    .exam-info-header {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .exam-info-header h2 {
+        font-size: 1.5em;
+    }
+
+    /* 개별 문항 카드 */
+    .question-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    /* 문항 헤더 (모바일 배치) */
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .question-header h4 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+    
+    /* 문항 삭제 버튼 위치 조정 */
+    .btn-remove-question {
+        align-self: flex-end;
+        margin-top: -30px;
+    }
+
+    /* 폼 컨트롤 패딩 조정 */
+    .form-control {
+        padding: 10px;
+        font-size: 0.95em;
+    }
+
+    /* 모바일 보기 입력 필드 조정 */
+    .options-group .option-item {
+        gap: 0;
+    }
+    
+    /* 입력 필드와 버튼 높이 조정 */
+    .options-group .option-item .option-input {
+        height: 40px; 
+    }
+
+    .options-group .option-item .btn-remove-option {
+        height: 40px; 
+        padding: 8px 12px;
+    }
+    
+    /* 메인 버튼 크기 및 여백 조정 (전체 너비 사용) */
+    #btnAddQuestion,
+    #btnSaveExam {
+        width: 100%; 
+        max-width: none; 
+        padding: 12px 20px;
+        font-size: 1em;
+        margin: 10px 0; 
+    }
+}

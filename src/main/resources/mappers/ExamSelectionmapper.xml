@@ -3,6 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.my.ex.ExamSelectionMapper">
+
 	<select id="getExamTypes" resultType="ExamTypeDto">
 		SELECT exam_type_code,
 			   exam_type_name
@@ -19,6 +20,7 @@
 			  FROM exam_type
 			 WHERE exam_type_code = #{examTypeCode}
 		 )
+		 AND isdeleted = 'N'
 		 ORDER BY exam_round
 	</select>
 	
@@ -31,9 +33,32 @@
 			 WHERE exam_type_code = #{examTypeCode}
 		 )
 		   AND exam_round = #{examRound}
+		   AND isdeleted = 'N'
 		 ORDER BY exam_subject
 	</select>
 	
+	<!-- 특정 폴더에 있는 모든 시험 제목 가져옴 -->
+	<select id="getAllExamTitlesByFolderId" resultType="ExamTitleDto">
+		SELECT
+			 i.exam_type_id AS examTypeId,
+			 t.exam_type_code AS examTypeCode,
+			 t.exam_type_name AS examTypeName, 
+		     
+		     i.exam_id AS examId,
+		     i.exam_round AS examRound,
+		     i.exam_subject AS examSubject,
+		     (SELECT COUNT(*) 
+                FROM exam_question q 
+               WHERE q.exam_id = i.exam_id
+             ) AS totalCount,
+             f.folder_id
+		  FROM exam_info i
+		  JOIN exam_type t ON i.exam_type_id = t.exam_type_id
+		  JOIN exam_folder f ON i.folder_id = f.folder_id
+		  WHERE f.folder_id = #{folderId}
+		    AND i.isdeleted = 'N'
+	</select>
+		
 	<!-- 중복 시험 여부 확인 -->
 	<select id="checkExistingExamInfo" parameterType="ExamInfoDto" resultType="Integer">
 		SELECT COUNT(*)
@@ -41,6 +66,7 @@
 		 WHERE exam_type_id = #{examTypeId}
 		   AND exam_round = #{examRound}
 		   AND exam_subject = #{examSubject}
+		   AND isdeleted = 'N'
 	</select>
 	
 	<!-- 시험 정보 저장 -->
@@ -100,6 +126,7 @@
 		INSERT INTO exam_choice
 			(
 			choice_id,
+			exam_id,
 			question_id,
 			choice_label,
 			choice_text,
@@ -108,6 +135,7 @@
 		VALUES
 			(
 			seq_exam_choice.nextval,
+			#{examId},
 			#{questionId},
 			#{choiceLabel},
 			#{choiceText},
@@ -122,9 +150,10 @@
 		 WHERE exam_type_code = #{examType}
 	</select>
 	
-	<!-- 시험 문제 가져오기 -->
+	<!-- examType, examRound, examSubject로부터 시험 문제 가져오기 -->
 	<select id="getExamQuestions" parameterType="java.util.HashMap" resultType="ExamQuestionDto">
 		SELECT Q.question_id,
+			   Q.exam_id,
 			   Q.question_num,
 		       Q.question_text,
 		       Q.question_image,
@@ -137,17 +166,33 @@
 		 WHERE T.exam_type_code = #{examType}
 		   AND I.exam_round = #{examRound}
 		   AND I.exam_subject = #{examSubject}
+		   AND I.isdeleted = 'N'
 		 ORDER BY Q.question_num asc
 	</select>
 	
+	<!-- examId로부터 시험 문제 가져오기 -->
+	<select id="getExamQuestionsByExamId" resultType="ExamQuestionDto">
+		SELECT question_id,
+			   question_num,
+		       question_text,
+		       question_image,
+		       individualPassage,
+		       commonPassage,
+		       passage_scope
+		  FROM exam_question 
+		 WHERE exam_id = #{examId}
+		 ORDER BY question_num asc
+	</select>	
+	
 	<!-- 선택지 가져오기 -->
-	<select id="getExamChoices" resultType="ExamChoiceDto">
+	<select id="getExamChoices" parameterType="int" resultType="ExamChoiceDto">
 		SELECT question_id,
 			   choice_id,
 		       choice_label,
 		       choice_text,
 		       choice_image
 		  FROM exam_choice
+		 WHERE exam_Id = #{examId}
 		 ORDER BY question_id ASC, choice_label ASC
 	</select>
 	
@@ -161,6 +206,24 @@
 		   AND I.exam_round = #{examRound}
 		   AND I.exam_subject = #{examSubject}
 		   AND Q.passage_scope IS NOT NULL
+		   AND I.isdeleted = 'N'
 	</select>
+	
+	<!-- 시험지의 전체 문항 수 -->
+	<select id="getTotalQuestionCount" parameterType="int" resultType="int">
+		SELECT count(question_num)
+		  FROM exam_question
+		 WHERE exam_id = #{examId}
+	</select>
+	
+	<!-- 시험지 삭제 -->
+	<update id="deleteExams" parameterType="java.util.List">
+		UPDATE exam_info
+		   SET isdeleted = 'Y'
+		 WHERE exam_id IN
+		 <foreach item="id" collection="list" open="(" separator="," close=")">
+		 	#{id}
+		 </foreach> 
+	</update>
 	
 </mapper>

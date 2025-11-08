@@ -2,6 +2,8 @@ package com.my.ex;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -13,7 +15,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class HomeController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
+	public String home(Locale locale, Model model, HttpSession session) {
+		Object userId = session.getAttribute("userId");
+		
+		if("admin".equals(userId)) {
+			return "redirect:/admin/main";
+		} 
+		
 		return "redirect:/exam/main";
 	}
 	

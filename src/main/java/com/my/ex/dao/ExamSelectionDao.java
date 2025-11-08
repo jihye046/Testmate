@@ -11,6 +11,7 @@ import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.response.ExamTitleDto;
 
 @Repository
 public class ExamSelectionDao implements IExamSelectionDao {
@@ -33,6 +34,11 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	@Override
 	public List<String> getExamSubjects(Map<String, String> map) {
 		return session.selectList(NAMESPACE + "getExamSubjects", map);
+	}
+	
+	@Override
+	public List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId) {
+		return session.selectList(NAMESPACE + "getAllExamTitlesByFolderId", folderId);
 	}
 	
 	@Override
@@ -64,15 +70,30 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	public List<ExamQuestionDto> getExamQuestions(Map<String, Object> map) {
 		return session.selectList(NAMESPACE + "getExamQuestions", map);
 	}
+	
+	@Override
+	public List<ExamQuestionDto> getExamQuestionsByExamId(int examId) {
+		return session.selectList(NAMESPACE + "getExamQuestionsByExamId", examId);
+	}
 
 	@Override
-	public List<ExamChoiceDto> getExamChoices() {
-		return session.selectList(NAMESPACE + "getExamChoices");
+	public List<ExamChoiceDto> getExamChoices(int examId) {
+		return session.selectList(NAMESPACE + "getExamChoices", examId);
 	}
 
 	@Override
 	public List<ExamQuestionDto> getCommonPassageInfo(Map<String, Object> map) {
 		return session.selectList(NAMESPACE + "getCommonPassageInfo", map);
+	}
+
+	@Override
+	public int getTotalQuestionCount(int examId) {
+		return session.selectOne(NAMESPACE + "getTotalQuestionCount", examId);
+	}
+
+	@Override
+	public int deleteExams(List<Integer> examIds) {
+		return session.update(NAMESPACE + "deleteExams", examIds);
 	}
 
 }

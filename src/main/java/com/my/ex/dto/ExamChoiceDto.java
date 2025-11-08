@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ExamChoiceDto {
 	private int choiceId; 		// pk
+	private int examId;			// exam_question fk
 	private int questionId; 	// exam_question fk
 	private String choiceLabel; // 선택지 식별자(①, ②, ③)
 	private String choiceText; 	// 선택지 내용

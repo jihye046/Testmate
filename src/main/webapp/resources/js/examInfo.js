@@ -93,12 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
     ================================================== */
     nextButton.addEventListener('click', (e) => {
         e.preventDefault()
+        window.location.href = 
+        	`/exam/showExamPage?examTypeEng=${examTypeSelect.value}` +
+            `&examRound=${examRoundSelect.value}` +
+            `&examSubject=${examSubjectSelect.value}`
+
+        /* 
         const params = new URLSearchParams({
-            examType: examTypeSelect.value,
+            examTypeEng: examTypeSelect.value,
             examRound: examRoundSelect.value,
             examSubject: examSubjectSelect.value
         }).toString()
+        
 
         window.location.href = `/exam/showExamPage?${params}`
+        */
     })
 })
