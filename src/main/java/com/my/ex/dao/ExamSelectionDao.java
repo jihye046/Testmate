@@ -96,4 +96,14 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		return session.update(NAMESPACE + "deleteExams", examIds);
 	}
 
+	@Override
+	public int findSubjectIdByName(Map<String, Object> map) {
+		return session.selectOne(NAMESPACE + "findSubjectIdByName", map);
+	}
+
+	@Override
+	public List<String> getSubjectsForExamType(String examTypeCode) {
+		return session.selectList(NAMESPACE + "getSubjectsForExamType", examTypeCode);
+	}
+
 }

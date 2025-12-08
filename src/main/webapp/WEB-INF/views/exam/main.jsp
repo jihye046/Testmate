@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>시험 선택 | 자동 채점 서비스</title>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <link href="<c:url value="/resources/css/main.css"/>" rel="stylesheet">
 <!-- axios -->
@@ -17,6 +17,10 @@
 	<c:set var="loginText" value="${empty sessionScope.userId ? '로그인' : '로그아웃'}"></c:set>
 	
 	<div class="container">
+		<div>
+			<a href="/admin/main">관리자 메인으로 이동</a>
+		</div> 
+	
 		<div class="top-utility">
 			<a href="${loginUrl}" class="login-link">
 				${loginText}

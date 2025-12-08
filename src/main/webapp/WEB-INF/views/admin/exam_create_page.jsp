@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,11 +17,44 @@
 	<div id="exam-creation-form">
 	    <div class="exam-info-header">
 	        <h2>새 시험지 문항 직접 등록</h2>
-	        <div class="form-group">
+
+	        <!-- <div class="form-group">
 	            <label for="examTitle">시험지 제목</label>
 	            <input type="text" id="examTitle" class="form-control" placeholder="예: 2024년 1회차 고졸 검정고시 국어">
-	        </div>
-	        </div>
+	        </div> -->
+			
+			<div class="exam-info-controls">
+				<div class="form-group">
+					<label for="examType">시험 유형</label>
+					<select id="examType" class="form-control">
+						<option value="" selected disabled>유형 선택</option>
+						<c:forEach items="${examtypes}" var="type">
+							<option value="${type.examTypeCode}">${type.examTypeName}</option>
+						</c:forEach>
+					</select>
+				</div>
+				
+				<div class="form-group">
+					<label for="examRound">시험 회차</label>
+					<input type="text" id="examRound" class="form-control" placeholder="예: 2023년도 제1회">
+					<!-- <select id="examRound" class="form-control">
+						<option value="" selected disabled>회차 선택</option>
+						<option value="1">2023년도 제1회</option>
+						<option value="2">2025년도 제1회</option>
+					</select> -->
+				</div>
+				
+				<div class="form-group">
+					<label for="examSubject">과목</label>
+					<select id="examSubject" class="form-control">
+						<option value="" selected disabled>과목 선택</option>
+<!-- 						<option value="국어">국어</option> -->
+<!-- 						<option value="사회">사회</option> -->
+					</select>
+				</div>
+			</div>
+
+		</div>
 	    
 	    <div id="question-list-container"> 
 			<!-- 동적으로 추가 -->

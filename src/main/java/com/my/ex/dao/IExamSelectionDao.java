@@ -25,4 +25,6 @@ public interface IExamSelectionDao {
 	List<ExamQuestionDto> getCommonPassageInfo(Map<String, Object> map);
 	int getTotalQuestionCount(int examId);
 	int deleteExams(List<Integer> examIds);
+	int findSubjectIdByName(Map<String, Object> map);
+	List<String> getSubjectsForExamType(String examTypeCode);
 }

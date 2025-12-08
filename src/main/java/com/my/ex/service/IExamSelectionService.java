@@ -24,4 +24,5 @@ public interface IExamSelectionService {
 	Set<ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject);
 	int getTotalQuestionCount(int examId);
 	boolean deleteExams(List<Integer> examIds);
+	List<String> getSubjectsForExamType(String examTypeCode);
 }

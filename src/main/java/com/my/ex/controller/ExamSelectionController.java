@@ -24,6 +24,7 @@ import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.request.ExamCreateRequestDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamCommonpassageDto;
 import com.my.ex.dto.response.ExamInfoGroup;
@@ -185,6 +186,24 @@ public class ExamSelectionController {
 	@ResponseBody
 	public boolean deleteExams(@RequestBody MoveExamsToFolderDto dto) {
 		return service.deleteExams(dto.getExamIds());
+	}
+	
+	/**
+	 * 선택한 시험 유형의 전체 과목들을 조회
+	 * 
+	 * @param examTypeCode
+	 * @return List<String> 과목들
+	 */
+	@GetMapping("/getSubjectsForExamType")
+	@ResponseBody
+	public List<String> getSubjectsForExamType(@RequestParam String examTypeCode) {
+		return service.getSubjectsForExamType(examTypeCode);
+	}
+	
+	@PostMapping("/saveExamByForm")
+	@ResponseBody
+	public void saveExamByForm(@RequestBody ExamCreateRequestDto request) {
+		
 	}
 	
 }

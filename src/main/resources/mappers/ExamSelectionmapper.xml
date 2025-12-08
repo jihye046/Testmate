@@ -226,4 +226,19 @@
 		 </foreach> 
 	</update>
 	
+	<!-- 과목 이름으로부터 id 조회 -->
+	<select id="findSubjectIdByName" parameterType="java.util.HashMap" resultType="Integer">
+		SELECT subject_id
+		  FROM exam_subject
+		 WHERE exam_subject = #{examSubject}
+		   AND exam_type_id = #{examTypeId}
+	</select>
+	
+	<!-- 시험 유형에 맞는 전체 과목 조회 -->
+	<select id="getSubjectsForExamType" parameterType="String" resultType="String">
+		SELECT s.exam_subject 
+		  FROM exam_subject s
+		  JOIN exam_type t on s.exam_type_id = t.exam_type_id
+		 WHERE t.exam_type_code = #{examTypeCode}		
+	</select>
 </mapper>

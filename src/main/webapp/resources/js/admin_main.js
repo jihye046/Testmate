@@ -374,7 +374,7 @@ const loadBulkActionBtn = () => {
     output += 
     `
         <button id="btn-toggle-move-mode" class="btn btn-secondary">
-            <i class="far fa-check-square"></i> 일괄 편집
+            <i class="far fa-check-square"></i> 편집 모드
         </button>
     `
 

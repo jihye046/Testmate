@@ -25,8 +25,10 @@ import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamQuestionDto;
+import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamCommonpassageDto;
+import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.service.AdminService;
@@ -228,7 +230,9 @@ public class AdminController {
 	}
 	
 	@GetMapping("/createExamPage")
-	public String createExamPage() {
+	public String createExamPage(Model model) {
+		List<ExamTypeDto> list = examService.getExamTypes();
+		model.addAttribute("examtypes", list);
 		return "/admin/exam_create_page";
 	}
 	

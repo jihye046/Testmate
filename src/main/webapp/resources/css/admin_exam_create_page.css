@@ -32,6 +32,18 @@
     margin-bottom: 20px;
 }
 
+.exam-info-controls {
+    display: flex;
+    gap: 20px; /* 각 드롭다운 사이의 간격 */
+    margin-top: 15px;
+}
+
+.exam-info-controls .form-group {
+    flex: 1; 
+    min-width: 150px; /* 너무 좁아지지 않도록 최소 너비 설정 */
+    margin-bottom: 20px;
+}
+
 /* 문항 목록 컨테이너 */
 #question-list-container {
     padding: 0 15px;
@@ -630,6 +642,11 @@ button:focus,
     
     .exam-info-header h2 {
         font-size: 1.5em;
+    }
+    
+    .exam-info-controls {
+        flex-direction: column;
+        gap: 0;
     }
 
     /* 개별 문항 카드 */

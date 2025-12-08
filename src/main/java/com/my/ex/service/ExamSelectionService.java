@@ -52,6 +52,14 @@ public class ExamSelectionService implements IExamSelectionService {
 
 	@Override
 	public boolean saveParsedExamData(ExamInfoDto examInfo, List<Map<String, Object>> questions) {
+		// 과목명으로 subject_id 조회 및 set
+		Map<String, Object> map = new HashMap<>();
+		map.put("examSubject", examInfo.getExamSubject());
+		map.put("examTypeId", examInfo.getExamTypeId());
+		Integer subjectId = dao.findSubjectIdByName(map);
+		if(subjectId == null) throw new RuntimeException("subjectId가 null입니다. 과목명을 확인하세요.");
+		examInfo.setSubjectId(subjectId);
+		
 		// 중복 시험 정보 확인
 		if(dao.checkExistingExamInfo(examInfo) > 0) return false;
 		
@@ -143,6 +151,11 @@ public class ExamSelectionService implements IExamSelectionService {
 	@Override
 	public boolean deleteExams(List<Integer> examIds) {
 		return dao.deleteExams(examIds) > 0;
+	}
+
+	@Override
+	public List<String> getSubjectsForExamType(String examTypeCode) {
+		return dao.getSubjectsForExamType(examTypeCode);
 	}
 
 

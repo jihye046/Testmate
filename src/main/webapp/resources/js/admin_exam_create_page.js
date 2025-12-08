@@ -1,14 +1,45 @@
 // 전역 변수
+const examinfoContainer = document.querySelector(".exam-info-controls")
 const questionContainer = document.querySelector("#question-list-container")
 const commonPassageModal = document.querySelector("#commonPassageModal")
 let commonPassageCounter = 1
 let passages = [] // 공통 지문 데이터를 저장할 배열
 
 document.addEventListener('DOMContentLoaded', () => {
-    // '문항 추가' 버튼 클릭 리스너
+
+    /* 시험지 정보 컨테이너 리스너
+    ================================================== */
+    examinfoContainer.addEventListener('click', (e) => {
+        const examTypeSelect = e.target.closest('#examType')
+        if(examTypeSelect){
+            examTypeSelect.addEventListener('change', () => {
+                const examTypeSelectedValue = examTypeSelect.value
+                if(!examTypeSelectedValue) return
+    
+                const params = {
+                    examTypeCode: examTypeSelectedValue
+                }
+                
+                axios.get('/exam/getSubjectsForExamType', { params })
+                    .then(response => {
+                        updateExamSubjects(response.data)
+                    })
+                    .catch(error => {
+                        console.error('error: ', error)
+                    })
+            })
+            return
+        }
+
+    })
+
+
+    /* '문항 추가' 버튼 클릭 리스너
+    ================================================== */
     document.querySelector("#btnAddQuestion").addEventListener('click', addQuestion)
 
-    // '시험지 최종 등록' 버튼 클릭 리스너
+    /* '시험지 최종 등록' 버튼 클릭 리스너
+    ================================================== */
     document.querySelector("#btnSaveExam").addEventListener('click', saveExam)
 
     /* 시험지 컨테이너 리스너
@@ -342,6 +373,18 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 })
 
+/* 시험 과목 UI 초기화
+================================================== */
+const updateExamSubjects = (examSubjects) => {
+    const examSubject = document.querySelector("#examSubject")
+
+    let options = '<option value="" selected disabled>과목 선택</option>'
+    examSubjects.forEach((subject) => {
+        options += `<option value="${subject}">${subject}</option>`
+    })
+
+    examSubject.innerHTML = options
+}
 
 /* 문항 추가, 시험지 최종 등록
 ================================================== */
@@ -661,7 +704,24 @@ const saveExam = () => {
         alert('시험지 문항을 작성하신 후 시도해주세요.')
         return
     } 
-    
+
+    const selectedType = examinfoContainer.querySelector("#examType").value
+    const selectedRound = examinfoContainer.querySelector("#examRound").value
+    const selectedSubject = examinfoContainer.querySelector("#examSubject").value
+    if(!selectedType || !selectedRound || !selectedSubject){
+        alert('시험지 정보를 작성해주세요.')
+        return
+    }
+    console.log(selectedSubject)
+
+    // 시험 정보
+    const examInfo = {
+        type: selectedType,
+        round: selectedRound,
+        subject: selectedSubject
+    }
+
+    // 시험 문제들
     const examData = []
     for(const card of cards){
         const questionNum = card.getAttribute("data-question-num")
@@ -767,6 +827,22 @@ const saveExam = () => {
         examData.push(questionObj)
     }
 
+    // 데이터 전송
+    const data = {
+        examInfo: examInfo,
+        questions: examData
+    }
+    
+    // POST 요청 시 JSON body 형태로 데이터를 전송
+    // 컨트롤러에서는 @RequestBody DTO, Map 으로 받음
+    // @RequestParam 으로 받으려면 URL 쿼리파라미터로 전달해야 함(보통은 비추천, URL 노출)
+    axios.post('/exam/saveExamByForm', data)
+        .then(response => {
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
 }
 
 /**

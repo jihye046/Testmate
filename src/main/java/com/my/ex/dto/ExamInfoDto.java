@@ -8,6 +8,7 @@ public class ExamInfoDto {
 	private int examTypeId; 	// 시험 종류
 	private String examRound; 	// 시험 회차
 	private String examSubject; // 시험 과목
+	private Integer subjectId;	// 시험 과목 id
 	private String sessionNo; 	// 시험 교시
 	private char isDeleted;		// 시험지 삭제 여부
 	
