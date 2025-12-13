@@ -17,8 +17,12 @@ import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.request.ExamCreateRequestDto;
+import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
+import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamCommonpassageDto;
 import com.my.ex.dto.response.ExamTitleDto;
+import com.my.ex.dto.service.ParsedExamData;
 
 @Service
 public class ExamSelectionService implements IExamSelectionService {
@@ -62,6 +66,11 @@ public class ExamSelectionService implements IExamSelectionService {
 		
 		// 중복 시험 정보 확인
 		if(dao.checkExistingExamInfo(examInfo) > 0) return false;
+		
+		// 폴더 id 저장
+		if(examInfo.getFolderId() == null) {
+			examInfo.setFolderId(1);
+		}
 		
 		// 시험 정보 저장
 		dao.saveParsedExamInfo(examInfo); // 시험 정보 저장 후 examId 받아옴
@@ -158,5 +167,62 @@ public class ExamSelectionService implements IExamSelectionService {
 		return dao.getSubjectsForExamType(examTypeCode);
 	}
 
+	@Override
+	public int findTypeIdByCode(String type) {
+		return dao.findTypeIdByCode(type);
+	}
+
+	@Override
+	public boolean saveExamByForm(ExamCreateRequestDto request) {
+		ParsedExamData data = buildParsedExamData(request);
+		return saveParsedExamData(data.getExamInfo(), data.getNewList());
+	}
+
+	/**
+	 * ExamCreateRequestDto(요청 데이터)를 DB 저장용 구조로 변환하고
+	 * ExamInfoDto와 문제 리스트(Map 포함)를 조립하여 ParsedExamData로 반환.
+	 * 
+	 * 관리자가 PDF 업로드 또는 직접 작성한 시험지를 저장할 때
+	 * saveParsedExamData() 호출 전에 사용됨.
+	 */
+	@Override
+	public ParsedExamData buildParsedExamData(ExamCreateRequestDto request) {
+		ExamInfoDto examInfo = new ExamInfoDto();
+		String subject = request.getExamInfo().getSubject();
+		int examTypeId = findTypeIdByCode(request.getExamInfo().getType());
+		examInfo.setExamRound(request.getExamInfo().getRound());
+		examInfo.setExamSubject(subject);
+		examInfo.setExamTypeId(examTypeId);
+		examInfo.setFolderId(request.getExamInfo().getFolderId());
+		
+		List<Questions> questions = request.getQuestions();
+		List<Map<String, Object>> newList = new ArrayList<>();
+		for(Questions q : questions) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("questionNum", q.getQuestionNum());
+			map.put("questionText", q.getQuestionText());
+			
+			map.put("useIndividualPassage", q.getUseIndividualPassage());
+			if(q.getUseIndividualPassage() == 'Y') {
+				map.put("individualPassage", q.getIndividualPassage().getContent());
+			}
+			
+			map.put("useCommonPassage", q.getUseCommonPassage());
+			if(q.getUseCommonPassage() == 'Y') {
+				map.put("commonPassage", q.getCommonPassage().getContent());
+				map.put("passageScope", q.getCommonPassage().getRangeText());
+			}
+			
+			List<QuestionChoices> choices = q.getQuestionChoices();
+			List<ExamChoiceDto> newChoiceList = new ArrayList<>();
+			for(QuestionChoices c : choices) {
+				newChoiceList.add(new ExamChoiceDto(c.getChoiceLabel(), c.getChoiceText(), c.getChoiceNum()));
+			}
+			map.put("options", newChoiceList);
+			newList.add(map);
+		}
+		
+		return new ParsedExamData(examInfo, newList);
+	}
 
 }

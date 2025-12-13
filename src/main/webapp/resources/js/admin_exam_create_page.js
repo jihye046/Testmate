@@ -2,6 +2,8 @@
 const examinfoContainer = document.querySelector(".exam-info-controls")
 const questionContainer = document.querySelector("#question-list-container")
 const commonPassageModal = document.querySelector("#commonPassageModal")
+const urlParam = new URLSearchParams(window.location.search)
+const folderId = urlParam.get("folderId")
 let commonPassageCounter = 1
 let passages = [] // 공통 지문 데이터를 저장할 배열
 
@@ -718,7 +720,8 @@ const saveExam = () => {
     const examInfo = {
         type: selectedType,
         round: selectedRound,
-        subject: selectedSubject
+        subject: selectedSubject,
+        folderId: folderId
     }
 
     // 시험 문제들
@@ -809,7 +812,7 @@ const saveExam = () => {
 
             choices.push({
                 choiceNum: choiceNum,
-                choiceContent: choiceContent,
+                choiceText: choiceContent,
                 choiceLabel: choiceLabels[choiceNum - 1]
             })
         }

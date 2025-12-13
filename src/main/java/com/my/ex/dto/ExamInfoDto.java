@@ -1,8 +1,10 @@
 package com.my.ex.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ExamInfoDto {
 	private int examId;			// pk
 	private int examTypeId; 	// 시험 종류
@@ -11,11 +13,17 @@ public class ExamInfoDto {
 	private Integer subjectId;	// 시험 과목 id
 	private String sessionNo; 	// 시험 교시
 	private char isDeleted;		// 시험지 삭제 여부
+	private Integer folderId;
 	
 	public ExamInfoDto(String examRound, String examSubject, String sessionNo) {
 		this.examRound = examRound;
 		this.examSubject = examSubject;
 		this.sessionNo = sessionNo;
+	}
+
+	public ExamInfoDto(String examRound, String examSubject) {
+		this.examRound = examRound;
+		this.examSubject = examSubject;
 	}
 	
 }

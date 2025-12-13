@@ -10,9 +10,8 @@ import lombok.Setter;
 public class ExamCreateRequestDto {
 	private CreateExamInfo examInfo;
 	private List<Questions> questions;
-	
-	@Getter
-	@Setter
+
+	@Data
 	public static class CreateExamInfo {
 		private String type;
 		private String round;
@@ -20,8 +19,7 @@ public class ExamCreateRequestDto {
 		private int folderId;
 	}
 	
-	@Getter
-	@Setter
+	@Data
 	public static class Questions {
 		private int questionNum;
 		private char useCommonPassage;
@@ -31,9 +29,8 @@ public class ExamCreateRequestDto {
 		private String questionText;
 		private List<QuestionChoices> questionChoices;
 		private char answerText;
-		
-		@Getter
-		@Setter
+
+		@Data
 		public static class CommonPassage {
 			private String type;
 			private String content;
@@ -41,19 +38,17 @@ public class ExamCreateRequestDto {
 			private int[] rangeArray;
 			private int id;
 		}
-		
-		@Getter
-		@Setter
+
+		@Data
 		public static class IndividualPassage {
 			private String type;
 			private String content;
 		}
-		
-		@Getter
-		@Setter
+
+		@Data
 		public static class QuestionChoices {
 			private int choiceNum;
-			private String choiceContent;
+			private String choiceText;
 			private String choiceLabel;
 		}
 	}

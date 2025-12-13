@@ -1,6 +1,7 @@
 package com.my.ex.controller;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,12 @@ import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
+import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
+import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamCommonpassageDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
+import com.my.ex.parser.ExamInfo;
 import com.my.ex.parser.GedExamParser;
 import com.my.ex.service.ExamSelectionService;
 
@@ -202,8 +206,8 @@ public class ExamSelectionController {
 	
 	@PostMapping("/saveExamByForm")
 	@ResponseBody
-	public void saveExamByForm(@RequestBody ExamCreateRequestDto request) {
-		
+	public boolean saveExamByForm(@RequestBody ExamCreateRequestDto request) {
+		return service.saveExamByForm(request);
 	}
 	
 }
