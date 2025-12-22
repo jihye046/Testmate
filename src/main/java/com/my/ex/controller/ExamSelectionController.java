@@ -208,6 +208,18 @@ public class ExamSelectionController {
 	@ResponseBody
 	public boolean saveExamByForm(@RequestBody ExamCreateRequestDto request) {
 		return service.saveExamByForm(request);
+		
+		/**
+		 * BUG
+		 */
+		// PDF 크롤링 후 DB 저장하는 로직에서 공통 지문이 저장되지 않는 문제 
+		// 시험지에서 이미지가 불러와지지 않는 문제
+		// 존재하지 않는 폴더인 경우 폴더 생성하는 로직 점검 및 추가
+		
+		/**
+		 * FEAT
+		 */
+		// 시험지 등록 성공 / 실패에 따른 화면 처리 
 	}
 	
 }

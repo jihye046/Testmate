@@ -351,7 +351,7 @@ public class GedExamParser implements IExamParser {
 	    	questionData.put("individualPassage", questionPassageText);
 	    }
 	    
-	    if(questionPassageText == null || questionPassageText.isEmpty()) {
+	    if(commonPassageText == null || commonPassageText.isEmpty()) {
 	    	questionData.put("useCommonPassage", "N");
 	    	questionData.put("commonPassage", null);
 	    } else {
