@@ -841,7 +841,12 @@ const saveExam = () => {
     // @RequestParam 으로 받으려면 URL 쿼리파라미터로 전달해야 함(보통은 비추천, URL 노출)
     axios.post('/exam/saveExamByForm', data)
         .then(response => {
-            console.log(response.data)
+            if(response.data){
+                alert('시험지가 성공적으로 등록되었습니다.')
+            } else {
+                alert('시험지 등록에 실패했습니다. 잠시 후 다시 시도해주세요.')
+            }
+            location.href = `/admin/main`
         })
         .catch(error => {
             console.error('error: ', error)
