@@ -10,8 +10,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.my.ex.config.EnvironmentConfig;
-import com.my.ex.controller.ExamSelectionController;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;

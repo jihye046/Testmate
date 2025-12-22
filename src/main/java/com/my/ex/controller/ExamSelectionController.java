@@ -164,9 +164,9 @@ public class ExamSelectionController {
 	{
 		String path = 
 				config.getImageUploadPath() +
-				examType + "\\" +
-				examRound + "\\" +
-				examSubject + "\\" +
+				examType + File.separator +
+				examRound + File.separator +
+				examSubject + File.separator +
 				filename;
 		// C:\server_program\project\testmate\images\2025년도 제1회\국어
 		File file = new File(path);
@@ -210,16 +210,9 @@ public class ExamSelectionController {
 		return service.saveExamByForm(request);
 		
 		/**
-		 * BUG
-		 */
-		// PDF 크롤링 후 DB 저장하는 로직에서 공통 지문이 저장되지 않는 문제 
-		// 시험지에서 이미지가 불러와지지 않는 문제
-		// 존재하지 않는 폴더인 경우 폴더 생성하는 로직 점검 및 추가
-		
-		/**
 		 * FEAT
 		 */
-		// 시험지 등록 성공 / 실패에 따른 화면 처리 
+		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
 	}
 	
 }
