@@ -27,7 +27,6 @@ import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
-import com.my.ex.dto.response.ExamCommonpassageDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
@@ -143,7 +142,7 @@ public class AdminController {
 		}
 		// 데이터 추출
 		List<ExamChoiceDto> choices = examService.getExamChoices(examId);
-		Set<ExamCommonpassageDto> distinctPassageDto = 
+		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto = 
 				examService.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 		

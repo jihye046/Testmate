@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,6 +43,7 @@
 		            </div>
                 	
                     <div class="question-content-box">
+                    
                         <!-- 공통 지문 -->
                         <c:forEach items="${examPageDto.distinctPassageDto}" var="commonPassageDto">
                             <c:if test="${questionDto.questionNum == commonPassageDto.commonPassageStartNum}">
@@ -50,7 +52,23 @@
                                         [${commonPassageDto.commonPassageStartNum}~${commonPassageDto.commonPassageEndNum}] 다음 글을 읽고 물음에 답하시오.
                                     </p>
                                     <div class="text-content">
-                                        ${commonPassageDto.commonPassageText}
+                                    	<c:choose>
+                                            <c:when test="${fn:endsWith(commonPassageDto.commonPassageText, '.png')
+                                                            or fn:endsWith(commonPassageDto.commonPassageText, '.jpg')
+                                                            or fn:endsWith(commonPassageDto.commonPassageText, '.jpeg')}">
+                                                <div class="question-media-box">
+                                                    <img src="/admin/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${commonPassageDto.commonPassageText}" 
+                                                        alt="문제 이미지" 
+                                                        class="question-image"
+                                                    >
+                                                </div>
+                                            </c:when>
+                                            <c:when test="${not empty commonPassageDto.commonPassageText}">
+                                                <div class="question-media-box">
+                                                    <div class="text-content single-passage">${commonPassageDto.commonPassageText}</div>
+                                                </div>                            	
+                                            </c:when>
+                                        </c:choose>
                                     </div>
                                 </div>
                             </c:if>
@@ -61,17 +79,21 @@
                             <span class="number-circle">${questionDto.questionNum}</span>
                             ${questionDto.questionText}
                         </p>
-
-						<!-- 단독 지문 -->
+                   		
+						<!-- 개별 지문 -->
                         <c:choose>
-                            <c:when test="${not empty questionDto.questionImage}">
-                                <div class="question-media-box">
-                                    <img src="/admin/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${questionDto.questionImage}" 
+                        	<c:when test="${not empty questionDto.individualPassage &&
+                        					( 
+	                        					fn:endsWith(questionDto.individualPassage, '.png') 
+	                        					or fn:endsWith(questionDto.individualPassage, '.jpg')
+	                        					or fn:endsWith(questionDto.individualPassage, '.jpeg')
+                        					)}">
+           						<div class="question-media-box">
+                                    <img src="/admin/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${questionDto.individualPassage}" 
                                          alt="문제 이미지" 
-                                         class="question-image"
-                                    >
+                                         class="question-image">
                                 </div>
-                            </c:when>
+           					</c:when>
                             <c:when test="${not empty questionDto.individualPassage}">
                                 <div class="question-media-box">
                                     <div class="text-content single-passage">${questionDto.individualPassage}</div>

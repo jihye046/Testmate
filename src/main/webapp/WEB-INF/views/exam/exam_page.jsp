@@ -40,7 +40,6 @@
                                             [${commonPassageDto.commonPassageStartNum}~${commonPassageDto.commonPassageEndNum}] 다음 글을 읽고 물음에 답하시오.
                                         </p>
                                         <div class="text-content">
-
                                             <c:choose>
                                                 <c:when test="${fn:endsWith(commonPassageDto.commonPassageText, '.png')
                                                                 or fn:endsWith(commonPassageDto.commonPassageText, '.jpg')

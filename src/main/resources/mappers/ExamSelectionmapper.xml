@@ -57,6 +57,7 @@
 		  JOIN exam_folder f ON i.folder_id = f.folder_id
 		  WHERE f.folder_id = #{folderId}
 		    AND i.isdeleted = 'N'
+		  ORDER BY examround desc
 	</select>
 		
 	<!-- 중복 시험 여부 확인 -->

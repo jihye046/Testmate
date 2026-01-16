@@ -235,6 +235,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     fileInput.value = ''
                     return
                 }
+
+                // 파일키, 파일 저장
+                const fileKey = `question_${rangeInput}_common_image`
+                passageData.fileKey = fileKey
+                passageData.file = commonContentContainer.querySelector("input[type='file']").files[0]
+                
                 content = fileInput.files[0].name
             }
             passageData.content = content
@@ -251,6 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return
             }
             passageData.rangeText = rangeInput
+            passageData.rangeArray = rangeArray
+
+            // ★ 파일이 적용될 범위 저장
             passageData.rangeArray = rangeArray
 
             // 4. 공통 지문 id 저장
@@ -701,6 +710,7 @@ const showToastMessage = (message) => {
 
 // 시험지 최종 등록
 const saveExam = () => {
+    const formData = new FormData()
     const cards = questionContainer.querySelectorAll('.question-item.card')
     if(cards.length == 0){
         alert('시험지 문항을 작성하신 후 시도해주세요.')
@@ -714,7 +724,6 @@ const saveExam = () => {
         alert('시험지 정보를 작성해주세요.')
         return
     }
-    console.log(selectedSubject)
 
     // 시험 정보
     const examInfo = {
@@ -723,6 +732,13 @@ const saveExam = () => {
         subject: selectedSubject,
         folderId: folderId
     }
+
+    // 공통 지문에 파일이 있는 경우 담기
+    passages.forEach(p => {
+        if(p.type == 'image' && p.file){
+            formData.append(p.fileKey, p.file)
+        }
+    })
 
     // 시험 문제들
     const examData = []
@@ -742,7 +758,12 @@ const saveExam = () => {
                 return
             } 
             questionObj.useCommonPassage = 'Y'
-            questionObj.commonPassage = passages.find(p => p.id == commonPassageId)
+            const originalPassage = passages.find(p => p.id == commonPassageId)
+
+            // 서버 DTO 구조에 맞추기 위해 공통 지문 객체에서 파일(file) 속성 제외
+            const restPassage = Object.assign({}, originalPassage) // 객체 복사
+			delete restPassage.file // 복사본에서 file 속성만 삭제
+            questionObj.commonPassage = restPassage
         } else {
             questionObj.useCommonPassage = 'N'
             questionObj.commonPassage = null
@@ -775,10 +796,13 @@ const saveExam = () => {
                     alert(`${questionNum}번 문항의 이미지를 등록해주세요.`)
                     return
                 }
+
                 individualPassage = {
                     type: 'image',
-                    content: fileInput.files[0].name
+                    content: fileInput.files[0].name,
+                    fileKey: `question_${questionNum}_individual_image`
                 }
+                formData.append(`question_${questionNum}_individual_image`, fileInput.files[0])
             }
 
             questionObj.individualPassage = individualPassage
@@ -831,15 +855,18 @@ const saveExam = () => {
     }
 
     // 데이터 전송
-    const data = {
-        examInfo: examInfo,
-        questions: examData
-    }
+    formData.append("examInfo", JSON.stringify(examInfo))
+    formData.append("questions", JSON.stringify(examData))
+    // const data = {
+    //     examInfo: examInfo,
+    //     questions: examData
+    // }
     
     // POST 요청 시 JSON body 형태로 데이터를 전송
     // 컨트롤러에서는 @RequestBody DTO, Map 으로 받음
     // @RequestParam 으로 받으려면 URL 쿼리파라미터로 전달해야 함(보통은 비추천, URL 노출)
-    axios.post('/exam/saveExamByForm', data)
+     
+    axios.post('/exam/saveExamByForm', formData)
         .then(response => {
             if(response.data){
                 alert('시험지가 성공적으로 등록되었습니다.')
@@ -851,6 +878,7 @@ const saveExam = () => {
         .catch(error => {
             console.error('error: ', error)
         })
+    
 }
 
 /**

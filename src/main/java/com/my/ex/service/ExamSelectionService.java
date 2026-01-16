@@ -1,15 +1,27 @@
 package com.my.ex.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+import org.apache.ibatis.mapping.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
@@ -18,7 +30,7 @@ import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
 import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
-import com.my.ex.dto.response.ExamCommonpassageDto;
+import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
 
@@ -27,6 +39,9 @@ public class ExamSelectionService implements IExamSelectionService {
 
 	@Autowired
 	private ExamSelectionDao dao;
+	
+	@Autowired
+	private EnvironmentConfig config;
 	
 	@Override
 	public List<ExamTypeDto> getExamTypes() {
@@ -92,6 +107,7 @@ public class ExamSelectionService implements IExamSelectionService {
 				int insertResult = dao.saveParsedChoiceInfo(choiceDto);
 				if(insertResult <= 0) throw new RuntimeException();
 			}
+			
 		}
 		
 		return true;
@@ -123,19 +139,19 @@ public class ExamSelectionService implements IExamSelectionService {
 	}
 	
 	@Override
-	public Set<ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject) {
+	public Set<ExamPageDto.ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("examType", examType);
 		map.put("examRound", examRound);
 		map.put("examSubject", examSubject);
 		List<ExamQuestionDto> questionDto = dao.getCommonPassageInfo(map);
 		
-		ExamCommonpassageDto commonpassageDto; 
+//		ExamCommonpassageDto commonpassageDto; 
 //		List<ExamCommonpassageDto> distinctPassageList = new ArrayList<>();
-		Set<ExamCommonpassageDto> distinctPassageSet = new HashSet<>();
+		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageSet = new HashSet<>();
 		
 		for(ExamQuestionDto dto: questionDto) {
-			commonpassageDto = new ExamCommonpassageDto();
+			ExamPageDto.ExamCommonpassageDto commonpassageDto = new ExamPageDto.ExamCommonpassageDto();
 			String scope = dto.getPassageScope(); // 11~13
 			
 			commonpassageDto.setCommonPassageStartNum(Integer.parseInt(scope.split("~")[0])); // 11
@@ -173,6 +189,7 @@ public class ExamSelectionService implements IExamSelectionService {
 	@Override
 	public boolean saveExamByForm(ExamCreateRequestDto request) {
 		ParsedExamData data = buildParsedExamData(request);
+		
 		return saveParsedExamData(data.getExamInfo(), data.getNewList());
 	}
 
@@ -185,10 +202,14 @@ public class ExamSelectionService implements IExamSelectionService {
 	 */
 	@Override
 	public ParsedExamData buildParsedExamData(ExamCreateRequestDto request) {
+		// 시험 코드로 부터 시험 종류 조회(middle-geomjeong → 중졸 검정고시)
+		
 		ExamInfoDto examInfo = new ExamInfoDto();
 		String subject = request.getExamInfo().getSubject();
+		String round = request.getExamInfo().getRound();
 		int examTypeId = findTypeIdByCode(request.getExamInfo().getType());
-		examInfo.setExamRound(request.getExamInfo().getRound());
+		// 시험지 정보
+		examInfo.setExamRound(round);
 		examInfo.setExamSubject(subject);
 		examInfo.setExamTypeId(examTypeId);
 		examInfo.setFolderId(request.getExamInfo().getFolderId());
@@ -197,20 +218,64 @@ public class ExamSelectionService implements IExamSelectionService {
 		List<Map<String, Object>> newList = new ArrayList<>();
 		for(Questions q : questions) {
 			Map<String, Object> map = new HashMap<>();
+			// 문제번호
 			map.put("questionNum", q.getQuestionNum());
+			
+			// 문제
 			map.put("questionText", q.getQuestionText());
 			
+			// 개별지문
 			map.put("useIndividualPassage", q.getUseIndividualPassage());
 			if(q.getUseIndividualPassage() == 'Y') {
-				map.put("individualPassage", q.getIndividualPassage().getContent());
-			}
+				if(q.getIndividualPassage().getType().equals("image")) {
+					// 폴더이름 생성
+					String typename = getExamtypename(request.getExamInfo().getType());
+					String folderPath = typename + File.separator +
+							round + File.separator +
+							subject;
+					
+					// 파일이름 생성
+					String filename = q.getIndividualPassage().getContent().trim().replace(" ", "_");
+					String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
+				
+					// 파일 저장
+	                String fileKey = q.getIndividualPassage().getFileKey();
+	                MultipartFile file = request.getFileMap().get(fileKey);
+					ensureImageFolderExists(folderPath, uniqueFilename, file);
+					map.put("individualPassage", uniqueFilename);
+				} else if(q.getIndividualPassage().getType().equals("text")) {
+					map.put("individualPassage", q.getIndividualPassage().getContent());
+				}
+			} 
 			
+			// 공통지문
 			map.put("useCommonPassage", q.getUseCommonPassage());
 			if(q.getUseCommonPassage() == 'Y') {
-				map.put("commonPassage", q.getCommonPassage().getContent());
-				map.put("passageScope", q.getCommonPassage().getRangeText());
+				if(q.getCommonPassage().getType().equals("image")) {
+					// 폴더이름 생성
+					String typename = getExamtypename(request.getExamInfo().getType());
+					String folderPath = typename + File.separator +
+							round + File.separator +
+							subject;
+					
+					// 파일이름 생성
+					String filename = q.getCommonPassage().getContent().trim().replace(" ", "_");
+					String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
+					map.put("commonPassage", uniqueFilename);
+					map.put("passageScope", q.getCommonPassage().getRangeText());
+					
+					// 파일 저장
+	                String fileKey = q.getCommonPassage().getFileKey();
+	                MultipartFile file = request.getFileMap().get(fileKey);
+					ensureImageFolderExists(folderPath, uniqueFilename, file);
+				} else if(q.getCommonPassage().getType().equals("text")) {
+					map.put("commonPassage", q.getCommonPassage().getContent());
+					map.put("passageScope", q.getCommonPassage().getRangeText());	
+				}
+				
 			}
 			
+			// 선택지
 			List<QuestionChoices> choices = q.getQuestionChoices();
 			List<ExamChoiceDto> newChoiceList = new ArrayList<>();
 			for(QuestionChoices c : choices) {
@@ -221,6 +286,31 @@ public class ExamSelectionService implements IExamSelectionService {
 		}
 		
 		return new ParsedExamData(examInfo, newList);
+	}
+
+	@Override
+	public void ensureImageFolderExists(String folderPath, String filename, MultipartFile file) {
+		if(config.getImageStorageType().equals("local")) {
+			Path fullPath = Paths.get(config.getImageUploadPath(), folderPath);
+			
+			// 폴더 생성
+			try {
+				if(Files.notExists(fullPath)) {
+					Files.createDirectories(fullPath);
+				}
+				
+				// 파일 저장
+				Path filePath = fullPath.resolve(filename);
+				InputStream is = file.getInputStream();
+				Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if(config.getImageStorageType().equals("gcs")) {
+			// TODO: GCS API 사용해서 폴더 확인 및 생성
+		} else {
+			throw new IllegalArgumentException("알 수 없는 이미지 저장소 타입: " + config.getImageStorageType());
+		}
 	}
 
 }
