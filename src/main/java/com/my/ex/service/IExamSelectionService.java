@@ -1,15 +1,22 @@
 package com.my.ex.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.groovy.parser.antlr4.GroovyParser.InclusiveOrExprAltContext;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
-import com.my.ex.dto.response.ExamCommonpassageDto;
+import com.my.ex.dto.request.ExamCreateRequestDto;
+import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
+import com.my.ex.dto.service.ParsedExamData;
 
 public interface IExamSelectionService {
 	List<ExamTypeDto> getExamTypes();
@@ -21,8 +28,12 @@ public interface IExamSelectionService {
 	List<ExamQuestionDto> getExamQuestions(String examType, String examRound, String examSubject);
 	List<ExamQuestionDto> getExamQuestionsByExamId(int examId);
 	List<ExamChoiceDto> getExamChoices(int examId);
-	Set<ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject);
+	Set<ExamPageDto.ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject);
 	int getTotalQuestionCount(int examId);
 	boolean deleteExams(List<Integer> examIds);
 	List<String> getSubjectsForExamType(String examTypeCode);
+	int findTypeIdByCode(String type);
+	boolean saveExamByForm(ExamCreateRequestDto request);
+	ParsedExamData buildParsedExamData(ExamCreateRequestDto request);
+	void ensureImageFolderExists(String folderPath, String filename, MultipartFile file);
 }

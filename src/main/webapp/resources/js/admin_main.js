@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector(".btn-manual-register").addEventListener('click', () => {
         // 직접 등록 페이지로 이동 로직
         closeCreateExamModal()
-        location.href = '/admin/createExamPage'
+        location.href = `/admin/createExamPage?folderId=${activeFolderId}`
     })
 
 })

@@ -1,6 +1,8 @@
 package com.my.ex.controller;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +19,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
@@ -26,9 +33,12 @@ import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
-import com.my.ex.dto.response.ExamCommonpassageDto;
+import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
+import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
+import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
+import com.my.ex.parser.ExamInfo;
 import com.my.ex.parser.GedExamParser;
 import com.my.ex.service.ExamSelectionService;
 
@@ -127,7 +137,7 @@ public class ExamSelectionController {
 		
 		// 데이터 추출
 		List<ExamChoiceDto> choices = service.getExamChoices(questions.get(0).getExamId());
-		Set<ExamCommonpassageDto> distinctPassageDto =
+		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto =
 				service.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		
 		// 데이터 담기
@@ -160,9 +170,9 @@ public class ExamSelectionController {
 	{
 		String path = 
 				config.getImageUploadPath() +
-				examType + "\\" +
-				examRound + "\\" +
-				examSubject + "\\" +
+				examType + File.separator +
+				examRound + File.separator +
+				examSubject + File.separator +
 				filename;
 		// C:\server_program\project\testmate\images\2025년도 제1회\국어
 		File file = new File(path);
@@ -200,10 +210,45 @@ public class ExamSelectionController {
 		return service.getSubjectsForExamType(examTypeCode);
 	}
 	
+//	@PostMapping("/saveExamByForm")
+//	@ResponseBody
+//	public void saveExamByForm(@RequestBody ExamCreateRequestDto request) throws IOException {
+//		return service.saveExamByForm(request);
+//		
+//		/**
+//		 * FEAT
+//		 */
+//		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
+//	}
+	
+	
 	@PostMapping("/saveExamByForm")
 	@ResponseBody
-	public void saveExamByForm(@RequestBody ExamCreateRequestDto request) {
+	public boolean saveExamByForm(
+			@RequestParam("examInfo") String examInfoStr,
+			@RequestParam("questions") String questionsStr,
+			@RequestParam Map<String, MultipartFile> fileMap) throws IOException
+	{
+		ObjectMapper mapper = new ObjectMapper();
+		ExamCreateRequestDto requestDto = new ExamCreateRequestDto();
 		
+		requestDto.setExamInfo(mapper.readValue(examInfoStr, CreateExamInfo.class));
+		requestDto.setQuestions(
+				mapper.readValue(
+						questionsStr,
+						new TypeReference<List<ExamCreateRequestDto.Questions>>() {}
+				)
+		);
+		requestDto.setFileMap(fileMap);
+		
+		return service.saveExamByForm(requestDto);
+		
+		/**
+		 * FEAT
+		 */
+		// JS에서 보내는 passageData.rangeArray = rangeArray 값이 담겨지지 않았음
+		// JS에서 보내는 individualPassage 객체의 questionNum 값이 담겨지지 않았음
+		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
 	}
 	
 }

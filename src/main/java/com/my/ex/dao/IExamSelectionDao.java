@@ -27,4 +27,5 @@ public interface IExamSelectionDao {
 	int deleteExams(List<Integer> examIds);
 	int findSubjectIdByName(Map<String, Object> map);
 	List<String> getSubjectsForExamType(String examTypeCode);
+	int findTypeIdByCode(String type);
 }

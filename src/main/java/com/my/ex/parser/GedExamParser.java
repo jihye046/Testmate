@@ -310,15 +310,18 @@ public class GedExamParser implements IExamParser {
 	        String[] options = choicesText.split(choiceDelimiter);
 
 	        String[] labels = new String[]{"①", "②", "③", "④", "⑤"};
-	        int labelIndex = 0;
+	        int[] nums = new int[] {1, 2, 3, 4, 5};
+	        
+	        int index = 0;
 
 	        for(String option: options) {
 	            String trimmedOption = option.trim();
 
 	            if(trimmedOption.isEmpty()) continue;
-	            if (labelIndex >= labels.length) break;
+	            if (index >= labels.length) break;
 
-	            String choiceLabel = labels[labelIndex];
+	            String choiceLabel = labels[index];
+	            int choiceNum = nums[index]; 
 	            
 	            // 선택지 내용에서 불필요한 줄바꿈/구분자(예: //) 제거 및 공백 정규화
 	            String choiceText = trimmedOption
@@ -331,32 +334,30 @@ public class GedExamParser implements IExamParser {
 	            choice.put("choiceLabel", choiceLabel);
 	            choice.put("choiceText", choiceText);
 	            */
-	            optionsList.add(new ExamChoiceDto(choiceLabel, choiceText));
+	            optionsList.add(new ExamChoiceDto(choiceLabel, choiceText, choiceNum));
 
-	            labelIndex++;
+	            index++;
 	        }
 	    }
 
 	    // 5. 추출 결과를 Map에 담아 반환
 	    questionData.put("questionNum", questionNum);
 	    questionData.put("questionText", questionText);
-
-	    // 개별 지문이 있으면 무조건 개별 지문을 사용하고 (문제 13번),
-	    // 개별 지문이 없을 때만 공통 지문을 사용 (문제 11, 12, 14, 15, 16번)
+	    if(questionPassageText == null || questionPassageText.isEmpty()) {
+	    	questionData.put("useIndividualPassage", "N");
+	    	questionData.put("individualPassage", null);
+	    } else {
+	    	questionData.put("useIndividualPassage", "Y");
+	    	questionData.put("individualPassage", questionPassageText);
+	    }
 	    
-	    // 개별지문, 공통지문 분리 수정
-//	    String finalPassage;
-//	    
-//	    if (!questionPassageText.isEmpty()) {
-//	        finalPassage = questionPassageText; // 개별 지문(보기) 우선
-//	    } else if (!commonPassageText.isEmpty()) { // 추가: 공통 지문이 있을 때만 사용
-//	        finalPassage = commonPassageText; 
-//	    } else {
-//	        finalPassage = "";
-//	    }
-	    
-	    questionData.put("individualPassage", questionPassageText);
-	    questionData.put("commonPassage", commonPassageText);
+	    if(commonPassageText == null || commonPassageText.isEmpty()) {
+	    	questionData.put("useCommonPassage", "N");
+	    	questionData.put("commonPassage", null);
+	    } else {
+	    	questionData.put("useCommonPassage", "Y");
+	    	questionData.put("commonPassage", commonPassageText);
+	    }
 //	    questionData.put("questionPassage", finalPassage);
 	    questionData.put("passageScope", passageScope);
 	    questionData.put("options", optionsList);
@@ -399,7 +400,8 @@ public class GedExamParser implements IExamParser {
 			String subject = infoMatcher.group(5).replaceAll("\\s+", "").trim();
 			
 			// ExamInfo 객체 생성
-			this.examInfo = new ExamInfoDto(round, subject, sessionNo);
+//			this.examInfo = new ExamInfoDto(round, subject, sessionNo);
+			this.examInfo = new ExamInfoDto(round, subject);
 			
 			// 추출된 기본 정보 블록을 텍스트에서 제거
 			cleanedText = infoMatcher.replaceAll("");

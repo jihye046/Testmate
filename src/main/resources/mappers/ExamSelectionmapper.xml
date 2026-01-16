@@ -57,6 +57,7 @@
 		  JOIN exam_folder f ON i.folder_id = f.folder_id
 		  WHERE f.folder_id = #{folderId}
 		    AND i.isdeleted = 'N'
+		  ORDER BY examround desc
 	</select>
 		
 	<!-- 중복 시험 여부 확인 -->
@@ -69,7 +70,7 @@
 		   AND isdeleted = 'N'
 	</select>
 	
-	<!-- 시험 정보 저장 -->
+	<!-- PDF 크롤링 시험 정보 저장 -->
 	<insert id="saveParsedExamInfo" parameterType="ExamInfoDto">
 		<selectKey resultType="int" keyProperty="examId" order="BEFORE" >
 			SELECT seq_exam_info.nextval FROM dual
@@ -80,7 +81,8 @@
 			exam_type_id,
 			exam_round,
 			exam_subject,
-			sessionNo
+			sessionNo,
+			folder_id
 			)
 		 VALUES
 		 	(
@@ -88,7 +90,8 @@
 		 	#{examTypeId},
 		 	#{examRound},
 		 	#{examSubject},
-		 	#{sessionNo}
+		 	#{sessionNo},
+		 	#{folderId}
 		 	)
 	</insert>
 	
@@ -130,7 +133,8 @@
 			question_id,
 			choice_label,
 			choice_text,
-			choice_image
+			choice_image,
+			choice_num
 			)
 		VALUES
 			(
@@ -139,7 +143,8 @@
 			#{questionId},
 			#{choiceLabel},
 			#{choiceText},
-			#{choiceImage}
+			#{choiceImage},
+			#{choiceNum}
 			)
 	</insert>
 	
@@ -241,4 +246,12 @@
 		  JOIN exam_type t on s.exam_type_id = t.exam_type_id
 		 WHERE t.exam_type_code = #{examTypeCode}		
 	</select>
+	
+	<!-- 시험 종류 코드로부터 id 조회 -->
+	<select id="findTypeIdByCode" parameterType="String" resultType="Integer">
+		 SELECT exam_type_id
+		   FROM exam_type
+		  WHERE exam_type_code = #{type}
+	</select>
+	
 </mapper>

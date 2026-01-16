@@ -1,6 +1,9 @@
 package com.my.ex.dto.request;
 
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;
 import lombok.Getter;
@@ -10,9 +13,9 @@ import lombok.Setter;
 public class ExamCreateRequestDto {
 	private CreateExamInfo examInfo;
 	private List<Questions> questions;
-	
-	@Getter
-	@Setter
+	private Map<String, MultipartFile> fileMap;
+
+	@Data
 	public static class CreateExamInfo {
 		private String type;
 		private String round;
@@ -20,8 +23,7 @@ public class ExamCreateRequestDto {
 		private int folderId;
 	}
 	
-	@Getter
-	@Setter
+	@Data
 	public static class Questions {
 		private int questionNum;
 		private char useCommonPassage;
@@ -31,29 +33,28 @@ public class ExamCreateRequestDto {
 		private String questionText;
 		private List<QuestionChoices> questionChoices;
 		private char answerText;
-		
-		@Getter
-		@Setter
+
+		@Data
 		public static class CommonPassage {
 			private String type;
 			private String content;
 			private String rangeText;
 			private int[] rangeArray;
+			private String fileKey;
 			private int id;
 		}
-		
-		@Getter
-		@Setter
+
+		@Data
 		public static class IndividualPassage {
 			private String type;
 			private String content;
+			private String fileKey;
 		}
-		
-		@Getter
-		@Setter
+
+		@Data
 		public static class QuestionChoices {
 			private int choiceNum;
-			private String choiceContent;
+			private String choiceText;
 			private String choiceLabel;
 		}
 	}

@@ -9,7 +9,7 @@ public class ExamQuestionDto {
 	private String sessionNo; 			// 교시
 	private int questionNum; 			// 문제 번호
 	private String questionText; 		// 문제 내용
-	private String questionImage; 		// 문제 이미지 URL
+//	private String questionImage; 		// 문제 이미지 URL
 //	private String questionPassage; 	// 문제 지문 텍스트
 	private String individualPassage; 	// 단독 지문
 	private String commonPassage;		// 공통 지문

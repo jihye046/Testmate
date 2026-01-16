@@ -18,4 +18,12 @@ public class ExamPageDto {
 	private String examSubject; 						  // 국어
 	private List<ExamChoiceDto> examChoices; 			  // 선택지 List<>
 	private Set<ExamCommonpassageDto> distinctPassageDto; // 중복제거한 공통지문 List<>
+	
+	// 공통지문 관리 dto
+	@Data
+	public static class ExamCommonpassageDto {
+		private int commonPassageStartNum;
+		private int commonPassageEndNum;
+		private String commonPassageText;
+	}
 }

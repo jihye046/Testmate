@@ -106,4 +106,9 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		return session.selectList(NAMESPACE + "getSubjectsForExamType", examTypeCode);
 	}
 
+	@Override
+	public int findTypeIdByCode(String type) {
+		return session.selectOne(NAMESPACE + "findTypeIdByCode", type);
+	}
+
 }
