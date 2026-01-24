@@ -2,6 +2,11 @@
 let activeFolderId = null
 let activeFolderName = null
 
+// PDF 분석 완료 여부
+let isAnalyzed = false
+
+const pdfFileInput = document.querySelector("#pdfFileInput")
+
 document.addEventListener('DOMContentLoaded', () => {
     // exam_page.jsp에서 '목록으로' 버튼을 눌러서 다시 돌아온 경우 '시험지 목록' 화면으로 보여주기
     const params = new URLSearchParams(window.location.search) // 현재 URL에서 쿼리스트링만 가져옴
@@ -128,10 +133,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PDF 파일 업로드 감지 리스너
     const pdfFileNameSpan = document.querySelector("#pdfFileName")
+    const analysisOptionsSection = document.querySelector("#pdf-analysis-section")
+
     pdfFileInput.addEventListener('change', (e) => {
         const fileName = e.target.files.length > 0 ? e.target.files[0].name : '선택된 파일 없음'
         pdfFileNameSpan.textContent = fileName
+        analysisOptionsSection.style.display = e.target.files.length > 0 ? 'block' : 'none'
+
     })
+    
+    // PDF 분석 및 변환 시작 버튼 클릭 리스너
+    analysisOptionsSection.addEventListener('click', (e) => {
+        const btnStartConversion = e.target.closest('#btnStartConversion')
+        if(btnStartConversion){
+            // loadPdfFile()
+            alert('분석 및 변환 버튼 클릭함')
+        }
+    })
+
+    // PDF 시험지 정보 설정 - 시험 유형 선택 리스너
+    const selectExamType = document.querySelector("#selectExamType")
+    selectExamType.addEventListener('change', (e) => {
+        const selectedType = e.target.value
+
+        // 시험 유형에 따라 시험 과목 옵션 동적 변경
+        const selectSubject = document.querySelector("#selectSubject")
+
+        const params = {
+            key: value,
+            key: value
+        }
+        
+        // GET 요청 시 쿼리스트링 형태로 params를 전송 (URL에 노출됨)
+        // 컨트롤러에서는 @RequestParam 으로 파라미터 받음
+        axios.get('/board/api', { params })
+            .then(response => {
+                console.log(response.data)
+            })
+            .catch(error => {
+                console.error('error: ', error)
+            })
+    })
+
+
 
     // 직접 등록하기 버튼 클릭 리스너
     document.querySelector(".btn-manual-register").addEventListener('click', () => {
@@ -350,6 +394,11 @@ const editFolder = () =>{}
 ================================================== */
 const createExamModal = document.querySelector("#createExamModal")
 
+const pdfFileName = document.querySelector("#pdfFileName")
+const uploadActionContainer = document.querySelector(".upload-actions")
+const progressContainer = document.querySelector("#loadingOverlay")
+const previewContainer = document.querySelector("#previewContainer")
+
 // 시험지 등록 모달 열기
 const openCreateExamModal = () => {
     createExamModal.style.display = 'flex'
@@ -358,13 +407,53 @@ const openCreateExamModal = () => {
 // 시험지 등록 모달 닫기
 const closeCreateExamModal = () => {
     createExamModal.style.display = 'none'
+    pdfFileInput.value = ''
+    pdfFileName.textContent = '선택된 파일 없음'
+    document.querySelector(".analysis-options-section").style.display = 'none'
+    uploadActionContainer.style.display = 'block'
+    progressContainer.style.display = 'none'
 }
 
 // 시험지 PDF 업로드 등록 함수
+const loadPdfFile = () => {
+    uploadActionContainer.style.display = 'none'
+    progressContainer.style.display = 'flex'
+
+    // 서버로 파일 전송
+    const formData = new FormData()
+    formData.append('pdfFile', pdfFileInput.files[0])
+    formData.append('folderId', activeFolderId)
+
+    axios.post('/exam/loadPdfFile', formData)
+        .then(response => {
+            // console.log(response.data)
+            const result = response.data.result
+            if(result){
+                // 분석 상태 변수 업데이트
+                isAnalyzed = true
+
+                // 분석 상태바 숨기기
+                progressContainer.style.display = 'none'
+
+                // 미리보기 컨테이너 보이기
+                previewContainer.style.display = 'block'
+
+                // 추출된 텍스트 미리보기 영역에 표시
+                const textPreview = document.querySelector("#textPreview")
+                response.data.questions.forEach((map) => {
+                    console.log(map)
+                })
+
+            } else {
+                alert('분석 실패')
+            }
 
 
-// 시험지 직접 등록 함수
-const createExam = () => {}
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
+}
 
 // 일괄 선택 버튼 로드 함수
 const loadBulkActionBtn = () => {

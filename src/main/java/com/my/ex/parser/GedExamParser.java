@@ -12,9 +12,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.stereotype.Component;
+
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 
+@Component
 public class GedExamParser implements IExamParser {
 
     // 1. 페이지 상단 헤더 제거 패턴 (초졸/중졸/고졸 모두 대응)

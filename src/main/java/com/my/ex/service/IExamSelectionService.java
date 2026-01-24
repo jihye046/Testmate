@@ -21,7 +21,7 @@ import com.my.ex.dto.service.ParsedExamData;
 public interface IExamSelectionService {
 	List<ExamTypeDto> getExamTypes();
 	List<String> getExamRounds(String examTypeCode);
-	List<String> getExamSubjects(String examTypeCode, String examRound);
+	List<String> getSubjectsByExamRound(String examTypeCode, String examRound);
 	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId);
 	boolean saveParsedExamData(ExamInfoDto examInfo, List<Map<String, Object>> questions);
 	String getExamtypename(String examType);
@@ -36,4 +36,5 @@ public interface IExamSelectionService {
 	boolean saveExamByForm(ExamCreateRequestDto request);
 	ParsedExamData buildParsedExamData(ExamCreateRequestDto request);
 	void ensureImageFolderExists(String folderPath, String filename, MultipartFile file);
+	List<Map<String, Object>> parsePdfToQuestions(MultipartFile file) throws Exception;
 }

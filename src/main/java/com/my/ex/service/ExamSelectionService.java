@@ -33,6 +33,11 @@ import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
+import com.my.ex.parser.GedExamParser;
+import com.my.ex.parser.PdfTextExtractor;
+import com.my.ex.parser.PdfTextNormalizer;
+
+import groovyjarjarantlr4.v4.parse.ANTLRParser.throwsSpec_return;
 
 @Service
 public class ExamSelectionService implements IExamSelectionService {
@@ -42,6 +47,15 @@ public class ExamSelectionService implements IExamSelectionService {
 	
 	@Autowired
 	private EnvironmentConfig config;
+	
+	@Autowired
+	private PdfTextExtractor extractor;
+	
+	@Autowired
+	private PdfTextNormalizer normalizer;
+	
+	@Autowired
+	private GedExamParser gedExamParser;
 	
 	@Override
 	public List<ExamTypeDto> getExamTypes() {
@@ -54,12 +68,12 @@ public class ExamSelectionService implements IExamSelectionService {
 	}
 
 	@Override
-	public List<String> getExamSubjects(String examTypeCode, String examRound) {
+	public List<String> getSubjectsByExamRound(String examTypeCode, String examRound) {
 		Map<String, String> map = new HashMap<>();
 		map.put("examTypeCode", examTypeCode);
 		map.put("examRound", examRound);
 		
-		return dao.getExamSubjects(map);
+		return dao.getSubjectsByExamRound(map);
 	}
 	
 	@Override
@@ -311,6 +325,30 @@ public class ExamSelectionService implements IExamSelectionService {
 		} else {
 			throw new IllegalArgumentException("알 수 없는 이미지 저장소 타입: " + config.getImageStorageType());
 		}
+	}
+
+	/**
+	 * 관리자가 업로드한 PDF를 읽음
+	 */
+	@Override
+	public List<Map<String, Object>> parsePdfToQuestions(MultipartFile file) throws Exception {
+		// 1. PDF 텍스트 추출
+		String text = extractor.extract(file);
+		
+		// 2. 한글 spacing 정리 및 좌/우 단 섞임 복구
+		text = normalizer.normalize(text);
+//		text = PdfTextNormalizer.normalize(text);
+		
+		if(text == null || text.trim().isEmpty()) {
+			throw new Exception("PDF에서 텍스트를 읽을 수 없습니다. PDF 파일인지 확인해주세요.");
+		}
+		
+		// 3. 파서를 이용하여 텍스트를 List<Map> 구조로 변환
+		return gedExamParser.parse(text);
+//		ExamInfoDto info = new ExamInfoDto("round테스트", "수학");
+//		info.setExamTypeId(1);
+//		
+//		return saveParsedExamData(info, questions);
 	}
 
 }

@@ -24,7 +24,8 @@
 		 ORDER BY exam_round
 	</select>
 	
-	<select id="getExamSubjects" parameterType="java.util.HashMap" resultType="String">
+	<!-- 특정 시험 회차에 대해 등록된 시험 과목을 불러옴  -->
+	<select id="getSubjectsByExamRound" parameterType="java.util.HashMap" resultType="String">
 		SELECT distinct exam_subject
 		  FROM exam_info
 		 WHERE exam_type_id = (

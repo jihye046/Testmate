@@ -32,8 +32,8 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	}
 
 	@Override
-	public List<String> getExamSubjects(Map<String, String> map) {
-		return session.selectList(NAMESPACE + "getExamSubjects", map);
+	public List<String> getSubjectsByExamRound(Map<String, String> map) {
+		return session.selectList(NAMESPACE + "getSubjectsByExamRound", map);
 	}
 	
 	@Override

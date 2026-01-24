@@ -1,5 +1,7 @@
 package com.my.ex.controller;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
 import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
+import com.my.ex.dto.response.ExamPdfPreview;
 import com.my.ex.parser.ExamInfo;
 import com.my.ex.parser.GedExamParser;
 import com.my.ex.service.ExamSelectionService;
@@ -71,13 +74,13 @@ public class ExamSelectionController {
 		return group;
 	}
 	
-	@GetMapping("/getExamSubjects")
+	@GetMapping("/getSubjectsByExamRound")
 	@ResponseBody
 	public ExamInfoGroup getExamSubjects(
 		@RequestParam String examTypeCode,
 		@RequestParam String examRound) 
 	{
-		List<String> examSubjects = service.getExamSubjects(examTypeCode, examRound);
+		List<String> examSubjects = service.getSubjectsByExamRound(examTypeCode, examRound);
 		
 		ExamInfoGroup group = new ExamInfoGroup();
 		group.setExamSubjects(examSubjects);
@@ -242,13 +245,25 @@ public class ExamSelectionController {
 		requestDto.setFileMap(fileMap);
 		
 		return service.saveExamByForm(requestDto);
-		
-		/**
-		 * FEAT
-		 */
-		// JS에서 보내는 passageData.rangeArray = rangeArray 값이 담겨지지 않았음
-		// JS에서 보내는 individualPassage 객체의 questionNum 값이 담겨지지 않았음
-		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
+	}
+	
+	@PostMapping("/loadPdfFile")
+	@ResponseBody
+	public ExamPdfPreview loadPdfFile(
+			@RequestParam MultipartFile pdfFile,
+			@RequestParam int folderId) 
+	{
+		try {
+			List<Map<String, Object>> questions = service.parsePdfToQuestions(pdfFile);
+			if(questions == null || questions.isEmpty()) {
+				return new ExamPdfPreview(false, "PDF에서 시험지를 추출할 수 없습니다.", null);
+			}
+			
+			return new ExamPdfPreview(true, "정상적으로 처리되었습니다.", questions); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ExamPdfPreview(false, "잘못된 입력값입니다.", null);
+		}
 	}
 	
 }
