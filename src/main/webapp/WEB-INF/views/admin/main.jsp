@@ -254,17 +254,15 @@
 								<label><i class="fas fa-layer-group"></i> 시험 유형</label>
 								<select id="selectExamType" class="form-select">
 									<option value="" disabled selected>유형 선택</option>
-									<option value="middle-geomjeong">중졸 검정고시</option>
-									<option value="high-geomjeong">고졸 검정고시</option>
+									<!-- 서버로부터 받은 데이터로 동적으로 설정 -->
 								</select>
 							</div>
 
 							<div class="form-group">
 								<label><i class="fas fa-book"></i> 시험 과목</label>
 								<select id="selectSubject" class="form-select">
-									<option value="" disabled selected>과목 선택</option>
-									<!-- <option value="DB">데이터베이스</option>
-									<option value="NW">네트워크</option> -->
+									<option value="" disabled selected>시험 유형을 선택해주세요</option>
+									<!-- 시험 유형에 따라 동적으로 설정 -->
 								</select>
 							</div>
 
@@ -272,19 +270,15 @@
 								<label><i class="fas fa-calendar-check"></i> 시행 연도</label>
 								<select id="selectYear" class="form-select">
 									<option value="" disabled selected>연도 선택</option>
-									<option value="2026">2026년</option>
-									<option value="2025">2025년</option>
-									<option value="2024">2024년</option>
+									<!-- 현재 연도부터 과거 10년치를 동적으로 설정 -->
 								</select>
 							</div>
 
 							<div class="form-group">
 								<label><i class="fas fa-redo"></i> 시행 회차</label>
 								<select id="selectRound" class="form-select">
-									<option value="" disabled selected>회차 선택</option>
-									<option value="1">1회</option>
-									<option value="2">2회</option>
-									<option value="3">3회</option>
+									<option value="" disabled selected>시험 유형을 선택해주세요</option>
+									<!-- 시험 유형에 따라 동적으로 설정 -->
 								</select>
 							</div>
 						</div>

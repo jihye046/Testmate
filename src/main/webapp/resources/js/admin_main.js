@@ -5,7 +5,20 @@ let activeFolderName = null
 // PDF 분석 완료 여부
 let isAnalyzed = false
 
+// PDF 업로드 관련 DOM 요소
 const pdfFileInput = document.querySelector("#pdfFileInput")
+
+const selectExamType = document.querySelector("#selectExamType")
+const selectYear = document.querySelector("#selectYear")
+const selectSubject = document.querySelector("#selectSubject")
+const selectRound = document.querySelector("#selectRound")
+
+// 🌐 시험 유형별 회차 매핑 (⭐ 시험 유형 추가 시 회차 매핑해줄것 ⭐)
+const examRoundMap = {
+    geomjeong: 4,
+    suneung: 2,
+    engineer: 1
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // exam_page.jsp에서 '목록으로' 버튼을 눌러서 다시 돌아온 경우 '시험지 목록' 화면으로 보여주기
@@ -125,6 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#createExamModal .btn-cancel").addEventListener('click', closeCreateExamModal)
     document.querySelector("#createExamModal .modal-close-btn").addEventListener('click', closeCreateExamModal)
 
+    /* 📄 시험지 PDF 파일 업로드로 등록하기
+    ================================================== */
+
     // PDF 파일 선택 버튼 클릭 리스너
     const pdfFileInput = document.querySelector("#pdfFileInput")
     document.querySelector(".btn-upload-trigger").addEventListener('click', () => {
@@ -146,36 +162,51 @@ document.addEventListener('DOMContentLoaded', () => {
     analysisOptionsSection.addEventListener('click', (e) => {
         const btnStartConversion = e.target.closest('#btnStartConversion')
         if(btnStartConversion){
-            // loadPdfFile()
-            alert('분석 및 변환 버튼 클릭함')
+            // loadPdfFile()'
+            
         }
     })
 
-    // PDF 시험지 정보 설정 - 시험 유형 선택 리스너
-    const selectExamType = document.querySelector("#selectExamType")
+    // PDF 시험지 정보 설정 - 1. 시험 유형 가져오기, 4. 시험 유형에 따라 시행 회차 옵션 동적 변경
+    axios.get('/exam/getExamTypes')
+        .then(response => {
+            updateExamTypes(response.data)
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
+
+    // PDF 시험지 정보 설정 - 2. 시험 유형에 따라 시험 과목 옵션 동적 변경
     selectExamType.addEventListener('change', (e) => {
-        const selectedType = e.target.value
-
-        // 시험 유형에 따라 시험 과목 옵션 동적 변경
-        const selectSubject = document.querySelector("#selectSubject")
-
+        const selectedType = e.target.value // 관리자가 선택한 시험 유형 값
         const params = {
-            key: value,
-            key: value
+            examTypeCode: selectedType
         }
         
-        // GET 요청 시 쿼리스트링 형태로 params를 전송 (URL에 노출됨)
-        // 컨트롤러에서는 @RequestParam 으로 파라미터 받음
-        axios.get('/board/api', { params })
+        axios.get('/exam/getSubjectsForExamType', { params })
             .then(response => {
-                console.log(response.data)
+                updateExamSubjects(response.data)
+                updateExamRounds(selectedType)
             })
             .catch(error => {
                 console.error('error: ', error)
             })
+        
     })
 
+    // PDF 시험지 정보 설정 - 3. 현재 연도부터 과거 10년을 selectbox에 넣기
+    const currentYear = new Date().getFullYear()
 
+    for(let year = currentYear; year >= currentYear - 10; year--){
+        const option = document.createElement('option')
+        option.value = year
+        option.textContent = `${year}년`
+        selectYear.appendChild(option)
+    }
+
+
+    /* 시험지 직접 등록하기
+    ================================================== */
 
     // 직접 등록하기 버튼 클릭 리스너
     document.querySelector(".btn-manual-register").addEventListener('click', () => {
@@ -778,6 +809,47 @@ const deleteSelectedExams = () => {
     fetchExamDelete(selectedExamIds)
 }
 
+/* PDF 업로드 설정
+================================================== */
+
+// 시험 과목 UI 초기화
+const updateExamSubjects = (examSubjects) => {
+    let options = '<option value="" disabled selected>과목 선택</option>'
+    examSubjects.forEach((subject) => {
+        options += `<option value="${subject}">${subject}</option>`
+    })
+
+    selectSubject.innerHTML = options
+}
+
+// 시험 유형 UI 초기화
+const updateExamTypes = (examTypes) => {
+    let options = `<option value="" disabled selected>유형 선택</option>`
+    examTypes.forEach((examType) => {
+        options += `<option value="${examType.examTypeCode}">${examType.examTypeName}</option>`
+    })
+
+    selectExamType.innerHTML = options
+}
+
+// 시험 시행 회차 UI 초기화
+const updateExamRounds = (selectedType) => {
+    
+    const examType = selectedType.split("-").pop() 
+    const round = examRoundMap[examType] ?? 1
+
+    createRoundOptions(round)
+}
+
+const createRoundOptions = (round) => {
+    let options = `<option value="" disabled selected>회차 선택</option>`
+    
+    for(let i = 1; i <= round; i++){
+        options += `<option value="${i}">${i}회</option>`
+    }
+
+    selectRound.innerHTML = options
+}
 
 /* 초기화 함수
 ================================================== */

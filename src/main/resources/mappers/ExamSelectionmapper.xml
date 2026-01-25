@@ -9,7 +9,7 @@
 			   exam_type_name
 		  FROM exam_type
 		 WHERE is_deleted = 0
-		 ORDER BY exam_type_name
+		 ORDER BY exam_type_id
 	</select>
 	
 	<select id="getExamRounds" resultType="String">
