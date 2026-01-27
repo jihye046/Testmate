@@ -52,13 +52,14 @@
                 FROM exam_question q 
                WHERE q.exam_id = i.exam_id
              ) AS totalCount,
+             i.created_date,
              f.folder_id
 		  FROM exam_info i
 		  JOIN exam_type t ON i.exam_type_id = t.exam_type_id
 		  JOIN exam_folder f ON i.folder_id = f.folder_id
 		  WHERE f.folder_id = #{folderId}
 		    AND i.isdeleted = 'N'
-		  ORDER BY examround desc
+		  ORDER BY i.created_date desc
 	</select>
 		
 	<!-- 중복 시험 여부 확인 -->
@@ -253,6 +254,17 @@
 		 SELECT exam_type_id
 		   FROM exam_type
 		  WHERE exam_type_code = #{type}
+	</select>
+	
+	<!-- 중복된 시험지를 등록하려는 경우 어느 폴더에 등록되었는지 알려주기 위해 folderId를 조회 -->
+	<select id="findExistingExamFolderId" parameterType="ExamInfoDto" resultType="String">
+		SELECT f.folder_name
+		  FROM exam_folder f
+		  JOIN exam_info i ON i.folder_id = f.folder_id
+		 WHERE i.exam_type_id = #{examTypeId}
+		   AND i.exam_round = #{examRound}
+		   AND i.exam_subject = #{examSubject}
+		   AND i.isdeleted = 'N'
 	</select>
 	
 </mapper>

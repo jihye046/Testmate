@@ -28,4 +28,5 @@ public interface IExamSelectionDao {
 	int findSubjectIdByName(Map<String, Object> map);
 	List<String> getSubjectsForExamType(String examTypeCode);
 	int findTypeIdByCode(String type);
+	String findExistingExamFolderId(ExamInfoDto examInfoDto);
 }

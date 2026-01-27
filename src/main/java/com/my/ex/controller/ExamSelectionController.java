@@ -1,11 +1,8 @@
 package com.my.ex.controller;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,10 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,13 +31,11 @@ import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
-import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
-import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamPdfPreview;
-import com.my.ex.parser.ExamInfo;
-import com.my.ex.parser.GedExamParser;
+import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
+import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
 
 // 시험지 선택/조회 등 관리 영역 
@@ -52,6 +45,9 @@ public class ExamSelectionController {
 	
 	@Autowired
 	private ExamSelectionService service;
+	
+	@Autowired
+	private ExamAnswerService answerService;
 	
 	@Autowired
 	private EnvironmentConfig config;
@@ -103,7 +99,7 @@ public class ExamSelectionController {
 			return "error: PDF 텍스트 내용이 비어있습니다.";
 		}
 		
-		GedExamParser parse = new GedExamParser();
+		GeomjeongExamParser parse = new GeomjeongExamParser();
 		List<Map<String, Object>> questions = parse.parse(text);
 		// 파싱된 시험 정보 및 문제 리스트 추출
 		ExamInfoDto examInfo = parse.getExamInfo();
@@ -219,18 +215,14 @@ public class ExamSelectionController {
 		return service.getSubjectsForExamType(examTypeCode);
 	}
 	
-//	@PostMapping("/saveExamByForm")
-//	@ResponseBody
-//	public void saveExamByForm(@RequestBody ExamCreateRequestDto request) throws IOException {
-//		return service.saveExamByForm(request);
-//		
-//		/**
-//		 * FEAT
-//		 */
-//		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
-//	}
-	
-	
+	/**
+	 * 관리자가 시험지를 직접 작성하여 등록하는 경우
+	 * @param examInfoStr
+	 * @param questionsStr
+	 * @param fileMap
+	 * @return
+	 * @throws IOException
+	 */
 	@PostMapping("/saveExamByForm")
 	@ResponseBody
 	public boolean saveExamByForm(
@@ -253,19 +245,76 @@ public class ExamSelectionController {
 		return service.saveExamByForm(requestDto);
 	}
 	
+	/**
+	 * 관리자가 시험지 PDF를 업로드하여 등록하는 경우
+	 * @param examInfo
+	 * @param pdfFile
+	 * @param folderId
+	 * @return
+	 */
 	@PostMapping("/loadPdfFile")
 	@ResponseBody
 	public ExamPdfPreview loadPdfFile(
+			@RequestParam String examInfo,
 			@RequestParam MultipartFile pdfFile,
-			@RequestParam int folderId) 
+			@RequestParam Integer folderId)
 	{
+		
 		try {
-			List<Map<String, Object>> questions = service.parsePdfToQuestions(pdfFile);
-			if(questions == null || questions.isEmpty()) {
-				return new ExamPdfPreview(false, "PDF에서 시험지를 추출할 수 없습니다.", null);
+			// 시험지 정보 매핑
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, String> examInfoMap = mapper.readValue(examInfo, new TypeReference<Map<String, String>>() {});
+			String examTypeCode = examInfoMap.get("examTypeCode");
+			String examRound = examInfoMap.get("examRound");
+			String examSubject = examInfoMap.get("examSubject");
+			
+			ExamInfoDto examInfoDto = new ExamInfoDto(examRound, examSubject);
+			examInfoDto.setExamTypeId(service.findTypeIdByCode(examTypeCode));
+			examInfoDto.setFolderId(folderId);
+			
+			boolean result = false;
+			List<Map<String, Object>> questions = null;
+			
+			// 검정고시 시험지인 경우
+			if(examTypeCode.endsWith("geomjeong")) {
+				// 1. 시험지 PDF 텍스트 추출
+				questions = service.parsePdfToQuestions(pdfFile);
+				if(questions == null || questions.isEmpty()) {
+					return new ExamPdfPreview(false, "PDF에서 시험지를 추출할 수 없습니다.", null);
+				}
+				
+				// 2. 시험지 등록 
+				result = service.saveParsedExamData(examInfoDto, questions);
+			} 
+			
+			// 검정고시 답안지인 경우
+			else if(examTypeCode.endsWith("geomjeongAnswer")) { // 문자열 비교하는 부분을 enum이나, 상수로 빼는것을 고려
+				// 1. 정답지 PDF 텍스트 추출
+				answerService.parsePdfToAnswers(pdfFile);
+				
+				// 2. 시험지 등록
 			}
 			
-			return new ExamPdfPreview(true, "정상적으로 처리되었습니다.", questions); 
+			// 정답지 db저장할 때 question_id 구하는 mapper
+			/*
+			 -- 필요 파라미터
+			-- examSubject, examRound, examTypeId, questionNum
+			SELECT Q.QUESTION_ID
+			FROM EXAM_QUESTION Q
+			JOIN EXAM_INFO I ON I.EXAM_ID = Q.EXAM_ID
+			WHERE I.EXAM_SUBJECT = '도덕'
+			AND I.EXAM_ROUND = '2016년도 제1회'
+			AND I.EXAM_TYPE_ID = 2
+			AND Q.QUESTION_NUM = 1;
+			 * */
+			
+			// 시험지/정답지 등록 결과에 따른 응답처리
+			if(!result) {
+				String folderName = service.findExistingExamFolderId(examInfoDto);
+				return new ExamPdfPreview(false, '"' + folderName + '"' + " 폴더에 이미 등록된 문서입니다.", null);
+			}
+			
+			return new ExamPdfPreview(true, "파일이 등록되었습니다.", questions); 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ExamPdfPreview(false, "잘못된 입력값입니다.", null);

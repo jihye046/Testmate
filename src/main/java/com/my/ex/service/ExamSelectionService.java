@@ -33,9 +33,9 @@ import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
-import com.my.ex.parser.GedExamParser;
-import com.my.ex.parser.PdfTextExtractor;
-import com.my.ex.parser.PdfTextNormalizer;
+import com.my.ex.parser.geomjeong.upload.exam.UploadedGeomjeongPdfTextExtractor;
+import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
+import com.my.ex.parser.geomjeong.upload.exam.GeomjeongPdfTextNormalizer;
 
 import groovyjarjarantlr4.v4.parse.ANTLRParser.throwsSpec_return;
 
@@ -49,13 +49,13 @@ public class ExamSelectionService implements IExamSelectionService {
 	private EnvironmentConfig config;
 	
 	@Autowired
-	private PdfTextExtractor extractor;
+	private UploadedGeomjeongPdfTextExtractor extractor;
 	
 	@Autowired
-	private PdfTextNormalizer normalizer;
+	private GeomjeongPdfTextNormalizer normalizer;
 	
 	@Autowired
-	private GedExamParser gedExamParser;
+	private GeomjeongExamParser gedExamParser;
 	
 	@Override
 	public List<ExamTypeDto> getExamTypes() {
@@ -345,10 +345,14 @@ public class ExamSelectionService implements IExamSelectionService {
 		
 		// 3. 파서를 이용하여 텍스트를 List<Map> 구조로 변환
 		return gedExamParser.parse(text);
-//		ExamInfoDto info = new ExamInfoDto("round테스트", "수학");
-//		info.setExamTypeId(1);
-//		
-//		return saveParsedExamData(info, questions);
+	}
+
+	/**
+	 * 중복된 시험지를 등록하려는 경우 어느 폴더에 등록되었는지 알려주기 위해 folderId를 조회
+	 */
+	@Override
+	public String findExistingExamFolderId(ExamInfoDto examInfoDto) {
+		return dao.findExistingExamFolderId(examInfoDto);
 	}
 
 }

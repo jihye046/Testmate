@@ -37,4 +37,5 @@ public interface IExamSelectionService {
 	ParsedExamData buildParsedExamData(ExamCreateRequestDto request);
 	void ensureImageFolderExists(String folderPath, String filename, MultipartFile file);
 	List<Map<String, Object>> parsePdfToQuestions(MultipartFile file) throws Exception;
+	String findExistingExamFolderId(ExamInfoDto examInfoDto);
 }

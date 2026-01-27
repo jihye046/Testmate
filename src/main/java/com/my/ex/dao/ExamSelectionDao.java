@@ -111,4 +111,9 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		return session.selectOne(NAMESPACE + "findTypeIdByCode", type);
 	}
 
+	@Override
+	public String findExistingExamFolderId(ExamInfoDto examInfoDto) {
+		return session.selectOne(NAMESPACE + "findExistingExamFolderId", examInfoDto);
+	}
+
 }

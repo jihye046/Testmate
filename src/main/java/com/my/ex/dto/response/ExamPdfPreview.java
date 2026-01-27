@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ExamPdfPreview {
-	private boolean result;
+	private boolean saved;
 	private String resultMessage;
 	private List<Map<String, Object>> questions;
 }

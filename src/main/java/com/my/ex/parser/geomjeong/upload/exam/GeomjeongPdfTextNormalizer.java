@@ -1,4 +1,4 @@
-package com.my.ex.parser;
+package com.my.ex.parser.geomjeong.upload.exam;
 
 import java.util.List;
 import java.util.Map;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.my.ex.dto.ExamInfoDto;
 
 /**
- * PdfTextExtractor 클래스에서 추출된 텍스트 깨끗하게 다듬기, 공백/줄바꿈/순서 정리
+ * UploadedGeomjeongPdfTextExtractor 클래스에서 추출된 텍스트 깨끗하게 다듬기, 공백/줄바꿈/순서 정리
  *
  */
 @Component
-public class PdfTextNormalizer {
+public class GeomjeongPdfTextNormalizer {
 	public String normalize(String text) {
 		if (text == null || text.isEmpty()) return "";
 

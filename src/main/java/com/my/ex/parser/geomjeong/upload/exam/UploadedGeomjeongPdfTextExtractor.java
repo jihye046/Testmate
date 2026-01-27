@@ -1,4 +1,4 @@
-package com.my.ex.parser;
+package com.my.ex.parser.geomjeong.upload.exam;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -23,10 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
  *
  */
 @Component
-public class PdfTextExtractor {
+public class UploadedGeomjeongPdfTextExtractor {
 	public String extract(MultipartFile file) throws IOException {
 		try (InputStream is = file.getInputStream();
-	             PDDocument document = PDDocument.load(is)) {
+	            PDDocument document = PDDocument.load(is)) {
 
 	            PDFTextStripperByArea areaStripper = new PDFTextStripperByArea();
 	            areaStripper.setSortByPosition(true);
