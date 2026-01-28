@@ -6,5 +6,5 @@ import com.my.ex.dto.ExamInfoDto;
 
 public interface IAnswerParser {
 	ExamInfoDto getExamInfo();
-	Map<String, String> parse(String fullText);
+	Map<Integer, String> parse(String fullText);
 }

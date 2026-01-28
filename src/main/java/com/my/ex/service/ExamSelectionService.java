@@ -100,8 +100,8 @@ public class ExamSelectionService implements IExamSelectionService {
 		}
 		
 		// 시험 정보 저장
-		dao.saveParsedExamInfo(examInfo); // 시험 정보 저장 후 examId 받아옴
-		Integer examId = (Integer)examInfo.getExamId(); // DB 삽입 후 주입된 examId
+		dao.saveParsedExamInfo(examInfo); // 시험 정보 저장 후 examId으로 설정됨
+		Integer examId = (Integer)examInfo.getExamId(); // DB 삽입 후 주입된 examId 가져옴
 		if(examId == null || examId <= 0) throw new RuntimeException();
 		
 		// 시험 문제 저장

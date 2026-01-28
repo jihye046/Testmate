@@ -27,7 +27,9 @@ public class UploadedGeomjeongPdfTextExtractor {
 	public String extract(MultipartFile file) throws IOException {
 		try (InputStream is = file.getInputStream();
 	            PDDocument document = PDDocument.load(is)) {
-
+			
+				/* 시험지 PDF는 좌/우 2단 레이아웃이라 일반 PDFTextStripper 사용 시
+				텍스트 순서가 섞여 영역 기반 추출기(PDFTextStripperByArea)를 사용 */
 	            PDFTextStripperByArea areaStripper = new PDFTextStripperByArea();
 	            areaStripper.setSortByPosition(true);
 

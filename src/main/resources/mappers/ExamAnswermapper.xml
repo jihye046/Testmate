@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.ex.ExamAnswerMapper">
+
+	<!-- questionId 조회 -->
+	<select id="getQuestionId" parameterType="java.util.HashMap" resultType="Integer">
+		SELECT Q.QUESTION_ID
+		  FROM EXAM_QUESTION Q
+		  JOIN EXAM_INFO I ON I.EXAM_ID = Q.EXAM_ID
+		 WHERE I.EXAM_SUBJECT = #{examInfoDto.examSubject}
+		   AND I.EXAM_ROUND = #{examInfoDto.examRound}
+		   AND I.EXAM_TYPE_ID = #{examInfoDto.examTypeId}
+		   AND Q.QUESTION_NUM = #{questionNum}
+	</select>
+
+	<!-- 정답지 PDF 업로드 시 정답지 저장 -->
+	<insert id="saveParsedAnswerData" parameterType="ExamAnswerDto">
+		INSERT INTO exam_answer
+			(
+			answer_id,
+			question_id,
+			correct_label
+			)
+		VALUES
+			(
+			seq_exam_answer.nextval,
+			#{questionId},
+			#{correctLabel}
+			)
+	</insert>
+</mapper>

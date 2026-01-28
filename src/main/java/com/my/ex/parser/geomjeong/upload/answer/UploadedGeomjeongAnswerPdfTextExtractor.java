@@ -5,8 +5,10 @@ import java.io.InputStream;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Component
 public class UploadedGeomjeongAnswerPdfTextExtractor {
 	
 	public String extract(MultipartFile file) throws IOException {
