@@ -38,7 +38,7 @@
 		 ORDER BY exam_subject
 	</select>
 	
-	<!-- 특정 폴더에 있는 모든 시험 제목 가져옴 -->
+	<!-- 특정 폴더에 있는 모든 시험지/정답지 정보 가져옴 -->
 	<select id="getAllExamTitlesByFolderId" resultType="ExamTitleDto">
 		SELECT
 			 i.exam_type_id AS examTypeId,
@@ -48,10 +48,18 @@
 		     i.exam_id AS examId,
 		     i.exam_round AS examRound,
 		     i.exam_subject AS examSubject,
-		     (SELECT COUNT(*) 
-                FROM exam_question q 
-               WHERE q.exam_id = i.exam_id
-             ) AS totalCount,
+		     
+		     CASE
+		     	WHEN t.exam_type_code LIKE '%Answer' THEN
+		     	    (SELECT COUNT(*) 
+		               FROM exam_answer a 
+		              WHERE a.exam_id = i.exam_id)
+		        ELSE
+				    (SELECT COUNT(*) 
+		               FROM exam_question q 
+		              WHERE q.exam_id = i.exam_id)
+			END AS totalCount,
+			
              i.created_date,
              f.folder_id
 		  FROM exam_info i
@@ -59,7 +67,7 @@
 		  JOIN exam_folder f ON i.folder_id = f.folder_id
 		  WHERE f.folder_id = #{folderId}
 		    AND i.isdeleted = 'N'
-		  ORDER BY i.created_date desc
+		  ORDER BY i.created_date DESC
 	</select>
 		
 	<!-- 중복 시험 여부 확인 -->

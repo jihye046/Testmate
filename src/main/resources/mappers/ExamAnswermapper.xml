@@ -21,13 +21,31 @@
 			(
 			answer_id,
 			question_id,
-			correct_label
+			correct_answer,
+			exam_id
 			)
 		VALUES
 			(
 			seq_exam_answer.nextval,
 			#{questionId},
-			#{correctLabel}
+			#{correctAnswer},
+			#{examId}
 			)
 	</insert>
+	
+	<!-- 정답지 조회 -->
+	<select id="getAnswers" parameterType="int" resultType="ExamAnswerDto">
+		SELECT q.question_num, a.correct_answer, a.question_id
+		  FROM exam_answer a
+		  JOIN exam_question  q on q.question_id = a.question_id
+		 WHERE a.exam_id = #{examid}
+		 ORDER BY QUESTION_NUM
+	</select>
+	
+	<update id="updateAnswers" parameterType="ExamAnswerDto">
+		UPDATE exam_answer
+		   SET correct_answer = #{correctAnswer}
+		 WHERE question_id = #{questionId}
+	</update>
+	
 </mapper>

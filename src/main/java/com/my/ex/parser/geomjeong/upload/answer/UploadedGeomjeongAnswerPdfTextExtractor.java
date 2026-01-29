@@ -18,8 +18,9 @@ public class UploadedGeomjeongAnswerPdfTextExtractor {
 			PDFTextStripper stripper = new PDFTextStripper();
             stripper.setSortByPosition(true);
 
-            String text = stripper.getText(document);
+            String text = stripper.getText(document); 
             return text.trim();
 		} 
 	}
+	
 }

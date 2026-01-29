@@ -10,6 +10,11 @@ import com.my.ex.dto.ExamInfoDto;
 
 public interface IExamAnswerService {
 	Map<Integer, String> parsePdfToAnswers(MultipartFile file) throws Exception ;
-	Integer getQuestionId(Map<String, Object> map); 
+	Integer getQuestionId(Integer qNum, ExamInfoDto examInfoDto); 
 	boolean saveParsedAnswerData(ExamInfoDto examInfo, List<ExamAnswerDto> answers);
+	List<ExamAnswerDto> getAnswers(int examId);
+	int labelToNumber(String label);
+	String examTypeCodeWithoutAnswer(String examTypeCode);
+	List<ExamAnswerDto> buildParsedAnswerData(Map<Integer, String> answerMap, ExamInfoDto examInfoDto);
+	boolean updateAnswers(List<ExamAnswerDto> answerDtos);
 }

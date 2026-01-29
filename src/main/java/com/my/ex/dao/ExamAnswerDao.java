@@ -1,5 +1,6 @@
 package com.my.ex.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -24,6 +25,16 @@ public class ExamAnswerDao implements IExamAnswerDao {
 	@Override
 	public int saveParsedAnswerData(ExamAnswerDto answersList) {
 		return session.insert(NAMESPACE + "saveParsedAnswerData", answersList);
+	}
+
+	@Override
+	public List<ExamAnswerDto> getAnswers(int examId) {
+		return session.selectList(NAMESPACE + "getAnswers", examId);
+	}
+
+	@Override
+	public int updateAnswers(ExamAnswerDto answer) {
+		return session.update(NAMESPACE + "updateAnswers", answer);
 	}
 
 }

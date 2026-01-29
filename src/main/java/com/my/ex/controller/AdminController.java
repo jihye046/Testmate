@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.my.ex.config.EnvironmentConfig;
+import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamQuestionDto;
@@ -31,6 +32,7 @@ import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.service.AdminService;
+import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
 
 // 관리자 페이지에서 수행하는 관리 영역
@@ -43,6 +45,9 @@ public class AdminController {
 	
 	@Autowired
 	private ExamSelectionService examService;
+	
+	@Autowired
+	private ExamAnswerService answerService;
 	
 	@Autowired
 	private EnvironmentConfig config;
@@ -136,17 +141,28 @@ public class AdminController {
 		@RequestParam String examSubject,
 		Model model) 
 	{
+		/* 정답지인 경우 */
+		if(examTypeEng.endsWith("Answer")) {
+			List<ExamAnswerDto> answers = answerService.getAnswers(examId);
+			ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
+			
+			model.addAttribute("answers", answers);
+			model.addAttribute("folderDto", folderDto);
+			
+			return "/admin/answer_page";
+		}
+		
+		/* 시험지인 경우 */
 		List<ExamQuestionDto> questions = examService.getExamQuestionsByExamId(examId);
 		if(questions == null || questions.isEmpty()) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
-		// 데이터 추출
+		
 		List<ExamChoiceDto> choices = examService.getExamChoices(examId);
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto = 
 				examService.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 		
-		// 데이터 담기
 		ExamPageDto response = 
 				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
 		model.addAttribute("examPageDto", response);

@@ -1,5 +1,6 @@
 package com.my.ex.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,6 @@ import com.my.ex.dto.ExamAnswerDto;
 public interface IExamAnswerDao {
 	Integer getQuestionId(Map<String, Object> map);
 	int saveParsedAnswerData(ExamAnswerDto answersList);
+	List<ExamAnswerDto> getAnswers(int examId);
+	int updateAnswers(ExamAnswerDto answerDto);
 }

@@ -3,8 +3,6 @@ package com.my.ex.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
-import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
@@ -137,7 +134,7 @@ public class ExamSelectionController {
 		@RequestParam String examSubject,
 		Model model) 
 	{
-		
+		// 시험지인 경우
 		String examTypeKor = service.getExamtypename(examTypeEng);
 		List<ExamQuestionDto> questions = service.getExamQuestions(examTypeEng, examRound, examSubject);
 		if(questions == null || questions.isEmpty()) {
@@ -294,38 +291,25 @@ public class ExamSelectionController {
 			// 검정고시 답안지인 경우
 			else if(examTypeCode.endsWith("geomjeongAnswer")) { // 문자열 비교하는 부분을 enum이나, 상수로 빼는것을 고려
 				// 1. 정답지 PDF 텍스트 추출
-				Map<Integer, String> map = answerService.parsePdfToAnswers(pdfFile);
-//				System.out.println("map: " + map); // map: {1=③, 11=①, 21=④, 2=②, 12=②, 22=①, 3=②, 13=④, 23=④, 4=③, 14=①, 24=④, 5=②, 15=①, 25=①, 6=③, 16=③, 7=③, 17=③, 8=②, 18=④, 9=②, 19=④, 10=④, 20=①}
+				Map<Integer, String> answerMap = answerService.parsePdfToAnswers(pdfFile);
 				
-				String examTypeCodeWithoutAnswer = examTypeCode.substring(0, examTypeCode.length() - "Answer".length());
-				int mappedExamTypeId = service.findTypeIdByCode(examTypeCodeWithoutAnswer); // 매핑될 시험지의 examTypeId
-				int originalExamTypeId  = service.findTypeIdByCode(examTypeCode); // 답안지의 examTypeId
-				
+				// 2. 정답지와 연결될 시험지의 examTypeCode를 이용해 examTypeId 조회 및 설정
+				String examTypeCodeWithoutAnswer = answerService.examTypeCodeWithoutAnswer(examTypeCode);
+				int mappedExamTypeId = service.findTypeIdByCode(examTypeCodeWithoutAnswer);
 				examInfoDto.setExamTypeId(mappedExamTypeId);
 				
-				List<ExamAnswerDto> answersList = new ArrayList<>();
-				for(Map.Entry<Integer, String> entry : map.entrySet()) {
-					// 2. questionId 조회
-					Integer qNum = entry.getKey();
-					String answer = entry.getValue();
-					
-					Map<String, Object> map1 = new HashMap<>();
-					map1.put("examInfoDto", examInfoDto);
-					map1.put("questionNum", qNum);
-					Integer questionId = answerService.getQuestionId(map1);
-					
-					if(questionId == null) {
-						return new ExamPdfPreview(false, "시험지를 먼저 등록하신 후 정답지를 등록해주세요", null);
-					}
-					
-					ExamAnswerDto answerDto = new ExamAnswerDto();
-					answerDto.setQuestionId(questionId);
-					answerDto.setCorrectLabel(answer);
-					answersList.add(answerDto);
+				// 3. 정답지의 examTypeCode를 이용해 examTypeId 조회
+				int originalExamTypeId  = service.findTypeIdByCode(examTypeCode);
+				
+				// 4. db저장용 구조로 변환
+				List<ExamAnswerDto> answersList = answerService.buildParsedAnswerData(answerMap, examInfoDto);
+				if(answersList == null || answersList.isEmpty()) {
+					return new ExamPdfPreview(false, "시험지를 먼저 등록하신 후 정답지를 등록해주세요", null);
 				}
 				
-				// 3. 정답지 등록
-				examInfoDto.setExamTypeId(originalExamTypeId); // 답안지의 examTypeId로 다시 set
+				// 5. 정답지 등록
+				/* 문제지 examTypeId로 저장되어있던 것을 정답지 examTypeId로 다시 설정하여 정답지 등록 */
+				examInfoDto.setExamTypeId(originalExamTypeId);
 				result = answerService.saveParsedAnswerData(examInfoDto, answersList);
 			}
 			
@@ -340,6 +324,13 @@ public class ExamSelectionController {
 			e.printStackTrace();
 			return new ExamPdfPreview(false, "잘못된 입력값입니다.", null);
 		}
+	}
+	
+	@PatchMapping("/updateAnswers")
+	@ResponseBody
+	public boolean updateAnswers(@RequestBody Map<String, List<ExamAnswerDto>> answers) {
+		return answerService.updateAnswers(answers.get("answers"));
+		// TODO: 여기까지 ok, 프론트 응답처리 하기
 	}
 	
 }
