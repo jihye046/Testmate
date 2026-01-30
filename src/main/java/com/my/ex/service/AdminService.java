@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.my.ex.dao.AdminDao;
 import com.my.ex.dto.ExamFolderDto;
@@ -55,8 +56,10 @@ public class AdminService implements IAdminService {
 
 	// 폴더 삭제
 	@Override
-	public boolean deleteFolder(int folderId) {
-		return dao.deleteFolder(folderId) > 0;
+	@Transactional
+	public void deleteFolder(int folderId) {
+		dao.deleteExamInFolder(folderId); 
+		dao.deleteFolder(folderId);
 	}
 
 	// 선택된 시험지를 지정된 폴더로 이동

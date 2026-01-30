@@ -45,17 +45,27 @@ const resetInput = (btn, questionNum) => {
 const updateAnswers = () => {
     let answers = []
 
-    document.querySelectorAll(".answer-input").forEach((input) => {
-        const answerObj = {
+    for(const input of document.querySelectorAll(".answer-input")){
+        if(input.value == ""){
+            alert("모든 문항의 정답을 입력해주세요.")
+            input.focus()
+            return
+        }
+        answers.push({
             questionId: input.closest('tr').querySelector(".q-num").dataset.questionId,
             correctAnswer: input.value
-        }
-        answers.push(answerObj)
-    })
+        })
+    }
 
     axios.patch('/exam/updateAnswers', {answers: answers})
         .then(response => {
-            console.log(response.data)
+            const updateResult = response.data
+            if(updateResult) {
+                alert("수정이 완료되었습니다.")
+                history.back()
+            } else {
+                alert("정답지 저장에 실패했습니다.")
+            }
         })
         .catch(error => {
             console.error('error: ', error)

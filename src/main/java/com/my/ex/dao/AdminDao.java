@@ -42,6 +42,11 @@ public class AdminDao implements IAdminDao {
 	public int deleteFolder(int folderId) {
 		return session.update(NAMESPACE + "deleteFolder", folderId);
 	}
+	
+	@Override
+	public int deleteExamInFolder(int folderId) {
+		return session.update(NAMESPACE + "deleteExamInFolder", folderId);
+	}
 
 	@Override
 	public int isDeleted(String folderName) {

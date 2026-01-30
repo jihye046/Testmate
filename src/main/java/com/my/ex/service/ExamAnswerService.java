@@ -54,7 +54,7 @@ public class ExamAnswerService implements IExamAnswerService {
 	}
 
 	@Override
-	@Transactional
+//	@Transactional
 	public boolean saveParsedAnswerData(ExamInfoDto examInfo, List<ExamAnswerDto> answers) {
 		// 중복 답안지 정보 확인
 		if(examSelectionDao.checkExistingExamInfo(examInfo) > 0) return false;

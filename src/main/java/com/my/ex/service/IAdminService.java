@@ -13,6 +13,6 @@ public interface IAdminService {
 	List<ExamFolderDto> getFolderList();
 	List<ExamFolderDto> getFolderListExcluding(int excludeFolderId);
 	boolean moveExamsToFolder(MoveExamsToFolderDto dto);
-	boolean deleteFolder(int folderId);
+	void deleteFolder(int folderId);
 	ExamFolderDto getFolderInfoByExamId(int examId);
 }

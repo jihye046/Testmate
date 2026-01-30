@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 폴더 삭제 버튼
         const folderDeleteBtn = e.target.closest('.btn-delete')
         if(folderDeleteBtn){
+            const confirmed = confirm('폴더를 삭제하시겠습니까? 해당 폴더에 포함된 시험지들도 함께 삭제됩니다.')
+            if(!confirmed) return
+            
             const folderId = folderDeleteBtn.getAttribute('data-id')
             deleteFolder(folderId)
         }

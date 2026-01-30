@@ -15,5 +15,6 @@ public interface IAdminDao {
 	List<ExamFolderDto> getFolderListExcluding(int excludeFolderId);
 	int moveExamsToFolder(MoveExamsToFolderDto dto);
 	int deleteFolder(int folderId);
+	int deleteExamInFolder(int folderId);
 	ExamFolderDto getFolderInfoByExamId(int examId);
 }

@@ -42,6 +42,7 @@
 		 ORDER BY QUESTION_NUM
 	</select>
 	
+	<!-- 정답지 수정 -->
 	<update id="updateAnswers" parameterType="ExamAnswerDto">
 		UPDATE exam_answer
 		   SET correct_answer = #{correctAnswer}

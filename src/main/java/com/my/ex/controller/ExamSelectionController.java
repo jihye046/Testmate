@@ -330,7 +330,6 @@ public class ExamSelectionController {
 	@ResponseBody
 	public boolean updateAnswers(@RequestBody Map<String, List<ExamAnswerDto>> answers) {
 		return answerService.updateAnswers(answers.get("answers"));
-		// TODO: 여기까지 ok, 프론트 응답처리 하기
 	}
 	
 }

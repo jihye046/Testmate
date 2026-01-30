@@ -34,6 +34,7 @@ import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.service.AdminService;
 import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
+import com.my.ex.service.IAdminService;
 
 // 관리자 페이지에서 수행하는 관리 영역
 @RequestMapping("/admin")
@@ -41,7 +42,8 @@ import com.my.ex.service.ExamSelectionService;
 public class AdminController {
 
 	@Autowired
-	private AdminService service;
+//	private AdminService service;
+	private IAdminService service;
 	
 	@Autowired
 	private ExamSelectionService examService;
@@ -241,7 +243,12 @@ public class AdminController {
 	@DeleteMapping("/deleteFolder/{folderId}")
 	@ResponseBody
 	public boolean deleteFolder(@PathVariable int folderId) {
-		return service.deleteFolder(folderId);
+		try {
+			service.deleteFolder(folderId);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	@GetMapping("/createExamPage")
