@@ -79,8 +79,8 @@ public class ExamAnswerService implements IExamAnswerService {
 	}
 
 	@Override
-	public List<ExamAnswerDto> getAnswers(int examId) {
-		return dao.getAnswers(examId);
+	public List<ExamAnswerDto> getAnswersByExamId(int examId) {
+		return dao.getAnswersByExamId(examId);
 	}
 
 	@Override
@@ -137,6 +137,11 @@ public class ExamAnswerService implements IExamAnswerService {
 		}
 		
 		return successCount == answers.size();
+	}
+
+	@Override
+	public List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds) {
+		return dao.getAnswerByQuestionId(questionIds);
 	}
 	
 }

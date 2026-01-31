@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -35,6 +36,8 @@ import com.my.ex.service.AdminService;
 import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
 import com.my.ex.service.IAdminService;
+import com.my.ex.service.IExamAnswerService;
+import com.my.ex.service.IExamSelectionService;
 
 // 관리자 페이지에서 수행하는 관리 영역
 @RequestMapping("/admin")
@@ -46,10 +49,12 @@ public class AdminController {
 	private IAdminService service;
 	
 	@Autowired
-	private ExamSelectionService examService;
+//	private ExamSelectionService examService;
+	private IExamSelectionService examService;
 	
 	@Autowired
-	private ExamAnswerService answerService;
+//	private ExamAnswerService answerService;
+	private IExamAnswerService answerService;
 	
 	@Autowired
 	private EnvironmentConfig config;
@@ -145,7 +150,7 @@ public class AdminController {
 	{
 		/* 정답지인 경우 */
 		if(examTypeEng.endsWith("Answer")) {
-			List<ExamAnswerDto> answers = answerService.getAnswers(examId);
+			List<ExamAnswerDto> answers = answerService.getAnswersByExamId(examId);
 			ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 			
 			model.addAttribute("answers", answers);
@@ -165,8 +170,20 @@ public class AdminController {
 				examService.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 		
+		List<Integer> questionIds = questions.stream()
+			.map(ExamQuestionDto::getQuestionId)
+			.collect(Collectors.toList());
+		 List<ExamAnswerDto> answers = answerService.getAnswerByQuestionId(questionIds);
+		
+		// question_id 조회 후 [exam_answer] 테이블에서 같은 question_id를 가진 correctAnswer을 조회
+//		for(ExamQuestionDto dto: questions) {
+//			answers.add(answerService.getAnswerByQuestionId(dto.getQuestionId()));
+//		}
+		
 		ExamPageDto response = 
-				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
+				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto, answers);
+		// getAnswersByQuestionIds(List<Integer> questionIds)
+		
 		model.addAttribute("examPageDto", response);
 		model.addAttribute("folderDto", folderDto);
 		

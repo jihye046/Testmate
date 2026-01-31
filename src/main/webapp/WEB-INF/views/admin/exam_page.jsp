@@ -131,9 +131,26 @@
                     <div class="answer-explanation-box">
                         <h4 class="box-title"><i class="fas fa-check-circle"></i> 정답 및 해설 (관리자 검토용)</h4>
                         
+                        <!-- 정답지 -->
                         <div class="correct-answer">
                             정답: <span class="answer-label">
-                                [데이터 연결 필요]
+                                <c:set var="currentCorrectAnswer" value="" />
+
+                                <c:forEach items="${examPageDto.examAnswers}" var="answerDto">
+                                    <c:if test="${answerDto.questionId == questionDto.questionId}">
+                                        <c:set var="currentCorrectAnswer" value="${answerDto.correctAnswer}"/>
+                                    </c:if>
+                                </c:forEach>
+
+                                <c:choose>
+                                    <c:when test="${not empty currentCorrectAnswer}">
+                                        ${currentCorrectAnswer}
+                                    </c:when>
+                                    <c:otherwise>
+                                        [데이터 연결 필요]
+                                    </c:otherwise>
+                                </c:choose>
+                                
                             </span>
                         </div>
                         

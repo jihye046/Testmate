@@ -33,8 +33,8 @@
 			)
 	</insert>
 	
-	<!-- 정답지 조회 -->
-	<select id="getAnswers" parameterType="int" resultType="ExamAnswerDto">
+	<!-- 정답지sheet 클릭 시 정답지만 조회 -->
+	<select id="getAnswersByExamId" parameterType="int" resultType="ExamAnswerDto">
 		SELECT q.question_num, a.correct_answer, a.question_id
 		  FROM exam_answer a
 		  JOIN exam_question  q on q.question_id = a.question_id
@@ -42,11 +42,25 @@
 		 ORDER BY QUESTION_NUM
 	</select>
 	
+	<select id=""></select>
+	
 	<!-- 정답지 수정 -->
 	<update id="updateAnswers" parameterType="ExamAnswerDto">
 		UPDATE exam_answer
 		   SET correct_answer = #{correctAnswer}
 		 WHERE question_id = #{questionId}
 	</update>
+	
+	<!-- 문제지 클릭 시 연결된 정답지 조회 -->
+	<select id="getAnswerByQuestionId" parameterType="java.util.List" resultType="ExamAnswerDto">
+		SELECT q.question_num, a.correct_answer, a.question_id
+		  FROM exam_answer a
+		  JOIN exam_question  q on q.question_id = a.question_id
+		 WHERE a.question_id IN 
+		 	<foreach collection="list" item="questionIds" open="(" separator="," close=")">
+		 		#{questionIds}
+	 		</foreach>
+		 ORDER BY QUESTION_NUM
+	</select>
 	
 </mapper>

@@ -12,9 +12,10 @@ public interface IExamAnswerService {
 	Map<Integer, String> parsePdfToAnswers(MultipartFile file) throws Exception ;
 	Integer getQuestionId(Integer qNum, ExamInfoDto examInfoDto); 
 	boolean saveParsedAnswerData(ExamInfoDto examInfo, List<ExamAnswerDto> answers);
-	List<ExamAnswerDto> getAnswers(int examId);
+	List<ExamAnswerDto> getAnswersByExamId(int examId);
 	int labelToNumber(String label);
 	String examTypeCodeWithoutAnswer(String examTypeCode);
 	List<ExamAnswerDto> buildParsedAnswerData(Map<Integer, String> answerMap, ExamInfoDto examInfoDto);
 	boolean updateAnswers(List<ExamAnswerDto> answerDtos);
+	List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds);
 }
