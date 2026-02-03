@@ -1,14 +1,12 @@
 package com.my.ex.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.ibatis.mapping.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +34,6 @@ import com.my.ex.parser.geomjeong.upload.exam.UploadedGeomjeongPdfTextExtractor;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.parser.geomjeong.upload.exam.GeomjeongPdfTextNormalizer;
 
-import groovyjarjarantlr4.v4.parse.ANTLRParser.throwsSpec_return;
 
 @Service
 public class ExamSelectionService implements IExamSelectionService {

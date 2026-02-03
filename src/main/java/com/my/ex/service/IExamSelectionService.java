@@ -1,12 +1,9 @@
 package com.my.ex.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.groovy.parser.antlr4.GroovyParser.InclusiveOrExprAltContext;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.my.ex.dto.ExamChoiceDto;

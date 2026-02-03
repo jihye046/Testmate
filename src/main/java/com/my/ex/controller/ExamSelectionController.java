@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,8 @@ import com.my.ex.dto.response.ExamPdfPreview;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
+import com.my.ex.service.IExamAnswerService;
+import com.my.ex.service.IExamSelectionService;
 
 // 시험지 선택/조회 등 관리 영역 
 @Controller
@@ -45,10 +48,12 @@ import com.my.ex.service.ExamSelectionService;
 public class ExamSelectionController {
 	
 	@Autowired
-	private ExamSelectionService service;
+//	private ExamSelectionService service;
+	private IExamSelectionService service;
 	
 	@Autowired
-	private ExamAnswerService answerService;
+//	private ExamAnswerService answerService;
+	private IExamAnswerService answerService;
 	
 	@Autowired
 	private EnvironmentConfig config;

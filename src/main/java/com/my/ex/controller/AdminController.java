@@ -1,9 +1,7 @@
 package com.my.ex.controller;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,12 +27,8 @@ import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
-import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
-import com.my.ex.service.AdminService;
-import com.my.ex.service.ExamAnswerService;
-import com.my.ex.service.ExamSelectionService;
 import com.my.ex.service.IAdminService;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
