@@ -1,6 +1,5 @@
 package com.my.ex.dto;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import lombok.Data;

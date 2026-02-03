@@ -1,7 +1,6 @@
 package com.my.ex.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
