@@ -1,4 +1,4 @@
-package com.my.ex.parser;
+package com.my.ex.parser.common;
 
 import lombok.Data;
 

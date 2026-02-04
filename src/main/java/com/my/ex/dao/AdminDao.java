@@ -1,7 +1,6 @@
 package com.my.ex.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,11 @@ public class AdminDao implements IAdminDao {
 	@Override
 	public int deleteFolder(int folderId) {
 		return session.update(NAMESPACE + "deleteFolder", folderId);
+	}
+	
+	@Override
+	public int deleteExamInFolder(int folderId) {
+		return session.update(NAMESPACE + "deleteExamInFolder", folderId);
 	}
 
 	@Override

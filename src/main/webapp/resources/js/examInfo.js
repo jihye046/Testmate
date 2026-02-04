@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     /* 시험 과목 DB 초기화
     ================================================== */
-    const fetchExamSubjects = (params) => {
-        axios.get('/exam/getExamSubjects', { params })
+    const getSubjectsByExamRound = (params) => {
+        axios.get('/exam/getSubjectsByExamRound', { params })
             .then(response => {
                 const examSubjects = response.data.examSubjects
                 updateExamSubjects(examSubjects)
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             examRound: examRoundSelect.value
         }
 
-        fetchExamSubjects(params)
+        getSubjectsByExamRound(params)
     }
 
     /* 시험 과목 UI 초기화
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // 과목 데이터 가져오기
-        fetchExamSubjects(params)
+        getSubjectsByExamRound(params)
     })
 
     /* 다음 버튼 클릭 시

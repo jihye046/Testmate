@@ -1,5 +1,7 @@
 package com.my.ex.dto;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +16,7 @@ public class ExamInfoDto {
 	private String sessionNo; 	// 시험 교시
 	private char isDeleted;		// 시험지 삭제 여부
 	private Integer folderId;
+	private LocalDate created_date;  // 시험지 등록일
 	
 	public ExamInfoDto(String examRound, String examSubject, String sessionNo) {
 		this.examRound = examRound;

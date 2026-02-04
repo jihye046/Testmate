@@ -32,8 +32,8 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	}
 
 	@Override
-	public List<String> getExamSubjects(Map<String, String> map) {
-		return session.selectList(NAMESPACE + "getExamSubjects", map);
+	public List<String> getSubjectsByExamRound(Map<String, String> map) {
+		return session.selectList(NAMESPACE + "getSubjectsByExamRound", map);
 	}
 	
 	@Override
@@ -109,6 +109,11 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	@Override
 	public int findTypeIdByCode(String type) {
 		return session.selectOne(NAMESPACE + "findTypeIdByCode", type);
+	}
+
+	@Override
+	public String findExistingExamFolderId(ExamInfoDto examInfoDto) {
+		return session.selectOne(NAMESPACE + "findExistingExamFolderId", examInfoDto);
 	}
 
 }

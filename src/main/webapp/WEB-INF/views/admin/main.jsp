@@ -211,6 +211,7 @@
 			</div>
 			
 			<div class="modal-body">
+				<!-- PDF 업로드하여 등록 -->
 				<div class="registration-option pdf-upload-option">
 					<h5 class="option-title"><i class="fas fa-file-pdf"></i> PDF 파일로 등록</h5>
 					<p class="option-description">PDF 파일 업로드를 통해 자동으로 문항을 분석하여 등록합니다.</p>
@@ -222,10 +223,89 @@
 						</button>
 						<span id="pdfFileName" class="file-name-display">선택된 파일 없음</span>
 					</div>
+
+					<!-- PDF 업로드 시 나타날 화면 -->
+					<div id="pdf-analysis-section" class="analysis-options-section" style="display:none; margin-top: 20px;">
+						<!-- OCR 옵션 -->
+<!-- 						<div class="option-card-mini"> -->
+<!-- 							<label class="checkbox-container"> -->
+<!-- 								<input type="checkbox" id="ocrOption" checked> -->
+<!-- 								<span class="checkmark"></span> -->
+<!-- 								<span class="option-text">이미지 텍스트 인식(OCR) 포함</span> -->
+<!-- 							</label> -->
+<!-- 						</div> -->
+						
+						<!-- PDF 분석 성공 시 미리보기 -->
+						<div id="previewContainer" style="display: none; margin-top: 20px;">
+							<h5 class="fw-bold"><i class="fas fa-file-alt"></i> 추출 결과 미리보기</h5>
+							<div id="textPreview" style="background: #f8f9fa; border: 1px solid #ddd; padding: 15px; 
+								max-height: 400px; overflow-y: auto; white-space: pre-wrap; border-radius: 8px; font-size: 0.9rem;">
+							</div>
+							<button type="button" class="btn-convert-start" id="btnFinishConversion">
+								<i class="fas fa-magic"></i> 시험지 등록
+							</button>
+						</div>
+
+						<!-- 시험 정보 설정 -->
+						<h4 style="margin-bottom: 20px; font-weight: 800; color: #3a3b45;">시험 정보 설정</h4>
+    
+						<div class="analysis-grid">
+							<div class="form-group">
+								<label><i class="fas fa-layer-group"></i> 시험 유형</label>
+								<select id="selectExamType" class="form-select">
+									<option value="" disabled selected>유형 선택</option>
+									<!-- 서버로부터 받은 데이터로 동적으로 설정 -->
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label><i class="fas fa-book"></i> 시험 과목</label>
+								<select id="selectSubject" class="form-select">
+									<option value="" disabled selected>시험 유형을 선택해주세요</option>
+									<!-- 시험 유형에 따라 동적으로 설정 -->
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label><i class="fas fa-calendar-check"></i> 시행 연도</label>
+								<select id="selectYear" class="form-select">
+									<option value="" disabled selected>연도 선택</option>
+									<!-- 현재 연도부터 과거 10년치를 동적으로 설정 -->
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label><i class="fas fa-redo"></i> 시행 회차</label>
+								<select id="selectRound" class="form-select">
+									<option value="" disabled selected>시험 유형을 선택해주세요</option>
+									<!-- 시험 유형에 따라 동적으로 설정 -->
+								</select>
+							</div>
+						</div>
+
+						<!-- 분석 시작 및 시험지 등록 버튼 -->
+						<div class="upload-actions" style="margin-top: 15px;">
+							<button type="button" class="btn-convert-start" id="btnStartConversion">
+								<i class="fas fa-magic"></i> 분석 및 변환 시작
+							</button>
+						</div>
+
+						<!-- 분석 진행 상태바 (변환 시작 시 노출) -->
+						<div id="loadingOverlay">
+						    <div class="custom-spinner"></div>
+						    <div style="color: white; margin-top: 20px; font-weight: bold; font-size: 1.2rem;">
+						        PDF 시험지를 분석하고 있습니다...
+						    </div>
+						    <div style="color: #ccc; margin-top: 5px;">잠시만 기다려주세요.</div>
+						</div>
+
+					</div>
+
 				</div>
 				
 				<hr>
 				
+				<!-- 직접 등록 -->
 				<div class="registration-option manual-input-option">
 					<h5 class="option-title"><i class="fas fa-keyboard"></i> 직접 문항 등록하기</h5>
 					<p class="option-description">문항 내용을 직접 입력하여 시험지를 만듭니다.</p>

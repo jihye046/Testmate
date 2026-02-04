@@ -1,10 +1,9 @@
 package com.my.ex.controller;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -22,16 +21,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.my.ex.config.EnvironmentConfig;
+import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
-import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
-import com.my.ex.service.AdminService;
-import com.my.ex.service.ExamSelectionService;
+import com.my.ex.service.IAdminService;
+import com.my.ex.service.IExamAnswerService;
+import com.my.ex.service.IExamSelectionService;
 
 // 관리자 페이지에서 수행하는 관리 영역
 @RequestMapping("/admin")
@@ -39,10 +39,16 @@ import com.my.ex.service.ExamSelectionService;
 public class AdminController {
 
 	@Autowired
-	private AdminService service;
+//	private AdminService service;
+	private IAdminService service;
 	
 	@Autowired
-	private ExamSelectionService examService;
+//	private ExamSelectionService examService;
+	private IExamSelectionService examService;
+	
+	@Autowired
+//	private ExamAnswerService answerService;
+	private IExamAnswerService answerService;
 	
 	@Autowired
 	private EnvironmentConfig config;
@@ -136,19 +142,42 @@ public class AdminController {
 		@RequestParam String examSubject,
 		Model model) 
 	{
+		/* 정답지인 경우 */
+		if(examTypeEng.endsWith("Answer")) {
+			List<ExamAnswerDto> answers = answerService.getAnswersByExamId(examId);
+			ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
+			
+			model.addAttribute("answers", answers);
+			model.addAttribute("folderDto", folderDto);
+			
+			return "/admin/answer_page";
+		}
+		
+		/* 시험지인 경우 */
 		List<ExamQuestionDto> questions = examService.getExamQuestionsByExamId(examId);
 		if(questions == null || questions.isEmpty()) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
-		// 데이터 추출
+		
 		List<ExamChoiceDto> choices = examService.getExamChoices(examId);
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto = 
 				examService.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 		
-		// 데이터 담기
+		List<Integer> questionIds = questions.stream()
+			.map(ExamQuestionDto::getQuestionId)
+			.collect(Collectors.toList());
+		 List<ExamAnswerDto> answers = answerService.getAnswerByQuestionId(questionIds);
+		
+		// question_id 조회 후 [exam_answer] 테이블에서 같은 question_id를 가진 correctAnswer을 조회
+//		for(ExamQuestionDto dto: questions) {
+//			answers.add(answerService.getAnswerByQuestionId(dto.getQuestionId()));
+//		}
+		
 		ExamPageDto response = 
-				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
+				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto, answers);
+		// getAnswersByQuestionIds(List<Integer> questionIds)
+		
 		model.addAttribute("examPageDto", response);
 		model.addAttribute("folderDto", folderDto);
 		
@@ -225,7 +254,12 @@ public class AdminController {
 	@DeleteMapping("/deleteFolder/{folderId}")
 	@ResponseBody
 	public boolean deleteFolder(@PathVariable int folderId) {
-		return service.deleteFolder(folderId);
+		try {
+			service.deleteFolder(folderId);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	@GetMapping("/createExamPage")

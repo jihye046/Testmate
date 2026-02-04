@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.ex.ExamAnswerMapper">
+
+	<!-- questionId 조회 -->
+	<select id="getQuestionId" parameterType="java.util.HashMap" resultType="Integer">
+		SELECT Q.QUESTION_ID
+		  FROM EXAM_QUESTION Q
+		  JOIN EXAM_INFO I ON I.EXAM_ID = Q.EXAM_ID
+		 WHERE I.EXAM_SUBJECT = #{examInfoDto.examSubject}
+		   AND I.EXAM_ROUND = #{examInfoDto.examRound}
+		   AND I.EXAM_TYPE_ID = #{examInfoDto.examTypeId}
+		   AND Q.QUESTION_NUM = #{questionNum}
+	</select>
+
+	<!-- 정답지 PDF 업로드 시 정답지 저장 -->
+	<insert id="saveParsedAnswerData" parameterType="ExamAnswerDto">
+		INSERT INTO exam_answer
+			(
+			answer_id,
+			question_id,
+			correct_answer,
+			exam_id
+			)
+		VALUES
+			(
+			seq_exam_answer.nextval,
+			#{questionId},
+			#{correctAnswer},
+			#{examId}
+			)
+	</insert>
+	
+	<!-- 정답지sheet 클릭 시 정답지만 조회 -->
+	<select id="getAnswersByExamId" parameterType="int" resultType="ExamAnswerDto">
+		SELECT q.question_num, a.correct_answer, a.question_id
+		  FROM exam_answer a
+		  JOIN exam_question  q on q.question_id = a.question_id
+		 WHERE a.exam_id = #{examid}
+		 ORDER BY QUESTION_NUM
+	</select>
+	
+	<select id=""></select>
+	
+	<!-- 정답지 수정 -->
+	<update id="updateAnswers" parameterType="ExamAnswerDto">
+		UPDATE exam_answer
+		   SET correct_answer = #{correctAnswer}
+		 WHERE question_id = #{questionId}
+	</update>
+	
+	<!-- 문제지 클릭 시 연결된 정답지 조회 -->
+	<select id="getAnswerByQuestionId" parameterType="java.util.List" resultType="ExamAnswerDto">
+		SELECT q.question_num, a.correct_answer, a.question_id
+		  FROM exam_answer a
+		  JOIN exam_question  q on q.question_id = a.question_id
+		 WHERE a.question_id IN 
+		 	<foreach collection="list" item="questionIds" open="(" separator="," close=")">
+		 		#{questionIds}
+	 		</foreach>
+		 ORDER BY QUESTION_NUM
+	</select>
+	
+</mapper>

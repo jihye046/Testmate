@@ -1,0 +1,206 @@
+@charset "UTF-8";
+
+:root {
+    --primary-color: #3498db;
+    --success-color: #2ecc71;
+    --border-color: #e2e8f0;
+    --bg-color: #f8fafc;
+}
+
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+}
+
+.answer-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--bg-color);
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #2d3748;
+}
+
+/* 테이블 스타일 */
+.answer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.answer-table th {
+    background-color: #f1f5f9;
+    padding: 12px;
+    text-align: center;
+    color: #475569;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.answer-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 문항 번호 */
+.q-num {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+/* 정답 입력창 */
+.answer-input {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.answer-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* 상태 뱃지 */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.status-wait { background: #fee2e2; color: #dc2626; }
+.status-done { background: #dcfce7; color: #16a34a; }
+
+/* 동작 버튼 */
+.btn-reset {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.btn-reset:hover { color: #ef4444; }
+
+.footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.btn-primary { background-color: var(--primary-color); color: #fff; }
+.btn-secondary { background-color: #94a3b8; color: #fff; }
+.btn:hover { opacity: 0.9; }
+
+/* 요약 바 */
+.summary-bar {
+    background: #f1f5f9;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* =================================================================
+ * RESPONSIVE STYLES (for screens <= 768px, tablets and phones)
+ * ================================================================= */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .answer-container {
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .header h2 {
+        font-size: 1.2rem;
+    }
+
+    /* 요약 바를 2열로 배치 */
+    .summary-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+
+    .summary-bar span:first-child {
+        grid-column: span 2; /* 총 문항은 상단에 크게 표시 */
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 5px;
+    }
+
+    /* 테이블 간격 조정 */
+    .answer-table td, .answer-table th {
+        padding: 10px 5px;
+    }
+
+    .answer-input {
+        width: 60px; /* 입력창 크기 축소 */
+        font-size: 1rem;
+    }
+
+    /* 상태 뱃지 텍스트 숨기기 (아이콘만 표시하여 공간 확보) */
+    .status-badge {
+        padding: 5px;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        justify-content: center;
+    }
+
+    .status-badge span {
+        display: none; /* "완료", "대기" 글자 숨김 */
+    }
+
+    /* 동작 버튼 터치 영역 확대 */
+    .btn-reset {
+        padding: 10px;
+        font-size: 1.1rem;
+    }
+}

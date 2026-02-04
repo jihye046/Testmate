@@ -12,7 +12,7 @@ import com.my.ex.dto.response.ExamTitleDto;
 public interface IExamSelectionDao {
 	List<ExamTypeDto> getExamTypes();
 	List<String> getExamRounds(String examTypeCode);
-	List<String> getExamSubjects(Map<String, String> map);
+	List<String> getSubjectsByExamRound(Map<String, String> map);
 	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId);
 	int checkExistingExamInfo(ExamInfoDto examInfo);
 	void saveParsedExamInfo(ExamInfoDto examInfo);
@@ -28,4 +28,5 @@ public interface IExamSelectionDao {
 	int findSubjectIdByName(Map<String, Object> map);
 	List<String> getSubjectsForExamType(String examTypeCode);
 	int findTypeIdByCode(String type);
+	String findExistingExamFolderId(ExamInfoDto examInfoDto);
 }

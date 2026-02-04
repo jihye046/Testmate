@@ -1,4 +1,4 @@
-package com.my.ex.parser;
+package com.my.ex.parser.common;
 
 import java.util.List;
 import java.util.Map;

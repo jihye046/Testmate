@@ -76,11 +76,22 @@
 		 </foreach>
 	</update>
 	
-	<!-- 폴더 삭제 요청 시 isDeleted 값 업데이트 -->
+	<!-- 폴더 삭제 요청 시 폴더의 isDeleted 값 업데이트 -->
 	<update id="deleteFolder" parameterType="int">
 		UPDATE exam_folder
 		   SET isDeleted = 'Y'
 		 WHERE folder_id = #{folderId}
+	</update>
+	
+	<!-- 폴더 삭제 요청 시 시험지 또는 정답지의 isDeleted 값 업데이트 -->
+	<update id="deleteExamInFolder" parameterType="int">
+		UPDATE exam_info
+		   SET isDeleted = 'Y'
+		 WHERE exam_id IN (
+		     SELECT exam_id
+		     FROM exam_info
+		     WHERE FOLDER_ID = ${folderId}
+		 )
 	</update>
 	
 	<!-- 선택된 시험지의 폴더ID와 폴더Name 조회 -->

@@ -1,9 +1,8 @@
 package com.my.ex.controller;
 
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,32 +14,33 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
+import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
-import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
-import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
-import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
+import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
-import com.my.ex.parser.ExamInfo;
-import com.my.ex.parser.GedExamParser;
+import com.my.ex.dto.response.ExamPdfPreview;
+import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
+import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
+import com.my.ex.service.IExamAnswerService;
+import com.my.ex.service.IExamSelectionService;
 
 // 시험지 선택/조회 등 관리 영역 
 @Controller
@@ -48,7 +48,12 @@ import com.my.ex.service.ExamSelectionService;
 public class ExamSelectionController {
 	
 	@Autowired
-	private ExamSelectionService service;
+//	private ExamSelectionService service;
+	private IExamSelectionService service;
+	
+	@Autowired
+//	private ExamAnswerService answerService;
+	private IExamAnswerService answerService;
 	
 	@Autowired
 	private EnvironmentConfig config;
@@ -58,6 +63,12 @@ public class ExamSelectionController {
 		List<ExamTypeDto> list = service.getExamTypes();
 		model.addAttribute("examtypes", list);
 		return "/exam/main";
+	}
+	
+	@GetMapping("/getExamTypes")
+	@ResponseBody
+	public List<ExamTypeDto> getExamTypes(){
+		return service.getExamTypes();
 	}
 	
 	@GetMapping("/getExamRounds")
@@ -71,13 +82,13 @@ public class ExamSelectionController {
 		return group;
 	}
 	
-	@GetMapping("/getExamSubjects")
+	@GetMapping("/getSubjectsByExamRound")
 	@ResponseBody
 	public ExamInfoGroup getExamSubjects(
 		@RequestParam String examTypeCode,
 		@RequestParam String examRound) 
 	{
-		List<String> examSubjects = service.getExamSubjects(examTypeCode, examRound);
+		List<String> examSubjects = service.getSubjectsByExamRound(examTypeCode, examRound);
 		
 		ExamInfoGroup group = new ExamInfoGroup();
 		group.setExamSubjects(examSubjects);
@@ -94,7 +105,7 @@ public class ExamSelectionController {
 			return "error: PDF 텍스트 내용이 비어있습니다.";
 		}
 		
-		GedExamParser parse = new GedExamParser();
+		GeomjeongExamParser parse = new GeomjeongExamParser();
 		List<Map<String, Object>> questions = parse.parse(text);
 		// 파싱된 시험 정보 및 문제 리스트 추출
 		ExamInfoDto examInfo = parse.getExamInfo();
@@ -128,7 +139,7 @@ public class ExamSelectionController {
 		@RequestParam String examSubject,
 		Model model) 
 	{
-		
+		// 시험지인 경우
 		String examTypeKor = service.getExamtypename(examTypeEng);
 		List<ExamQuestionDto> questions = service.getExamQuestions(examTypeEng, examRound, examSubject);
 		if(questions == null || questions.isEmpty()) {
@@ -210,18 +221,14 @@ public class ExamSelectionController {
 		return service.getSubjectsForExamType(examTypeCode);
 	}
 	
-//	@PostMapping("/saveExamByForm")
-//	@ResponseBody
-//	public void saveExamByForm(@RequestBody ExamCreateRequestDto request) throws IOException {
-//		return service.saveExamByForm(request);
-//		
-//		/**
-//		 * FEAT
-//		 */
-//		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
-//	}
-	
-	
+	/**
+	 * 관리자가 시험지를 직접 작성하여 등록하는 경우
+	 * @param examInfoStr
+	 * @param questionsStr
+	 * @param fileMap
+	 * @return
+	 * @throws IOException
+	 */
 	@PostMapping("/saveExamByForm")
 	@ResponseBody
 	public boolean saveExamByForm(
@@ -242,13 +249,92 @@ public class ExamSelectionController {
 		requestDto.setFileMap(fileMap);
 		
 		return service.saveExamByForm(requestDto);
+	}
+	
+	/**
+	 * 관리자가 시험지 PDF를 업로드하여 등록하는 경우
+	 * @param examInfo
+	 * @param pdfFile
+	 * @param folderId
+	 * @return
+	 */
+	@PostMapping("/loadPdfFile")
+	@ResponseBody
+	public ExamPdfPreview loadPdfFile(
+			@RequestParam String examInfo,
+			@RequestParam MultipartFile pdfFile,
+			@RequestParam Integer folderId)
+	{
 		
-		/**
-		 * FEAT
-		 */
-		// JS에서 보내는 passageData.rangeArray = rangeArray 값이 담겨지지 않았음
-		// JS에서 보내는 individualPassage 객체의 questionNum 값이 담겨지지 않았음
-		// 이미지 등록 시 생성되지 않은 폴더이면 자동으로 폴더 생성되도록
+		try {
+			// 시험지 정보 매핑
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, String> examInfoMap = mapper.readValue(examInfo, new TypeReference<Map<String, String>>() {});
+			String examTypeCode = examInfoMap.get("examTypeCode");
+			String examRound = examInfoMap.get("examRound");
+			String examSubject = examInfoMap.get("examSubject");
+			
+			ExamInfoDto examInfoDto = new ExamInfoDto(examRound, examSubject);
+			examInfoDto.setExamTypeId(service.findTypeIdByCode(examTypeCode));
+			examInfoDto.setFolderId(folderId);
+			
+			boolean result = false;
+			List<Map<String, Object>> questions = null;
+			
+			// 검정고시 시험지인 경우
+			if(examTypeCode.endsWith("geomjeong")) {
+				// 1. 시험지 PDF 텍스트 추출 후 파싱된 전체 문제 리스트를 반환
+				questions = service.parsePdfToQuestions(pdfFile);
+				if(questions == null || questions.isEmpty()) {
+					return new ExamPdfPreview(false, "PDF에서 시험지를 추출할 수 없습니다.", null);
+				}
+				
+				// 2. 시험지 등록 
+				result = service.saveParsedExamData(examInfoDto, questions);
+			} 
+			
+			// 검정고시 답안지인 경우
+			else if(examTypeCode.endsWith("geomjeongAnswer")) { // 문자열 비교하는 부분을 enum이나, 상수로 빼는것을 고려
+				// 1. 정답지 PDF 텍스트 추출
+				Map<Integer, String> answerMap = answerService.parsePdfToAnswers(pdfFile);
+				
+				// 2. 정답지와 연결될 시험지의 examTypeCode를 이용해 examTypeId 조회 및 설정
+				String examTypeCodeWithoutAnswer = answerService.examTypeCodeWithoutAnswer(examTypeCode);
+				int mappedExamTypeId = service.findTypeIdByCode(examTypeCodeWithoutAnswer);
+				examInfoDto.setExamTypeId(mappedExamTypeId);
+				
+				// 3. 정답지의 examTypeCode를 이용해 examTypeId 조회
+				int originalExamTypeId  = service.findTypeIdByCode(examTypeCode);
+				
+				// 4. db저장용 구조로 변환
+				List<ExamAnswerDto> answersList = answerService.buildParsedAnswerData(answerMap, examInfoDto);
+				if(answersList == null || answersList.isEmpty()) {
+					return new ExamPdfPreview(false, "시험지를 먼저 등록하신 후 정답지를 등록해주세요", null);
+				}
+				
+				// 5. 정답지 등록
+				/* 문제지 examTypeId로 저장되어있던 것을 정답지 examTypeId로 다시 설정하여 정답지 등록 */
+				examInfoDto.setExamTypeId(originalExamTypeId);
+				result = answerService.saveParsedAnswerData(examInfoDto, answersList);
+			}
+			
+			// 시험지/정답지 등록 결과에 따른 응답처리
+			if(!result) {
+				String folderName = service.findExistingExamFolderId(examInfoDto);
+				return new ExamPdfPreview(false, '"' + folderName + '"' + " 폴더에 이미 등록된 문서입니다.", null);
+			}
+			
+			return new ExamPdfPreview(true, "파일이 등록되었습니다.", questions); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ExamPdfPreview(false, "잘못된 입력값입니다.", null);
+		}
+	}
+	
+	@PatchMapping("/updateAnswers")
+	@ResponseBody
+	public boolean updateAnswers(@RequestBody Map<String, List<ExamAnswerDto>> answers) {
+		return answerService.updateAnswers(answers.get("answers"));
 	}
 	
 }

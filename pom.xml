@@ -269,6 +269,20 @@
 		    <artifactId>spring-boot-devtools</artifactId>
 		    <version>4.0.0-M3</version>
 		</dependency>
+		
+		<!-- pdf 업로드 시 텍스트 추출 -->
+		<dependency>
+		    <groupId>org.apache.pdfbox</groupId>
+		    <artifactId>pdfbox</artifactId>
+		    <version>2.0.30</version>
+		</dependency>
+		
+		<!-- 날짜 데이터가 숫자로 나오는 현상을 해결하고 yyyy-mm-dd 형식으로 변환해주는 모듈 -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.datatype</groupId>
+		    <artifactId>jackson-datatype-jsr310</artifactId>
+		    <version>2.15.2</version> 
+		</dependency>
 	
 	</dependencies>
     <build>

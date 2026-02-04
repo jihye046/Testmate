@@ -2,6 +2,25 @@
 let activeFolderId = null
 let activeFolderName = null
 
+// PDF 분석 완료 여부
+let isAnalyzed = false
+
+// PDF 업로드 관련 DOM 요소
+const pdfFileInput = document.querySelector("#pdfFileInput")
+
+const selectExamType = document.querySelector("#selectExamType")
+const selectYear = document.querySelector("#selectYear")
+const selectSubject = document.querySelector("#selectSubject")
+const selectRound = document.querySelector("#selectRound")
+
+// 🌐 시험 유형별 회차 매핑 (⭐ 시험 유형 추가 시 회차 매핑해줄것 ⭐)
+const examRoundMap = {
+    geomjeong: 4,
+    suneung: 2,
+    engineer: 1,
+    geomjeongAnswer: 4
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // exam_page.jsp에서 '목록으로' 버튼을 눌러서 다시 돌아온 경우 '시험지 목록' 화면으로 보여주기
     const params = new URLSearchParams(window.location.search) // 현재 URL에서 쿼리스트링만 가져옴
@@ -30,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 폴더 삭제 버튼
         const folderDeleteBtn = e.target.closest('.btn-delete')
         if(folderDeleteBtn){
+            const confirmed = confirm('폴더를 삭제하시겠습니까? 해당 폴더에 포함된 시험지들도 함께 삭제됩니다.')
+            if(!confirmed) return
+            
             const folderId = folderDeleteBtn.getAttribute('data-id')
             deleteFolder(folderId)
         }
@@ -120,6 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#createExamModal .btn-cancel").addEventListener('click', closeCreateExamModal)
     document.querySelector("#createExamModal .modal-close-btn").addEventListener('click', closeCreateExamModal)
 
+    /* 📄 시험지 PDF 파일 업로드로 등록하기
+    ================================================== */
+
     // PDF 파일 선택 버튼 클릭 리스너
     const pdfFileInput = document.querySelector("#pdfFileInput")
     document.querySelector(".btn-upload-trigger").addEventListener('click', () => {
@@ -128,10 +153,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PDF 파일 업로드 감지 리스너
     const pdfFileNameSpan = document.querySelector("#pdfFileName")
+    const analysisOptionsSection = document.querySelector("#pdf-analysis-section")
+
     pdfFileInput.addEventListener('change', (e) => {
         const fileName = e.target.files.length > 0 ? e.target.files[0].name : '선택된 파일 없음'
         pdfFileNameSpan.textContent = fileName
+        analysisOptionsSection.style.display = e.target.files.length > 0 ? 'block' : 'none'
+
+        // 파일 변경 시 시험 유형 옵션 다시 불러오기
+        fetchGetExamTypes()
     })
+    
+    // PDF 분석 및 변환 시작 버튼 클릭 리스너
+    analysisOptionsSection.addEventListener('click', (e) => {
+        const btnStartConversion = e.target.closest('#btnStartConversion')
+        if(btnStartConversion){
+            loadPdfFile()
+        }
+    })
+
+    // PDF 시험지 정보 설정 
+    fetchGetExamTypes() // 시험 유형 가져오기
+    selectExamType.addEventListener('change', (e) => {
+        const selectedType = e.target.value // 관리자가 선택한 시험 유형 값
+        fetchGetSubjects(selectedType)
+    }) // 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
+    
+    updateExamYears() //현재 연도부터 과거 10년을 selectbox에 넣기
+
+
+    /* 시험지 직접 등록하기
+    ================================================== */
 
     // 직접 등록하기 버튼 클릭 리스너
     document.querySelector(".btn-manual-register").addEventListener('click', () => {
@@ -350,6 +402,11 @@ const editFolder = () =>{}
 ================================================== */
 const createExamModal = document.querySelector("#createExamModal")
 
+const pdfFileName = document.querySelector("#pdfFileName")
+const uploadActionContainer = document.querySelector(".upload-actions")
+const progressContainer = document.querySelector("#loadingOverlay")
+const previewContainer = document.querySelector("#previewContainer")
+
 // 시험지 등록 모달 열기
 const openCreateExamModal = () => {
     createExamModal.style.display = 'flex'
@@ -358,13 +415,69 @@ const openCreateExamModal = () => {
 // 시험지 등록 모달 닫기
 const closeCreateExamModal = () => {
     createExamModal.style.display = 'none'
+    pdfFileInput.value = ''
+    pdfFileName.textContent = '선택된 파일 없음'
+    document.querySelector(".analysis-options-section").style.display = 'none'
+    uploadActionContainer.style.display = 'block'
+    progressContainer.style.display = 'none'
+    clearPdfUploadSelectbox()
 }
 
 // 시험지 PDF 업로드 등록 함수
+const loadPdfFile = () => {
+    // uploadActionContainer.style.display = 'none'
+    progressContainer.style.display = 'flex'
 
+    const formData = new FormData()
 
-// 시험지 직접 등록 함수
-const createExam = () => {}
+    // 시험지 정보 데이터 유효성 검사
+    const examInfo = validateExamInfo()
+    if(!examInfo) {
+        progressContainer.style.display = 'none'
+        return
+    }
+    // 서버로 파일 전송
+    formData.append('examInfo', JSON.stringify(examInfo))
+    formData.append('pdfFile', pdfFileInput.files[0])
+    formData.append('folderId', activeFolderId)
+
+    axios.post('/exam/loadPdfFile', formData)
+        .then(response => {
+            const isSaved = response.data.saved
+            if(isSaved){
+                // 분석 상태 변수 업데이트
+                isAnalyzed = true
+
+                
+
+                // 미리보기 컨테이너 보이기
+                // previewContainer.style.display = 'block'
+
+                // 추출된 텍스트 미리보기 영역에 표시
+                // const textPreview = document.querySelector("#textPreview")
+                // response.data.questions.forEach((map) => {
+                //     console.log(map)
+                // })
+                
+                // 시험지 목록 새로고침
+                loadExamListData(activeFolderId)
+
+                // 폴더 리스트 새로고침
+                fetchFolderList()
+
+                // 모달 닫기
+                closeCreateExamModal()
+            } else {
+                // 모달은 닫지 않고 'PDF 분석중' 표시만 숨김
+                progressContainer.style.display = 'none'
+            }
+            alert(response.data.resultMessage)
+
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
+}
 
 // 일괄 선택 버튼 로드 함수
 const loadBulkActionBtn = () => {
@@ -426,7 +539,7 @@ const loadExamListData = (folderId) => {
                             <h3 class="card-title">${examTitleDto.displayTitle}</h3>
                             <div class="card-meta">
                                 <p><i class="fas fa-question-circle"></i> 문항 수: <strong>${examTitleDto.totalCount}개</strong></p>
-                                <p><i class="fas fa-calendar-alt"></i> 등록일: 2025-01-01</p>
+                                <p><i class="fas fa-calendar-alt"></i> 등록일: ${examTitleDto.createdDate}</p>
                             </div>
                             <div class="card-actions">
                                 <button class="btn btn-action btn-view" 
@@ -689,6 +802,108 @@ const deleteSelectedExams = () => {
     fetchExamDelete(selectedExamIds)
 }
 
+/* PDF 업로드 설정
+================================================== */
+
+// 시험 과목 UI 동적으로 설정
+const updateExamSubjects = (examSubjects) => {
+    let options = '<option value="" disabled selected>과목 선택</option>'
+    examSubjects.forEach((subject) => {
+        options += `<option value="${subject}">${subject}</option>`
+    })
+
+    selectSubject.innerHTML = options
+}
+
+// 시험 유형 UI 동적으로 설정
+const updateExamTypes = (examTypes) => {
+    let options = `<option value="" disabled selected>유형 선택</option>`
+    examTypes.forEach((examType) => {
+        options += `<option value="${examType.examTypeCode}">${examType.examTypeName}</option>`
+    })
+
+    selectExamType.innerHTML = options
+}
+
+// 시험 시행 연도 UI 동적으로 설정
+const updateExamYears = () => {
+    const currentYear = new Date().getFullYear()
+
+    for(let year = currentYear; year >= currentYear - 10; year--){
+        const option = document.createElement('option')
+        option.value = year
+        option.textContent = `${year}년`
+        selectYear.appendChild(option)
+    }
+}
+
+// 시험 시행 회차 UI 동적으로 설정
+// 1. 시험 유형에 따른 최대 회차 매핑
+const updateExamRounds = (selectedType) => {
+    
+    const examType = selectedType.split("-").pop() 
+    const round = examRoundMap[examType] || 1
+    
+    createRoundOptions(round)
+}
+
+// 2. 회차 옵션 생성 함수
+const createRoundOptions = (round) => {
+    let options = `<option value="" disabled selected>회차 선택</option>`
+    
+    for(let i = 1; i <= round; i++){
+        options += `<option value="${i}">${i}회</option>`
+    }
+
+    selectRound.innerHTML = options
+}
+
+// 시험지 정보 유효성 검사
+const validateExamInfo = () => {
+    const examTypeValue = selectExamType.value
+    const examYearValue = selectYear.value
+    const subjectValue = selectSubject.value
+    const roundValue = selectRound.value
+    
+    if(!examTypeValue){selectExamType.focus(); return null} 
+    if(!subjectValue){selectSubject.focus(); return null}
+    if(!examYearValue){selectYear.focus(); return null} 
+    if(!roundValue){selectRound.focus(); return null}
+    
+    return {
+        examTypeCode: examTypeValue, 
+        examRound: `${examYearValue}년도 제${roundValue}회`, 
+        examSubject: subjectValue
+    }
+}
+
+// 시험 유형 가져오기
+const fetchGetExamTypes = () => {
+    axios.get('/exam/getExamTypes')
+        .then(response => {
+            updateExamTypes(response.data)
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
+}
+
+// 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
+const fetchGetSubjects = (selectedType) => {
+    const params = {
+        examTypeCode: selectedType
+    }
+    
+    axios.get('/exam/getSubjectsForExamType', { params })
+        .then(response => {
+            const examSubjects = response.data
+            updateExamSubjects(examSubjects)
+            updateExamRounds(selectedType)
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
+}
 
 /* 초기화 함수
 ================================================== */
@@ -708,4 +923,12 @@ const clearSelections = () => {
 
     // 폴더 id 초기화
     activeFolderId = null
+}
+
+// 시험지 정보 [selectbox] UI 초기화
+const clearPdfUploadSelectbox = () => {
+    selectExamType.innerHTML = '<option value="" disabled selected>유형 선택</option>'
+    selectSubject.innerHTML = '<option value="" disabled selected>시험 유형을 선택해주세요</option>'
+    selectYear.innerHTML = '<option value="" disabled selected>연도 선택</option>'
+    selectRound.innerHTML = '<option value="" disabled selected>시험 유형을 선택해주세요</option>'
 }

@@ -1,14 +1,12 @@
 package com.my.ex.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.ibatis.mapping.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +30,10 @@ import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
+import com.my.ex.parser.geomjeong.upload.exam.UploadedGeomjeongPdfTextExtractor;
+import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
+import com.my.ex.parser.geomjeong.upload.exam.GeomjeongPdfTextNormalizer;
+
 
 @Service
 public class ExamSelectionService implements IExamSelectionService {
@@ -42,6 +43,15 @@ public class ExamSelectionService implements IExamSelectionService {
 	
 	@Autowired
 	private EnvironmentConfig config;
+	
+	@Autowired
+	private UploadedGeomjeongPdfTextExtractor extractor;
+	
+	@Autowired
+	private GeomjeongPdfTextNormalizer normalizer;
+	
+	@Autowired
+	private GeomjeongExamParser gedExamParser;
 	
 	@Override
 	public List<ExamTypeDto> getExamTypes() {
@@ -54,12 +64,12 @@ public class ExamSelectionService implements IExamSelectionService {
 	}
 
 	@Override
-	public List<String> getExamSubjects(String examTypeCode, String examRound) {
+	public List<String> getSubjectsByExamRound(String examTypeCode, String examRound) {
 		Map<String, String> map = new HashMap<>();
 		map.put("examTypeCode", examTypeCode);
 		map.put("examRound", examRound);
 		
-		return dao.getExamSubjects(map);
+		return dao.getSubjectsByExamRound(map);
 	}
 	
 	@Override
@@ -86,8 +96,8 @@ public class ExamSelectionService implements IExamSelectionService {
 		}
 		
 		// 시험 정보 저장
-		dao.saveParsedExamInfo(examInfo); // 시험 정보 저장 후 examId 받아옴
-		Integer examId = (Integer)examInfo.getExamId(); // DB 삽입 후 주입된 examId
+		dao.saveParsedExamInfo(examInfo); // 시험 정보 저장 후 examId으로 설정됨
+		Integer examId = (Integer)examInfo.getExamId(); // DB 삽입 후 주입된 examId 가져옴
 		if(examId == null || examId <= 0) throw new RuntimeException();
 		
 		// 시험 문제 저장
@@ -311,6 +321,34 @@ public class ExamSelectionService implements IExamSelectionService {
 		} else {
 			throw new IllegalArgumentException("알 수 없는 이미지 저장소 타입: " + config.getImageStorageType());
 		}
+	}
+
+	/**
+	 * 관리자가 업로드한 PDF를 읽음
+	 */
+	@Override
+	public List<Map<String, Object>> parsePdfToQuestions(MultipartFile file) throws Exception {
+		// 1. PDF 텍스트 추출
+		String text = extractor.extract(file);
+		
+		// 2. 한글 spacing 정리 및 좌/우 단 섞임 복구
+		text = normalizer.normalize(text);
+//		text = PdfTextNormalizer.normalize(text);
+		
+		if(text == null || text.trim().isEmpty()) {
+			throw new Exception("PDF에서 텍스트를 읽을 수 없습니다. PDF 파일인지 확인해주세요.");
+		}
+		
+		// 3. 파서를 이용하여 텍스트를 List<Map> 구조로 변환
+		return gedExamParser.parse(text);
+	}
+
+	/**
+	 * 중복된 시험지를 등록하려는 경우 어느 폴더에 등록되었는지 알려주기 위해 folderId를 조회
+	 */
+	@Override
+	public String findExistingExamFolderId(ExamInfoDto examInfoDto) {
+		return dao.findExistingExamFolderId(examInfoDto);
 	}
 
 }

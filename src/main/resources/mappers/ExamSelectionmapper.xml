@@ -9,7 +9,7 @@
 			   exam_type_name
 		  FROM exam_type
 		 WHERE is_deleted = 0
-		 ORDER BY exam_type_name
+		 ORDER BY exam_type_id
 	</select>
 	
 	<select id="getExamRounds" resultType="String">
@@ -24,7 +24,8 @@
 		 ORDER BY exam_round
 	</select>
 	
-	<select id="getExamSubjects" parameterType="java.util.HashMap" resultType="String">
+	<!-- 특정 시험 회차에 대해 등록된 시험 과목을 불러옴  -->
+	<select id="getSubjectsByExamRound" parameterType="java.util.HashMap" resultType="String">
 		SELECT distinct exam_subject
 		  FROM exam_info
 		 WHERE exam_type_id = (
@@ -37,7 +38,7 @@
 		 ORDER BY exam_subject
 	</select>
 	
-	<!-- 특정 폴더에 있는 모든 시험 제목 가져옴 -->
+	<!-- 특정 폴더에 있는 모든 시험지/정답지 정보 가져옴 -->
 	<select id="getAllExamTitlesByFolderId" resultType="ExamTitleDto">
 		SELECT
 			 i.exam_type_id AS examTypeId,
@@ -47,17 +48,26 @@
 		     i.exam_id AS examId,
 		     i.exam_round AS examRound,
 		     i.exam_subject AS examSubject,
-		     (SELECT COUNT(*) 
-                FROM exam_question q 
-               WHERE q.exam_id = i.exam_id
-             ) AS totalCount,
+		     
+		     CASE
+		     	WHEN t.exam_type_code LIKE '%Answer' THEN
+		     	    (SELECT COUNT(*) 
+		               FROM exam_answer a 
+		              WHERE a.exam_id = i.exam_id)
+		        ELSE
+				    (SELECT COUNT(*) 
+		               FROM exam_question q 
+		              WHERE q.exam_id = i.exam_id)
+			END AS totalCount,
+			
+             i.created_date,
              f.folder_id
 		  FROM exam_info i
 		  JOIN exam_type t ON i.exam_type_id = t.exam_type_id
 		  JOIN exam_folder f ON i.folder_id = f.folder_id
 		  WHERE f.folder_id = #{folderId}
 		    AND i.isdeleted = 'N'
-		  ORDER BY examround desc
+		  ORDER BY i.created_date DESC
 	</select>
 		
 	<!-- 중복 시험 여부 확인 -->
@@ -252,6 +262,17 @@
 		 SELECT exam_type_id
 		   FROM exam_type
 		  WHERE exam_type_code = #{type}
+	</select>
+	
+	<!-- 중복된 시험지를 등록하려는 경우 어느 폴더에 등록되었는지 알려주기 위해 folderId를 조회 -->
+	<select id="findExistingExamFolderId" parameterType="ExamInfoDto" resultType="String">
+		SELECT f.folder_name
+		  FROM exam_folder f
+		  JOIN exam_info i ON i.folder_id = f.folder_id
+		 WHERE i.exam_type_id = #{examTypeId}
+		   AND i.exam_round = #{examRound}
+		   AND i.exam_subject = #{examSubject}
+		   AND i.isdeleted = 'N'
 	</select>
 	
 </mapper>

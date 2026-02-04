@@ -1,7 +1,6 @@
 package com.my.ex.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
@@ -15,5 +14,6 @@ public interface IAdminDao {
 	List<ExamFolderDto> getFolderListExcluding(int excludeFolderId);
 	int moveExamsToFolder(MoveExamsToFolderDto dto);
 	int deleteFolder(int folderId);
+	int deleteExamInFolder(int folderId);
 	ExamFolderDto getFolderInfoByExamId(int examId);
 }
