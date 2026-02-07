@@ -24,7 +24,8 @@ public interface IExamSelectionService {
 	String getExamtypename(String examType);
 	List<ExamQuestionDto> getExamQuestions(String examType, String examRound, String examSubject);
 	List<ExamQuestionDto> getExamQuestionsByExamId(int examId);
-	List<ExamChoiceDto> getExamChoices(int examId);
+	List<ExamChoiceDto> getExamChoicesByExamId(int examId);
+	List<ExamChoiceDto> getExamChoicesByQuestionId(int questionId);
 	Set<ExamPageDto.ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject);
 	int getTotalQuestionCount(int examId);
 	boolean deleteExams(List<Integer> examIds);
@@ -35,4 +36,6 @@ public interface IExamSelectionService {
 	void ensureImageFolderExists(String folderPath, String filename, MultipartFile file);
 	List<Map<String, Object>> parsePdfToQuestions(MultipartFile file) throws Exception;
 	String findExistingExamFolderId(ExamInfoDto examInfoDto);
+	ExamInfoDto getExamInfoByExamId(int examId);
+	ExamQuestionDto getExamQuestionByQuestionId(int questionId);
 }

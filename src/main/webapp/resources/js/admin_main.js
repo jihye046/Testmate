@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#createExamModal .btn-cancel").addEventListener('click', closeCreateExamModal)
     document.querySelector("#createExamModal .modal-close-btn").addEventListener('click', closeCreateExamModal)
 
+    
     /* 📄 시험지 PDF 파일 업로드로 등록하기
     ================================================== */
 
@@ -156,12 +157,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const analysisOptionsSection = document.querySelector("#pdf-analysis-section")
 
     pdfFileInput.addEventListener('change', (e) => {
-        const fileName = e.target.files.length > 0 ? e.target.files[0].name : '선택된 파일 없음'
-        pdfFileNameSpan.textContent = fileName
-        analysisOptionsSection.style.display = e.target.files.length > 0 ? 'block' : 'none'
+        const hasFile = e.target.files.length > 0
+        const fileName = hasFile ? e.target.files[0].name : '선택된 파일 없음'
 
+        pdfFileNameSpan.textContent = fileName
+        analysisOptionsSection.style.display = hasFile ? 'block' : 'none'
+
+        // 전체 초기화
+        clearPdfUploadSelectbox()
+        
         // 파일 변경 시 시험 유형 옵션 다시 불러오기
-        fetchGetExamTypes()
+        if(hasFile){
+            fetchGetExamTypes()
+        }
     })
     
     // PDF 분석 및 변환 시작 버튼 클릭 리스너
@@ -173,13 +181,19 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     // PDF 시험지 정보 설정 
-    fetchGetExamTypes() // 시험 유형 가져오기
+    fetchGetExamTypes() 
     selectExamType.addEventListener('change', (e) => {
-        const selectedType = e.target.value // 관리자가 선택한 시험 유형 값
+        const selectedType = e.target.value 
+
+        // selectbox 값 초기화
+        selectYear.value = ''
+        selectSubject.value = ''
+        selectRound.value = ''
+		
+		// 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
         fetchGetSubjects(selectedType)
-    }) // 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
-    
-    updateExamYears() //현재 연도부터 과거 10년을 selectbox에 넣기
+        updateExamYears() 
+    }) 
 
 
     /* 시험지 직접 등록하기
@@ -828,7 +842,8 @@ const updateExamTypes = (examTypes) => {
 // 시험 시행 연도 UI 동적으로 설정
 const updateExamYears = () => {
     const currentYear = new Date().getFullYear()
-
+    
+	// 현재 연도 ~ 과거 10년치
     for(let year = currentYear; year >= currentYear - 10; year--){
         const option = document.createElement('option')
         option.value = year
@@ -927,6 +942,11 @@ const clearSelections = () => {
 
 // 시험지 정보 [selectbox] UI 초기화
 const clearPdfUploadSelectbox = () => {
+    selectExamType.value = ''
+    selectSubject.value = ''
+    selectYear.value = ''
+    selectRound.value = ''
+
     selectExamType.innerHTML = '<option value="" disabled selected>유형 선택</option>'
     selectSubject.innerHTML = '<option value="" disabled selected>시험 유형을 선택해주세요</option>'
     selectYear.innerHTML = '<option value="" disabled selected>연도 선택</option>'

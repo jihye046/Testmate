@@ -13,6 +13,7 @@
 		   AND I.EXAM_ROUND = #{examInfoDto.examRound}
 		   AND I.EXAM_TYPE_ID = #{examInfoDto.examTypeId}
 		   AND Q.QUESTION_NUM = #{questionNum}
+		   AND I.ISDELETED = 'N'
 	</select>
 
 	<!-- 정답지 PDF 업로드 시 정답지 저장 -->
@@ -39,10 +40,8 @@
 		  FROM exam_answer a
 		  JOIN exam_question  q on q.question_id = a.question_id
 		 WHERE a.exam_id = #{examid}
-		 ORDER BY QUESTION_NUM
+		 ORDER BY question_num
 	</select>
-	
-	<select id=""></select>
 	
 	<!-- 정답지 수정 -->
 	<update id="updateAnswers" parameterType="ExamAnswerDto">
@@ -51,8 +50,8 @@
 		 WHERE question_id = #{questionId}
 	</update>
 	
-	<!-- 문제지 클릭 시 연결된 정답지 조회 -->
-	<select id="getAnswerByQuestionId" parameterType="java.util.List" resultType="ExamAnswerDto">
+	<!-- 문제지 클릭 시 연결된 정답지 전체 조회 -->
+	<select id="getAnswersByQuestionIds" parameterType="java.util.List" resultType="ExamAnswerDto">
 		SELECT q.question_num, a.correct_answer, a.question_id
 		  FROM exam_answer a
 		  JOIN exam_question  q on q.question_id = a.question_id
@@ -60,7 +59,16 @@
 		 	<foreach collection="list" item="questionIds" open="(" separator="," close=")">
 		 		#{questionIds}
 	 		</foreach>
-		 ORDER BY QUESTION_NUM
+		 ORDER BY question_num
+	</select>
+	
+	<!-- 특정 문항 수정 클릭 시 해당 문제 정답만 조회 -->
+	<select id="getAnswerByQuestionId" parameterType="Integer" resultType="ExamAnswerDto">
+		SELECT q.question_num, a.correct_answer, a.question_id
+		  FROM exam_answer a
+		  JOIN exam_question  q on q.question_id = a.question_id
+		 WHERE a.question_id = #{questionId}
+		 ORDER BY question_num
 	</select>
 	
 </mapper>

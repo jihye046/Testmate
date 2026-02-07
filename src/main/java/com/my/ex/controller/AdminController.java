@@ -154,29 +154,31 @@ public class AdminController {
 		}
 		
 		/* 시험지인 경우 */
+		// 1. 시험지 문제
 		List<ExamQuestionDto> questions = examService.getExamQuestionsByExamId(examId);
 		if(questions == null || questions.isEmpty()) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
 		
-		List<ExamChoiceDto> choices = examService.getExamChoices(examId);
+		// 2. 선택지
+		List<ExamChoiceDto> choices = examService.getExamChoicesByExamId(examId);
+		
+		// 3. 공통 지문 
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto = 
 				examService.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
+		
+		// 4. 폴더 정보
 		ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 		
+		// 5. 정답지
 		List<Integer> questionIds = questions.stream()
 			.map(ExamQuestionDto::getQuestionId)
 			.collect(Collectors.toList());
-		 List<ExamAnswerDto> answers = answerService.getAnswerByQuestionId(questionIds);
+		List<ExamAnswerDto> answers = answerService.getAnswersByQuestionIds(questionIds);
 		
-		// question_id 조회 후 [exam_answer] 테이블에서 같은 question_id를 가진 correctAnswer을 조회
-//		for(ExamQuestionDto dto: questions) {
-//			answers.add(answerService.getAnswerByQuestionId(dto.getQuestionId()));
-//		}
-		
+		// 6. 데이터 담기
 		ExamPageDto response = 
 				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto, answers);
-		// getAnswersByQuestionIds(List<Integer> questionIds)
 		
 		model.addAttribute("examPageDto", response);
 		model.addAttribute("folderDto", folderDto);

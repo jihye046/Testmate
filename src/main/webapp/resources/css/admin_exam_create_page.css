@@ -17,7 +17,10 @@
 
 /* 시험지 기본 정보 헤더 */
 .exam-info-header {
-    background-color: #ffffff;
+/* 	display: flex; */
+    gap: 20px;
+    align-items: center;
+    color: #7f8c8d;
     padding: 20px 25px;
     border-bottom: 2px solid #f0f0f0;
     margin-bottom: 25px;
@@ -29,7 +32,28 @@
     font-size: 1.8em;
     color: #2c3e50;
     margin-top: 0;
-    margin-bottom: 20px;
+/*     margin-bottom: 20px; */
+}
+
+.exam-info-header i {
+	color: #3498db;
+    margin-right: 5px;
+}
+
+.btn-back {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    margin-left: auto; 오른쪽 끝으로 이동
+}
+
+.btn-back:hover {
+    background-color: #7f8c8d;
 }
 
 .exam-info-controls {
@@ -83,6 +107,39 @@
     font-size: 1.4em;
     color: #34495e;
     margin: 0;
+}
+
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 공통지문 보기 버튼 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+.common-passage-check-commonContentContainer button {
+	font-size: 0.8em;
+    padding: 6px 14px;
+    margin-left: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d9e6;
+    background-color: #fff;
+    color: #5d9cec;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.common-passage-check-commonContentContainer button:hover:not(:disabled) {
+    background-color: #f0f7ff;
+    border-color: #5d9cec !important;
+    color: #4a89dc;
+}
+
+.common-passage-check-commonContentContainer button:disabled {
+    border-color: #e0e0e0;
+    color: #bbb;
+    background-color: #f5f5f5;
+    cursor: not-allowed;
 }
 
 /* --------------------------------------------------------------- */
@@ -575,6 +632,44 @@ button:focus,
     font-size: 0.9em;
 }
 
+/* --------------------------------------------------------------- */
+/* 🌟🌟🌟 개별 지문 에디터 상단 안내 메시지 박스 스타일 🌟🌟🌟 */
+/* --------------------------------------------------------------- */
+.passage-tip-box {
+    background-color: #f0f7ff;
+    border: 1px solid #d1e9ff;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.passage-tip-box i {
+    color: #3498db;
+    margin-top: 3px;
+    font-size: 1.1rem;
+}
+
+.passage-tip-text {
+    font-size: 0.9rem;
+    color: #34495e;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.passage-tip-text strong {
+    color: #2980b9;
+    font-weight: 700;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* =================================================================
  * 🌟🌟🌟 [최종 수정] 모달 푸터 버튼 디자인 (깔끔한 회색 아웃라인 통일) 🌟🌟🌟
  * ================================================================= */
@@ -636,12 +731,20 @@ button:focus,
 
     /* 시험지 기본 정보 헤더 */
     .exam-info-header {
+    	flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
         padding: 15px;
         margin-bottom: 15px;
     }
     
     .exam-info-header h2 {
         font-size: 1.5em;
+    }
+    
+    .btn-back {
+        margin-left: 0;
+        width: 100%;
     }
     
     .exam-info-controls {

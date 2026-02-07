@@ -24,6 +24,18 @@
 		 ORDER BY exam_round
 	</select>
 	
+	<!-- examId로 시험지 정보 조회 -->
+	<select id="getExamInfoByExamId" parameterType="int" resultType="ExamInfoDto">
+		SELECT t.exam_type_code AS examtypeeng, 
+		       t.exam_type_name AS examtypekor, 
+		       f.exam_round, 
+		       f.exam_subject
+		  FROM exam_info f
+		  JOIN exam_type t ON t.exam_type_id = f.exam_type_id
+		 WHERE exam_id = #{examId}
+		   AND isdeleted = 'N'
+	</select>
+	
 	<!-- 특정 시험 회차에 대해 등록된 시험 과목을 불러옴  -->
 	<select id="getSubjectsByExamRound" parameterType="java.util.HashMap" resultType="String">
 		SELECT distinct exam_subject
@@ -165,7 +177,7 @@
 		 WHERE exam_type_code = #{examType}
 	</select>
 	
-	<!-- examType, examRound, examSubject로부터 시험 문제 가져오기 -->
+	<!-- examType, examRound, examSubject로부터 시험 전체 문제 가져오기 -->
 	<select id="getExamQuestions" parameterType="java.util.HashMap" resultType="ExamQuestionDto">
 		SELECT Q.question_id,
 			   Q.exam_id,
@@ -185,7 +197,7 @@
 		 ORDER BY Q.question_num asc
 	</select>
 	
-	<!-- examId로부터 시험 문제 가져오기 -->
+	<!-- examId로부터 시험 전체 문제 가져오기 -->
 	<select id="getExamQuestionsByExamId" resultType="ExamQuestionDto">
 		SELECT question_id,
 			   question_num,
@@ -199,8 +211,20 @@
 		 ORDER BY question_num asc
 	</select>	
 	
+	<!-- questionId로부터 특정 문제 가져오기 -->
+	<select id="getExamQuestionByQuestionId" resultType="ExamQuestionDto">
+		SELECT question_id,
+			   question_num,
+			   question_text,
+			   individualPassage,
+			   commonPassage,
+			   passage_scope
+		  FROM exam_question
+		 WHERE question_id = #{questionId}
+	</select>
+	
 	<!-- 선택지 가져오기 -->
-	<select id="getExamChoices" parameterType="int" resultType="ExamChoiceDto">
+	<select id="getExamChoicesByExamId" parameterType="int" resultType="ExamChoiceDto">
 		SELECT question_id,
 			   choice_id,
 		       choice_label,
@@ -208,6 +232,19 @@
 		       choice_image
 		  FROM exam_choice
 		 WHERE exam_Id = #{examId}
+		 ORDER BY question_id ASC, choice_label ASC
+	</select>
+	
+	<!-- 특정 문제의 선택지 가져오기 -->
+	<select id="getExamChoicesByQuestionId" parameterType="int" resultType="ExamChoiceDto">
+		SELECT question_id,
+			   choice_id,
+		       choice_label,
+		       choice_text,
+		       choice_image,
+		       choice_num
+		  FROM exam_choice
+		 WHERE question_id = #{questoinId}
 		 ORDER BY question_id ASC, choice_label ASC
 	</select>
 	

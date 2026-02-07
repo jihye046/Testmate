@@ -144,11 +144,6 @@ public class ExamSelectionService implements IExamSelectionService {
 	}
 
 	@Override
-	public List<ExamChoiceDto> getExamChoices(int examId) {
-		return dao.getExamChoices(examId);
-	}
-	
-	@Override
 	public Set<ExamPageDto.ExamCommonpassageDto> getCommonPassageInfo(String examType, String examRound, String examSubject) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("examType", examType);
@@ -349,6 +344,26 @@ public class ExamSelectionService implements IExamSelectionService {
 	@Override
 	public String findExistingExamFolderId(ExamInfoDto examInfoDto) {
 		return dao.findExistingExamFolderId(examInfoDto);
+	}
+
+	@Override
+	public ExamInfoDto getExamInfoByExamId(int examId) {
+		return dao.getExamInfoByExamId(examId);
+	}
+
+	@Override
+	public ExamQuestionDto getExamQuestionByQuestionId(int questionId) {
+		return dao.getExamQuestionByQuestionId(questionId);
+	}
+
+	@Override
+	public List<ExamChoiceDto> getExamChoicesByExamId(int examId) {
+		return dao.getExamChoicesByExamId(examId);
+	}
+
+	@Override
+	public List<ExamChoiceDto> getExamChoicesByQuestionId(int questionId) {
+		return dao.getExamChoicesByQuestionId(questionId);
 	}
 
 }

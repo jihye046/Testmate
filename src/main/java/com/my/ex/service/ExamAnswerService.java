@@ -139,8 +139,13 @@ public class ExamAnswerService implements IExamAnswerService {
 	}
 
 	@Override
-	public List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds) {
-		return dao.getAnswerByQuestionId(questionIds);
+	public List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds) {
+		return dao.getAnswersByQuestionIds(questionIds);
+	}
+
+	@Override
+	public ExamAnswerDto getAnswerByQuestionId(Integer questionId) {
+		return dao.getAnswerByQuestionId(questionId);
 	}
 	
 }

@@ -3,6 +3,7 @@ package com.my.ex.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,11 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
+import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
@@ -39,6 +42,7 @@ import com.my.ex.dto.response.ExamPdfPreview;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.service.ExamAnswerService;
 import com.my.ex.service.ExamSelectionService;
+import com.my.ex.service.IAdminService;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
 
@@ -54,6 +58,9 @@ public class ExamSelectionController {
 	@Autowired
 //	private ExamAnswerService answerService;
 	private IExamAnswerService answerService;
+	
+	@Autowired
+	private IAdminService adminService;
 	
 	@Autowired
 	private EnvironmentConfig config;
@@ -131,44 +138,33 @@ public class ExamSelectionController {
 	 * 		(시험 문제들, 시험지 한글 타입, 시험지 회차, 시험 과목, 선택지, 중복제거된 공통지문 Dto)
 	 */
 	@GetMapping("/showExamPage")
-//	@ResponseBody
 	public String showExamPage (
-//	public Map<String, Object> showExamPage (
 		@RequestParam String examTypeEng,
 		@RequestParam String examRound,
 		@RequestParam String examSubject,
 		Model model) 
 	{
-		// 시험지인 경우
+		/* 데이터 추출 */
+		// 1. 시험지 문제
 		String examTypeKor = service.getExamtypename(examTypeEng);
 		List<ExamQuestionDto> questions = service.getExamQuestions(examTypeEng, examRound, examSubject);
 		if(questions == null || questions.isEmpty()) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
 		
-		// 데이터 추출
-		List<ExamChoiceDto> choices = service.getExamChoices(questions.get(0).getExamId());
+		// 2. 선택지
+		List<ExamChoiceDto> choices = service.getExamChoicesByExamId(questions.get(0).getExamId());
+		
+		// 3. 공통 지문
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto =
 				service.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		
-		// 데이터 담기
+		/* 데이터 담기 */
 		ExamPageDto response = 
 				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
 		model.addAttribute("examPageDto", response);
 		
 		return "/exam/exam_page";
-			
-		
-//		Map<String, Object> map = new HashMap<>();
-//		String examTypename = service.getExamtypename(examType);
-//		List<ExamQuestionDto> questions = service.getExamQuestions(examType, examRound, examSubject);
-//		List<ExamChoiceDto> choices = service.getExamChoices();
-//		Set<ExamCommonpassageDto> distinctPassageDto = service.getCommonPassageInfo(examType, examRound, examSubject); // 공통지문 시작번호 추출
-//		ExamPageDto response = new ExamPageDto(questions, examTypename, examRound, examSubject, choices, distinctPassageDto);
-//		map.put("examPageDto", response);
-//	
-//		return map;
-		
 	}
 	
 	@GetMapping("/getExamImagePath")
@@ -286,7 +282,10 @@ public class ExamSelectionController {
 				// 1. 시험지 PDF 텍스트 추출 후 파싱된 전체 문제 리스트를 반환
 				questions = service.parsePdfToQuestions(pdfFile);
 				if(questions == null || questions.isEmpty()) {
-					return new ExamPdfPreview(false, "PDF에서 시험지를 추출할 수 없습니다.", null);
+					String message = 
+							"PDF에서 시험지를 추출할 수 없습니다. \n" +
+							"정답지 PDF를 업로드하려면 시험 유형을 '정답지'로 선택해주세요.";
+					return new ExamPdfPreview(false, message, null);
 				}
 				
 				// 2. 시험지 등록 
@@ -335,6 +334,57 @@ public class ExamSelectionController {
 	@ResponseBody
 	public boolean updateAnswers(@RequestBody Map<String, List<ExamAnswerDto>> answers) {
 		return answerService.updateAnswers(answers.get("answers"));
+	}
+	
+	@GetMapping("/editQuestion/{questionId}/{examId}")
+//	@ResponseBody
+//	public ExamPageDto editQuestionPage(
+	public String editQuestionPage(
+			@PathVariable int questionId,
+			@PathVariable int examId,
+			Model model) 
+	{
+		ExamInfoDto examInfo = service.getExamInfoByExamId(examId);
+		String examTypeEng = examInfo.getExamTypeEng();
+		String examTypeKor = examInfo.getExamTypeKor();
+		String examRound = examInfo.getExamRound();
+		String examSubject = examInfo.getExamSubject();
+		
+		// 1. 시험지 문제 
+		ExamQuestionDto question = service.getExamQuestionByQuestionId(questionId);
+		if(question == null) {
+			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
+		}
+		
+		// 2. 선택지
+		List<ExamChoiceDto> choices = service.getExamChoicesByQuestionId(questionId);
+		
+		// 3. 정답지
+		ExamAnswerDto answer = answerService.getAnswerByQuestionId(questionId);
+		
+		/* 데이터 담기 */
+		ExamPageDto response = 
+				new ExamPageDto(question, examTypeKor, examRound, examSubject, choices, answer);
+		model.addAttribute("examPageDto", response); // jsp용
+		
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String examPageDtoJson = mapper.writeValueAsString(response);
+			model.addAttribute("examPageDtoJson", examPageDtoJson); // js용
+		} catch (JsonProcessingException e) {
+			throw new IllegalStateException("JSON 변환 실패", e);
+		}
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("examId", examId);
+		map.put("examTypeEng", examTypeEng);
+		map.put("examTypeKor", examTypeKor);
+		map.put("examRound", examRound);
+		map.put("examSubject", examSubject);
+		model.addAttribute("map", map); // 수정페이지에서 시험지 페이지로 돌아갈 수 있도록 필요한 파라미터값(/admin/showExamPage?)
+		
+		return "/admin/exam_edit_page";
+//		return response;
 	}
 	
 }

@@ -18,6 +18,9 @@ public class ExamInfoDto {
 	private Integer folderId;
 	private LocalDate created_date;  // 시험지 등록일
 	
+	// 🔥response용으로만 쓰이는 필드
+	private String examTypeEng, examTypeKor; // ex) 'middle-geomjeong', '중졸 검정고시'
+	
 	public ExamInfoDto(String examRound, String examSubject, String sessionNo) {
 		this.examRound = examRound;
 		this.examSubject = examSubject;
@@ -27,6 +30,13 @@ public class ExamInfoDto {
 	public ExamInfoDto(String examRound, String examSubject) {
 		this.examRound = examRound;
 		this.examSubject = examSubject;
+	}
+
+	public ExamInfoDto(String examRound, String examSubject, String examTypeEng, String examTypeKor) {
+		this.examRound = examRound;
+		this.examSubject = examSubject;
+		this.examTypeEng = examTypeEng;
+		this.examTypeKor = examTypeKor;
 	}
 	
 }

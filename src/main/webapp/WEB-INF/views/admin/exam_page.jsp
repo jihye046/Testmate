@@ -36,8 +36,7 @@
                 	
                 	<!-- 각 문항 수정 버튼 -->
                 	<div class="question-actions">
-		                <button class="btn btn-edit-question" 
-		                        onclick="location.href='/admin/editQuestion?questionId=${questionDto.questionId}'">
+		                <button class="btn btn-edit-question" data-question-id="${questionDto.questionId}">
 		                    <i class="fas fa-edit"></i> 문항 수정
 		                </button>
 		            </div>

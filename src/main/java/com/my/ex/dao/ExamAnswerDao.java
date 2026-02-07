@@ -38,8 +38,13 @@ public class ExamAnswerDao implements IExamAnswerDao {
 	}
 
 	@Override
-	public List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds) {
-		return session.selectList(NAMESPACE + "getAnswerByQuestionId", questionIds);
+	public List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds) {
+		return session.selectList(NAMESPACE + "getAnswersByQuestionIds", questionIds);
+	}
+
+	@Override
+	public ExamAnswerDto getAnswerByQuestionId(Integer questionId) {
+		return session.selectOne(NAMESPACE + "getAnswerByQuestionId", questionId);
 	}
 
 }

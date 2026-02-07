@@ -77,8 +77,13 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	}
 
 	@Override
-	public List<ExamChoiceDto> getExamChoices(int examId) {
-		return session.selectList(NAMESPACE + "getExamChoices", examId);
+	public List<ExamChoiceDto> getExamChoicesByExamId(int examId) {
+		return session.selectList(NAMESPACE + "getExamChoicesByExamId", examId);
+	}
+	
+	@Override
+	public List<ExamChoiceDto> getExamChoicesByQuestionId(int questionId) {
+		return session.selectList(NAMESPACE + "getExamChoicesByQuestionId", questionId);
 	}
 
 	@Override
@@ -115,5 +120,17 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	public String findExistingExamFolderId(ExamInfoDto examInfoDto) {
 		return session.selectOne(NAMESPACE + "findExistingExamFolderId", examInfoDto);
 	}
+
+	@Override
+	public ExamInfoDto getExamInfoByExamId(int examId) {
+		return session.selectOne(NAMESPACE + "getExamInfoByExamId", examId);
+	}
+
+	@Override
+	public ExamQuestionDto getExamQuestionByQuestionId(int questionId) {
+		return session.selectOne(NAMESPACE + "getExamQuestionByQuestionId", questionId);
+	}
+
+	
 
 }
