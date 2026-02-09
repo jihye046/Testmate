@@ -3,6 +3,8 @@ package com.my.ex.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,24 +172,49 @@ public class ExamSelectionController {
 	@GetMapping("/getExamImagePath")
 	@ResponseBody
 	public Resource getExamImagePath(
-		@RequestParam String examType,
-		@RequestParam String examRound,
-		@RequestParam String examSubject,
+		@RequestParam(required = false, defaultValue = "") String examType,
+		@RequestParam(required = false, defaultValue = "") String examRound,
+		@RequestParam(required = false, defaultValue = "") String examSubject,
 		@RequestParam String filename)
 	{
-		String path = 
-				config.getImageUploadPath() +
-				examType + File.separator +
-				examRound + File.separator +
-				examSubject + File.separator +
-				filename;
+		Path filePath;
+		String baseDir = config.getImageUploadPath();
+		
+		if(examType.isEmpty() && examRound.isEmpty() && examSubject.isEmpty()) {
+			filePath = Paths.get(baseDir, "temp", filename);
+		} else {
+			filePath = Paths.get(baseDir, examType, examRound, examSubject, filename);
+		}
+		
 		// C:\server_program\project\testmate\images\2025년도 제1회\국어
-		File file = new File(path);
+		File file = filePath.toFile();
 		if (file.exists()) {
 			return new FileSystemResource(file); // file자체를 보내는 것은 X, HTTP 본문 응답으로 자동 변환해주는 API(FileSystemResource())를 이용해서 보내야 함
 		} else {
 			throw new RuntimeException("File not found: " + file.getAbsolutePath());
 		}
+	}
+	
+	/**
+	 * 에디터 이미지 임시 저장 처리
+	 * @param image 에디터에 업로드한 이미지 파일
+	 * @return fileName(저장된 파일명), status(성공여부)를 포함한 Map
+	 */
+	@PostMapping("/uploadEditorImage")
+	@ResponseBody
+	public Map<String, Object> uploadEditorImage(@RequestParam MultipartFile image) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			String savedFileName = service.saveEditorImage(image);
+			
+			response.put("fileName", savedFileName);
+			response.put("status", "success");
+		} catch (Exception e) {
+			response.put("status", "error");
+			response.put("message", e.getMessage());
+		}
+		
+		return response;
 	}
 	
 	/**

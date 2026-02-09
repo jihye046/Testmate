@@ -40,23 +40,29 @@
                                             [${commonPassageDto.commonPassageStartNum}~${commonPassageDto.commonPassageEndNum}] 다음 글을 읽고 물음에 답하시오.
                                         </p>
                                         <div class="text-content">
-                                            <c:choose>
-                                                <c:when test="${fn:endsWith(commonPassageDto.commonPassageText, '.png')
-                                                                or fn:endsWith(commonPassageDto.commonPassageText, '.jpg')
-                                                                or fn:endsWith(commonPassageDto.commonPassageText, '.jpeg')}">
-                                                    <div class="question-media-box">
-                                                        <img src="/exam/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${commonPassageDto.commonPassageText}" 
-                                                            alt="문제 이미지" 
-                                                            class="question-image"
-                                                        >
-                                                    </div>
-                                                </c:when>
-                                                <c:when test="${not empty commonPassageDto.commonPassageText}">
-                                                    <div class="question-media-box">
-                                                        <div class="text-content single-passage">${commonPassageDto.commonPassageText}</div>
-                                                    </div>                            	
-                                                </c:when>
-                                            </c:choose>
+<%--                                             <c:choose> --%>
+<%--                                                 <c:when test="${fn:endsWith(commonPassageDto.commonPassageText, '.png') --%>
+<%--                                                                 or fn:endsWith(commonPassageDto.commonPassageText, '.jpg') --%>
+<%--                                                                 or fn:endsWith(commonPassageDto.commonPassageText, '.jpeg')}"> --%>
+<!--                                                     <div class="question-media-box"> -->
+<%--                                                         <img src="/exam/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${commonPassageDto.commonPassageText}"  --%>
+<!--                                                             alt="문제 이미지"  -->
+<!--                                                             class="question-image" -->
+<!--                                                         > -->
+<!--                                                     </div> -->
+<%--                                                 </c:when> --%>
+<%--                                                 <c:when test="${not empty commonPassageDto.commonPassageText}"> --%>
+<!--                                                     <div class="question-media-box"> -->
+<%--                                                         <div class="text-content single-passage">${commonPassageDto.commonPassageText}</div> --%>
+<!--                                                     </div>                            	 -->
+<%--                                                 </c:when> --%>
+<%--                                             </c:choose> --%>
+                                            
+                                            <c:if test="${not empty commonPassageDto.commonPassageText}">
+                                                <div class="question-media-box">
+                                                    <div class="text-content single-passage">${commonPassageDto.commonPassageText}</div>
+                                                </div>                            	
+                                            </c:if>
                                         </div>
                                     </div>
                             	</c:if>
@@ -66,23 +72,29 @@
                             <p class="question-number" id="qnum_${questionDto.questionNum}">${questionDto.questionNum}. ${questionDto.questionText}</p>
 
                             <!-- 단독 지문 -->
-                            <c:choose>
-                            	<c:when test="${fn:endsWith(questionDto.individualPassage, '.png')
-                                                or fn:endsWith(questionDto.individualPassage, '.jpg')
-                                                or fn:endsWith(questionDto.individualPassage, '.jpeg')}">
-                            		<div class="question-media-box">
-                                        <img src="/exam/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${questionDto.individualPassage}" 
-											alt="문제 이미지" 
-											class="question-image"
-										>
-                                	</div>
-                            	</c:when>
-                            	<c:when test="${not empty questionDto.individualPassage}">
-									<div class="question-media-box">
-								        <div class="text-content single-passage">${questionDto.individualPassage}</div>
-								    </div>                            	
-                            	</c:when>
-                            </c:choose>
+<%--                             <c:choose> --%>
+<%--                             	<c:when test="${fn:endsWith(questionDto.individualPassage, '.png') --%>
+<%--                                                 or fn:endsWith(questionDto.individualPassage, '.jpg') --%>
+<%--                                                 or fn:endsWith(questionDto.individualPassage, '.jpeg')}"> --%>
+<!--                             		<div class="question-media-box"> -->
+<%--                                         <img src="/exam/getExamImagePath?examType=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}&filename=${questionDto.individualPassage}"  --%>
+<!-- 											alt="문제 이미지"  -->
+<!-- 											class="question-image" -->
+<!-- 										> -->
+<!--                                 	</div> -->
+<%--                             	</c:when> --%>
+<%--                             	<c:when test="${not empty questionDto.individualPassage}"> --%>
+<!-- 									<div class="question-media-box"> -->
+<%-- 								        <div class="text-content single-passage">${questionDto.individualPassage}</div> --%>
+<!-- 								    </div>                            	 -->
+<%--                             	</c:when> --%>
+<%--                             </c:choose> --%>
+                            
+                            <c:if test="${not empty questionDto.individualPassage}">
+								<div class="question-media-box">
+							        <div class="text-content single-passage">${questionDto.individualPassage}</div>
+							    </div>                            	
+                           	</c:if>
                             
                     		<!-- 선택지들 -->
                     		<div class="options-group">

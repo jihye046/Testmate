@@ -19,4 +19,5 @@ public interface IExamAnswerService {
 	boolean updateAnswers(List<ExamAnswerDto> answerDtos);
 	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
 	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
+	String examTypeCodeWithAnswer(String examTypeCode);
 }

@@ -261,7 +261,7 @@ const CommonPassageHandler = {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if(!document.querySelector("#exam_create_page")) return
+    if(!document.querySelector(".exam_create_page")) return
 
     /* 시험지 정보 컨테이너 리스너
     ================================================== */
@@ -421,9 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         CommonPassageHandler.handleModalClick(e, context)
     })
 
-    
-        
-
+    window.edit_common.bindPassageEvents()
         
     /* 
     commonPassageModal.addEventListener('click', (e) => {
@@ -712,7 +710,7 @@ const createQuestionHml = (number) => {
                         </button>
                     </div>
 
-                    <div class="passage-controls passage-container">
+                    <div class="passage-controls passage-container" id="passage-controls-${number}">
                         <label class="form-check-label">
                             개별 지문
                         </label>
@@ -841,8 +839,26 @@ const closeCommonPassageModal = () => {
 
 // 텍스트 지문 UI
 const createPassageTextHtml = (questionNum) => {
+    // 안내 메시지 HTML 구성
+    const tipHtml = 
+    `
+        <div class="passage-tip-box">
+            <i class="fas fa-info-circle"></i>
+            <p class="passage-tip-text">
+                <strong>💡 작성 Tip:</strong> 이미지와 텍스트가 모두 포함된 지문은 
+                아래 에디터의 <strong>이미지 삽입 버튼</strong>을 이용해 함께 작성할 수 있습니다.
+            </p>
+        </div>
+    `
     return `
-        <textarea class="form-control no-resize passage-text" rows="6" id="passage-text-${questionNum}" data-q-num="${questionNum}" maxlength="1000" placeholder="문항에 필요한 지문 내용을 입력하세요."></textarea>
+        <div class="editor-container" id="editor-wrapper-${questionNum}">
+            ${tipHtml}
+            <div id="editor-${questionNum}" class="quill-editor-box"></div>
+            <div style="display:none;">
+                <textarea class="form-control no-resize passage-text" rows="6" id="passage-text-${questionNum}" data-q-num="${questionNum}" maxlength="1000" placeholder="문항에 필요한 지문 내용을 입력하세요."></textarea>
+            </div>
+        </div>
+        
     `
 }
 

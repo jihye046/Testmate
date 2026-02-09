@@ -6,14 +6,14 @@
 
 	<!-- questionId 조회 -->
 	<select id="getQuestionId" parameterType="java.util.HashMap" resultType="Integer">
-		SELECT Q.QUESTION_ID
-		  FROM EXAM_QUESTION Q
-		  JOIN EXAM_INFO I ON I.EXAM_ID = Q.EXAM_ID
-		 WHERE I.EXAM_SUBJECT = #{examInfoDto.examSubject}
-		   AND I.EXAM_ROUND = #{examInfoDto.examRound}
-		   AND I.EXAM_TYPE_ID = #{examInfoDto.examTypeId}
-		   AND Q.QUESTION_NUM = #{questionNum}
-		   AND I.ISDELETED = 'N'
+		SELECT q.question_id
+		  FROM exam_question q
+		  JOIN exam_info i ON i.exam_id = q.exam_id
+		 WHERE i.exam_subject = #{examInfoDto.examSubject}
+		   AND i.exam_round = #{examInfoDto.examRound}
+		   AND i.exam_type_id = #{examInfoDto.examTypeId}
+		   AND q.question_num = #{questionNum}
+		   AND i.isdeleted = 'N'
 	</select>
 
 	<!-- 정답지 PDF 업로드 시 정답지 저장 -->

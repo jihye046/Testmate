@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // const editBtn = document.querySelectorAll(".btn-edit-question")
     document.querySelectorAll(".btn-edit-question").forEach((editBtn) => {
         editBtn.addEventListener('click', (e) => {
-        const urlParam = new URLSearchParams(window.location.search)
-        const examId = urlParam.get("examId")
-        const questionId = editBtn.dataset.questionId
-        location.href = `/exam/editQuestion/${questionId}/${examId}`
-    })
+            const urlParam = new URLSearchParams(window.location.search)
+            const examId = urlParam.get("examId")
+            const questionId = editBtn.dataset.questionId
+            location.href = `/exam/editQuestion/${questionId}/${examId}`
+        })
     })
     
 })

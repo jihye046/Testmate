@@ -7,14 +7,18 @@
 <meta charset="UTF-8">
 <title>시험지 등록 페이지</title>
 <link href="<c:url value="/resources/css/admin_exam_create_page.css"/>" rel="stylesheet">
+
 <!-- axios -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <!-- font-awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Quill 에디터 -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 </head>
 <body>
-	<div id="exam_create_page">
+	<div class="exam_create_page">
 		<div id="exam-creation-form">
 			<div class="exam-info-header">
 				<h2>새 시험지 문항 직접 등록</h2>
@@ -81,7 +85,7 @@
 					
 					<div class="form-group">
 						<label>지문 내용</label>
-						<div id="modal-passage-controls" class="passage-controls">
+						<div class="passage-controls" id="modal-passage-controls">
 							<button type="button" class="btn btn-sm btn-outline-secondary modal-btn-passage-type" data-type="text">
 								<i class="fas fa-file-alt"></i> 텍스트 지문
 							</button>
@@ -134,6 +138,11 @@
 		<div id="toastMessage" class="toast-message"></div>
 	</div>
 
+	<script src="<c:url value='/resources/js/admin_exam_edit_page.js'/>"></script>
 	<script src="<c:url value='/resources/js/admin_exam_create_page.js'/>"></script>
+
+	<!-- Quill 에디터 -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
 </body>
 </html>

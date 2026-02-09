@@ -1,5 +1,6 @@
 package com.my.ex.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,9 +34,11 @@ public interface IExamSelectionService {
 	int findTypeIdByCode(String type);
 	boolean saveExamByForm(ExamCreateRequestDto request);
 	ParsedExamData buildParsedExamData(ExamCreateRequestDto request);
-	void ensureImageFolderExists(String folderPath, String filename, MultipartFile file);
+	String ensureImageFolderExists(String folderPath, String filename, MultipartFile file);
 	List<Map<String, Object>> parsePdfToQuestions(MultipartFile file) throws Exception;
 	String findExistingExamFolderId(ExamInfoDto examInfoDto);
 	ExamInfoDto getExamInfoByExamId(int examId);
 	ExamQuestionDto getExamQuestionByQuestionId(int questionId);
+	String saveEditorImage(MultipartFile image) throws IOException;
+	String processHtmlEmbeddedImages(String content, String examType, String examRound, String examSubject);
 }

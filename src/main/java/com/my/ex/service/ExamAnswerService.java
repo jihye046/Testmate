@@ -99,6 +99,15 @@ public class ExamAnswerService implements IExamAnswerService {
 	public String examTypeCodeWithoutAnswer(String examTypeCode) {
 		return examTypeCode.substring(0, examTypeCode.length() - "Answer".length());
 	}
+	
+	// 정답지와 연결될 시험지의 examTypeCode에 Answer를 붙임
+	@Override
+	public String examTypeCodeWithAnswer(String examTypeCode) {
+		if(examTypeCode.endsWith("Answer")) {
+			return examTypeCode;
+		}
+		return examTypeCode + "Answer";
+	}
 
 	// 관리자가 정답지 PDF 업로드 시 DB 저장용 구조로 변환
 	// saveParsedAnswerData() 호출 전에 사용됨
@@ -147,5 +156,5 @@ public class ExamAnswerService implements IExamAnswerService {
 	public ExamAnswerDto getAnswerByQuestionId(Integer questionId) {
 		return dao.getAnswerByQuestionId(questionId);
 	}
-	
+
 }

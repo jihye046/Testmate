@@ -1,6 +1,7 @@
 package com.my.ex.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,13 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.github.javaparser.utils.Log;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dao.ExamSelectionDao;
+import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
@@ -30,9 +35,9 @@ import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
-import com.my.ex.parser.geomjeong.upload.exam.UploadedGeomjeongPdfTextExtractor;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.parser.geomjeong.upload.exam.GeomjeongPdfTextNormalizer;
+import com.my.ex.parser.geomjeong.upload.exam.UploadedGeomjeongPdfTextExtractor;
 
 
 @Service
@@ -52,6 +57,9 @@ public class ExamSelectionService implements IExamSelectionService {
 	
 	@Autowired
 	private GeomjeongExamParser gedExamParser;
+	
+	@Autowired
+	private ExamAnswerService answerService;
 	
 	@Override
 	public List<ExamTypeDto> getExamTypes() {
@@ -101,6 +109,7 @@ public class ExamSelectionService implements IExamSelectionService {
 		if(examId == null || examId <= 0) throw new RuntimeException();
 		
 		// 시험 문제 저장
+		List<ExamAnswerDto> answersList = new ArrayList<>();
 		for(Map<String, Object> question : questions) {
 			question.put("examId", examId);
 			dao.saveParsedQuestionInfo(question); // 문제 저장 후 questionId 받아옴
@@ -118,8 +127,17 @@ public class ExamSelectionService implements IExamSelectionService {
 				if(insertResult <= 0) throw new RuntimeException();
 			}
 			
+			// 시험 정답지 저장
+			ExamAnswerDto answerDto = new ExamAnswerDto();
+			answerDto.setQuestionId(questionId);
+			answerDto.setCorrectAnswer(Integer.parseInt(question.get("answer").toString()));
+			answersList.add(answerDto);
 		}
-		
+		String examTypeCodeWithAnswer = answerService.
+				examTypeCodeWithAnswer(examInfo.getExamTypeEng()); 
+		int answerExamTypeId = findTypeIdByCode(examTypeCodeWithAnswer);
+		System.out.println("answerExamTypeId: " + answerExamTypeId);
+//		answerService.saveParsedAnswerData(examInfo, answersList);
 		return true;
 	}
 
@@ -213,11 +231,14 @@ public class ExamSelectionService implements IExamSelectionService {
 		String subject = request.getExamInfo().getSubject();
 		String round = request.getExamInfo().getRound();
 		int examTypeId = findTypeIdByCode(request.getExamInfo().getType());
+		String typename = getExamtypename(request.getExamInfo().getType());
+		String engType = request.getExamInfo().getType();
 		// 시험지 정보
 		examInfo.setExamRound(round);
 		examInfo.setExamSubject(subject);
 		examInfo.setExamTypeId(examTypeId);
 		examInfo.setFolderId(request.getExamInfo().getFolderId());
+		examInfo.setExamTypeEng(engType);
 		
 		List<Questions> questions = request.getQuestions();
 		List<Map<String, Object>> newList = new ArrayList<>();
@@ -234,7 +255,6 @@ public class ExamSelectionService implements IExamSelectionService {
 			if(q.getUseIndividualPassage() == 'Y') {
 				if(q.getIndividualPassage().getType().equals("image")) {
 					// 폴더이름 생성
-					String typename = getExamtypename(request.getExamInfo().getType());
 					String folderPath = typename + File.separator +
 							round + File.separator +
 							subject;
@@ -249,7 +269,14 @@ public class ExamSelectionService implements IExamSelectionService {
 					ensureImageFolderExists(folderPath, uniqueFilename, file);
 					map.put("individualPassage", uniqueFilename);
 				} else if(q.getIndividualPassage().getType().equals("text")) {
-					map.put("individualPassage", q.getIndividualPassage().getContent());
+					// html 코드에 이미지 태그가 있으면 src 속성을 파일 이름으로 수정
+					String processHtml = processHtmlEmbeddedImages(
+							q.getIndividualPassage().getContent(), 
+							typename, 
+							round, 
+							subject
+					);
+					map.put("individualPassage", processHtml);
 				}
 			} 
 			
@@ -258,7 +285,7 @@ public class ExamSelectionService implements IExamSelectionService {
 			if(q.getUseCommonPassage() == 'Y') {
 				if(q.getCommonPassage().getType().equals("image")) {
 					// 폴더이름 생성
-					String typename = getExamtypename(request.getExamInfo().getType());
+//					String typename = getExamtypename(request.getExamInfo().getType());
 					String folderPath = typename + File.separator +
 							round + File.separator +
 							subject;
@@ -288,13 +315,16 @@ public class ExamSelectionService implements IExamSelectionService {
 			}
 			map.put("options", newChoiceList);
 			newList.add(map);
+			
+			// 정답지
+			map.put("answer", q.getAnswerText());
 		}
 		
 		return new ParsedExamData(examInfo, newList);
 	}
 
 	@Override
-	public void ensureImageFolderExists(String folderPath, String filename, MultipartFile file) {
+	public String ensureImageFolderExists(String folderPath, String filename, MultipartFile file) {
 		if(config.getImageStorageType().equals("local")) {
 			Path fullPath = Paths.get(config.getImageUploadPath(), folderPath);
 			
@@ -306,13 +336,19 @@ public class ExamSelectionService implements IExamSelectionService {
 				
 				// 파일 저장
 				Path filePath = fullPath.resolve(filename);
-				InputStream is = file.getInputStream();
-				Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+				
+				try(InputStream is = file.getInputStream()){
+					Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+				
+				return filename;
 			} catch (Exception e) {
 				e.printStackTrace();
+				throw new RuntimeException("파일 저장 중 오류 발생", e); // 예외를 던져서 상위에서 인지하게 함
 			}
 		} else if(config.getImageStorageType().equals("gcs")) {
 			// TODO: GCS API 사용해서 폴더 확인 및 생성
+			return filename;
 		} else {
 			throw new IllegalArgumentException("알 수 없는 이미지 저장소 타입: " + config.getImageStorageType());
 		}
@@ -364,6 +400,62 @@ public class ExamSelectionService implements IExamSelectionService {
 	@Override
 	public List<ExamChoiceDto> getExamChoicesByQuestionId(int questionId) {
 		return dao.getExamChoicesByQuestionId(questionId);
+	}
+
+	@Override
+	public String saveEditorImage(MultipartFile image) throws IOException {
+		String originalName = image.getOriginalFilename(); // 확장자 포함
+		String cleanName = originalName.trim().replace(" ", "_");
+		String savedFileName = UUID.randomUUID().toString() + "_" + cleanName;
+		
+		return ensureImageFolderExists("temp", savedFileName, image);
+	}
+
+	/**
+	 * 1. 임시 폴더(temp)에 저장된 이미지를 실제 시험지 폴더로 이동
+	 * 2. DB에 저장될 HTML 내 <img> 태그의 src 경로를 완성형 파라미터로 치환
+	 */
+	@Override
+	public String processHtmlEmbeddedImages(String content, String examType, String examRound, String examSubject) {
+		if(content == null || !content.contains("<img")) {
+			return content; // 이미지가 없으면 바로 반환
+		}
+		
+		// <img 태그의 src 속성 내 filename 파라미터 값을 추출하는 정규표현식
+		Pattern pattern = Pattern.compile("<img[^>]+src=[^>]+filename=([^&\"'\\s>]+)");
+	    Matcher matcher = pattern.matcher(content);
+		
+	    String updatedContent = content;
+	    String baseDir = config.getImageUploadPath();
+	    
+	    while(matcher.find()) {
+	    	String filename = matcher.group(1);
+	    	
+	    	// 1. 임시 저장소에 있던 파일을 시험지 등록 전용 파일로 이동
+	    	Path tempPath = Paths.get(baseDir, "temp", filename);
+	    	Path targetPath = Paths.get(baseDir, examType, examRound, examSubject);
+
+	    	try {
+	    		if(Files.exists(tempPath)) {
+	    			if(Files.notExists(targetPath)) {
+	    				Files.createDirectories(targetPath);
+	    			}
+	    			
+	    			// 파일 이동 (임시 -> 실제 저장소)
+	    			Files.move(tempPath, targetPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+	    			
+	    			// 2. html코드 수정: 기존 src를 새로운 src로 치환
+	    			String oldString = "filename=" + filename;
+	    			String newString = String.format("filename=%s&examType=%s&examRound=%s&examSubject=%s",
+	    											filename, examType, examRound, examSubject);
+	    			updatedContent = updatedContent.replace(oldString, newString);
+	    		}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+		
+		return updatedContent;
 	}
 
 }

@@ -186,29 +186,6 @@ public class AdminController {
 		return "/admin/exam_page";
 	}
 	
-	@GetMapping("/getExamImagePath")
-	@ResponseBody
-	public Resource getExamImagePath(
-		@RequestParam String examType,
-		@RequestParam String examRound,
-		@RequestParam String examSubject,
-		@RequestParam String filename)
-	{
-		String path = 
-				config.getImageUploadPath() +
-				examType + "\\" +
-				examRound + "\\" +
-				examSubject + "\\" +
-				filename;
-		// C:\server_program\project\testmate\images\2025년도 제1회\국어
-		File file = new File(path);
-		if (file.exists()) {
-			return new FileSystemResource(file); // file자체를 보내는 것은 X, HTTP 본문 응답으로 자동 변환해주는 API(FileSystemResource())를 이용해서 보내야 함
-		} else {
-			throw new RuntimeException("File not found: " + file.getAbsolutePath());
-		}
-	}
-
 	/**
 	 * 새 폴더 생성
 	 * 

@@ -716,6 +716,89 @@ button:focus,
 }
 
 /* =================================================================
+ * Quill 에디터 커스텀 스타일 (반응형 및 스크롤바 디자인 포함)
+ * ================================================================= */
+
+/* 에디터 전체를 감싸는 영역 */
+.quill-editor {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 테두리 밖으로 내용이 나가지 않도록 설정 */
+}
+
+/* 툴바 스타일 미세 조정 */
+.ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background: #f8fafc;
+    padding: 8px;
+}
+
+/* Quill 내부 컨테이너 (실제 편집 영역의 부모) */
+.ql-container.ql-snow {
+    font-family: 'Pretendard', 'Inter', sans-serif;
+    border: none !important;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    
+    /* [스크롤바 활성화를 위한 설정] */
+    height: 400px; /* 에디터 고정 높이 */
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 실제 텍스트가 입력되는 영역 */
+.ql-editor {
+    background: white;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 15px 20px;
+    flex: 1; /* 부모 높이를 가득 채움 */
+    
+    /* [스크롤 기능 설정] */
+    overflow-y: auto; 
+    overflow-x: hidden;
+}
+
+/* 플레이스홀더 스타일 */
+.ql-editor.ql-blank::before {
+    font-size: 14px;
+    color: rgba(0,0,0,0.6);
+    font-style: normal;
+}
+
+/* =================================================================
+ * 커스텀 스크롤바 디자인 (Webkit 브라우저 대상)
+ * ================================================================= */
+
+/* 스크롤바 전체 너비 */
+.ql-editor::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* 스크롤바 배경(트랙) */
+.ql-editor::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+/* 스크롤바 막대(핸들) */
+.ql-editor::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+}
+
+/* 스크롤바 막대 호버 상태 */
+.ql-editor::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* =================================================================
  * RESPONSIVE STYLES (for screens <= 768px, tablets and phones)
  * ================================================================= */
 @media (max-width: 768px) {
@@ -806,5 +889,22 @@ button:focus,
         padding: 12px 20px;
         font-size: 1em;
         margin: 10px 0; 
+    }
+
+    .ql-container.ql-snow {
+        height: 300px;
+    }
+    
+    .ql-editor {
+        padding: 12px 15px;
+        font-size: 0.95rem;
+    }
+    
+    .ql-toolbar.ql-snow {
+        padding: 6px;
+    }
+    
+    .ql-editor.ql-blank::before {
+        font-size: 0.95rem;
     }
 }

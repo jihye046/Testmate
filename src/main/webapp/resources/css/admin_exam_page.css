@@ -153,6 +153,9 @@ body {
     padding: 20px;
     border-radius: 6px;
     margin-bottom: 25px;
+    
+    display: flow-root; 
+    overflow: hidden;
 }
 
 .text-range {

@@ -30,7 +30,7 @@ public class ExamCreateRequestDto {
 		private IndividualPassage individualPassage;
 		private String questionText;
 		private List<QuestionChoices> questionChoices;
-		private char answerText;
+		private int answerText;
 
 		@Data
 		public static class CommonPassage {
