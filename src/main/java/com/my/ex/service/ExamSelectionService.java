@@ -1,6 +1,5 @@
 package com.my.ex.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.github.javaparser.utils.Log;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamAnswerDto;
@@ -136,8 +134,9 @@ public class ExamSelectionService implements IExamSelectionService {
 		String examTypeCodeWithAnswer = answerService.
 				examTypeCodeWithAnswer(examInfo.getExamTypeEng()); 
 		int answerExamTypeId = findTypeIdByCode(examTypeCodeWithAnswer);
-		System.out.println("answerExamTypeId: " + answerExamTypeId);
-//		answerService.saveParsedAnswerData(examInfo, answersList);
+		examInfo.setExamTypeId(answerExamTypeId);
+		answerService.saveParsedAnswerData(examInfo, answersList);
+		
 		return true;
 	}
 
@@ -167,10 +166,8 @@ public class ExamSelectionService implements IExamSelectionService {
 		map.put("examType", examType);
 		map.put("examRound", examRound);
 		map.put("examSubject", examSubject);
-		List<ExamQuestionDto> questionDto = dao.getCommonPassageInfo(map);
 		
-//		ExamCommonpassageDto commonpassageDto; 
-//		List<ExamCommonpassageDto> distinctPassageList = new ArrayList<>();
+		List<ExamQuestionDto> questionDto = dao.getCommonPassageInfo(map);
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageSet = new HashSet<>();
 		
 		for(ExamQuestionDto dto: questionDto) {
@@ -181,10 +178,7 @@ public class ExamSelectionService implements IExamSelectionService {
 			commonpassageDto.setCommonPassageEndNum(Integer.parseInt(scope.split("~")[1])); // 13
 			commonpassageDto.setCommonPassageText(dto.getCommonPassage()); // 공통 지문
 			distinctPassageSet.add(commonpassageDto);
-//			distinctPassageList.add(commonpassageDto);
 		}
-//		System.out.println("Set size: " + distinctPassageSet.size()); // Set size: 5
-//		System.out.println("List size: " + distinctPassageList.size()); // List size: 15
 		
 		return distinctPassageSet;
 	}
@@ -255,9 +249,7 @@ public class ExamSelectionService implements IExamSelectionService {
 			if(q.getUseIndividualPassage() == 'Y') {
 				if(q.getIndividualPassage().getType().equals("image")) {
 					// 폴더이름 생성
-					String folderPath = typename + File.separator +
-							round + File.separator +
-							subject;
+					String folderPath = Paths.get(typename, round, subject).toString();
 					
 					// 파일이름 생성
 					String filename = q.getIndividualPassage().getContent().trim().replace(" ", "_");
@@ -286,9 +278,7 @@ public class ExamSelectionService implements IExamSelectionService {
 				if(q.getCommonPassage().getType().equals("image")) {
 					// 폴더이름 생성
 //					String typename = getExamtypename(request.getExamInfo().getType());
-					String folderPath = typename + File.separator +
-							round + File.separator +
-							subject;
+					String folderPath = Paths.get(typename, round, subject).toString();
 					
 					// 파일이름 생성
 					String filename = q.getCommonPassage().getContent().trim().replace(" ", "_");
@@ -304,7 +294,6 @@ public class ExamSelectionService implements IExamSelectionService {
 					map.put("commonPassage", q.getCommonPassage().getContent());
 					map.put("passageScope", q.getCommonPassage().getRangeText());	
 				}
-				
 			}
 			
 			// 선택지

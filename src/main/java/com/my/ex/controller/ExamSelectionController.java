@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
-import com.my.ex.dto.ExamFolderDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
@@ -42,9 +41,6 @@ import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamPdfPreview;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
-import com.my.ex.service.ExamAnswerService;
-import com.my.ex.service.ExamSelectionService;
-import com.my.ex.service.IAdminService;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
 
@@ -54,18 +50,14 @@ import com.my.ex.service.IExamSelectionService;
 public class ExamSelectionController {
 	
 	@Autowired
-//	private ExamSelectionService service;
 	private IExamSelectionService service;
 	
 	@Autowired
-//	private ExamAnswerService answerService;
 	private IExamAnswerService answerService;
 	
 	@Autowired
-	private IAdminService adminService;
-	
-	@Autowired
 	private EnvironmentConfig config;
+	
 	
 	@GetMapping("/main")
 	public String mainPage(Model model) {

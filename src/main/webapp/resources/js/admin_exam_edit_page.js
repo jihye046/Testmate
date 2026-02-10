@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ExamEditor.bindPassageEvents()
         }
     })
+
 })
 
 
@@ -254,7 +255,7 @@ const ExamEditor = {
             this.editors[qNum] = quill
     
             // 초기 데이터가 있으면 에디터와 hidden textarea에 주입
-            if(initialData && !initialData.includes("<img")){ // 이미지 경로가 아닌 텍스트일 때만
+            if(initialData){ 
                 quill.root.innerHTML = initialData
                 const hiddenTextarea = document.querySelector(`#passage-text-${qNum}`)
                 if(hiddenTextarea) hiddenTextarea.value = initialData
@@ -314,5 +315,6 @@ const ExamEditor = {
 }
 
 window.edit_common = {
+    renderPassageInput: ExamEditor.renderPassageInput.bind(ExamEditor),
     bindPassageEvents: ExamEditor.bindPassageEvents.bind(ExamEditor)
 }

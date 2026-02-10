@@ -25,6 +25,15 @@ const CommonPassageHandler = {
         // 1. 닫기 버튼 처리
         const closeBtn = e.target.closest('.close-button')
         if(closeBtn){
+            const card = questionContainer.querySelector(`.question-item[data-question-num="${questionModalNum}"]`)
+            // 최종 '작성 완료'를 하지 않고 닫는 경우, 활성화 상태를 취소하고 초기화함
+            if(card && !card.getAttribute("data-selected-passage-id")){
+                const checkbox = card.querySelector(`#common-passage-toggle-${questionModalNum}`)
+                const cardViewBtn = card.querySelector(`#commonPassageViewBtn-${questionModalNum}`)
+                checkbox.checked = false    // 체크박스 해제
+                cardViewBtn.disabled = true // '공통 지문 설정' 버튼 비활성화
+            } 
+
             closeCommonPassageModal()
             return
         }
@@ -176,37 +185,23 @@ const CommonPassageHandler = {
 
         // 6. 공통 지문 목록 적용 버튼
         const commonPassageApplyBtn = e.target.closest('.btn-apply-common-passage')
-        if(commonPassageApplyBtn){
-            const passageId = commonPassageApplyBtn.getAttribute('data-passage-id')
-            const passageType = commonPassageApplyBtn.getAttribute('data-passage-type')
-            // 임시 저장 목록에서 적용 버튼 클릭 시 selectedPassageId 값 갱신
-            commonPassageModal.setAttribute("data-selected-passage-id", passageId)
-            commonPassageModal.setAttribute("data-selected-passage-type", passageType)
 
-            const passageObj = passages.find(passage => passage.id == passageId)
-            let activeBtn = null
-            controls.querySelectorAll('.modal-btn-passage-type').forEach((btn) => {
-                resetButton(btn)
-            })
-            let output = ''
-            if(passageObj.type == 'text'){
-                activeBtn = controls.querySelector(".modal-btn-passage-type[data-type='text']")
-                output = 
-                `
-                    <textarea class="form-control no-resize passage-text" rows="6" data-q-num="${questionModalNum}" maxlength="1000">${passageObj.content}</textarea>
-                `
-            } else if(passageObj.type == 'image'){
-                activeBtn = controls.querySelector(".modal-btn-passage-type[data-type='image']")
-                output =
-                `
-                    <input type="file" class="form-control passage-image-file" accept=".jpg, .jpeg, .png" data-q-num="${questionModalNum}">
-                    <small class="form-text text-muted" style="color: #0056b3;">⚠️ ${passageObj.content} 파일을 다시 업로드해주세요.</small>
-                    <div class="image-preview" id="image-preview-${questionModalNum}"></div>
-                `
+        if(commonPassageApplyBtn){
+            const isConfirmed = window.confirm('해당 지문을 적용하시겠습니까?')
+            if(isConfirmed){
+                // 모달 데이터 속성 갱신
+                const passageId = commonPassageApplyBtn.getAttribute('data-passage-id')
+                const passageType = commonPassageApplyBtn.getAttribute('data-passage-type')
+                commonPassageModal.setAttribute("data-selected-passage-id", passageId)
+                commonPassageModal.setAttribute("data-selected-passage-type", passageType)
+
+                // 에디터에 내용 렌더링
+                const passageObj = passages.find(passage => passage.id == passageId) 
+                window.edit_common.renderPassageInput('modal', passageType, passageObj.content)
+
+                // 범위 입력창 값 set
+                commonPassageModal.querySelector("#common-passage-range").value = passageObj.rangeText
             }
-            commonContentContainer.innerHTML = output.trim()
-            activeButton(activeBtn)
-            commonPassageModal.querySelector("#common-passage-range").value = passageObj.rangeText
         }
 
         // 7. 작성 완료 버튼
@@ -304,8 +299,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // '문항 삭제' 버튼 리스너
         const removeQuestionBtn = e.target.closest('.btn-remove-question')
         if(removeQuestionBtn){
-            const questionCard = removeQuestionBtn.closest('.question-item.card')
-            removeQuestion(questionCard)
+            const isConfirmed = confirm('해당 문항를 삭제하시겠습니까?')
+            if(isConfirmed){
+                const questionCard = removeQuestionBtn.closest('.question-item.card')
+                removeQuestion(questionCard)
+            }
             return
         }
         
@@ -337,8 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const passageBtns = questionContainer.querySelectorAll(`.btn-passage-type[data-q-num="${questionNum}"]`)
         const passageContent = questionContainer.querySelector(`#passage-content-${questionNum}`)
         
-        
-
         // 체크박스 클릭 시 '공통 지문 설정' 버튼 상태 변경
         if(toggle){
             const cardViewBtn = card.querySelector(`#commonPassageViewBtn-${questionNum}`)
@@ -347,9 +343,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // '공통 지문 설정' 버튼 클릭 시 모달창 열기
-        const clickViewBtn = e.target.closest(`#commonPassageViewBtn-${questionNum}`)
-        if(clickViewBtn && !clickViewBtn.disabled){
-            openCommonPassageModal(questionNum)
+        const clickViewBtn = e.target.closest('.btn-common-passage-view')
+        if(clickViewBtn){
+            const card = clickViewBtn.closest('.question-item.card')
+            const questionNum = card.dataset.questionNum
+
+            if(!clickViewBtn.disabled){
+                openCommonPassageModal(questionNum)
+
+                const selectedPassageId = card.getAttribute("data-selected-passage-id")
+                if(card && selectedPassageId){
+                    // 지문 범위에 포함된 모든 문항의 공통 지문에 set
+                    // const savedPassage = passages.find(p => p.rangeArray && p.rangeArray.includes(parseInt(questionNum)))
+                    const savedPassage = passages.find(p => p.id == selectedPassageId)
+                    if(savedPassage){
+                        window.edit_common.renderPassageInput('modal', savedPassage.type, savedPassage.content)
+                        const rangeInput = commonPassageModal.querySelector("#common-passage-range")
+                        if(rangeInput){
+                            rangeInput.value = savedPassage.rangeText
+                        } 
+                    } 
+                }
+            }
             return
         }
 
@@ -423,246 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.edit_common.bindPassageEvents()
         
-    /* 
-    commonPassageModal.addEventListener('click', (e) => {
-        // 공통 지문 모달창 닫기
-        const closeBtn = e.target.closest('.close-button')
-        if(closeBtn){
-            closeCommonPassageModal()
-            return
-        }
-
-        // 공통 지문 유형 버튼
-        const commonPassageTypeBtn = e.target.closest('.modal-btn-passage-type')
-        const commonContentContainer = commonPassageModal.querySelector('#modal-passage-input')
-        const questionModalNum = commonPassageModal.getAttribute("data-q-modal-num")
-        if(commonPassageTypeBtn){
-            const dataType = commonPassageTypeBtn.getAttribute("data-type")
-            const commonControls = commonPassageTypeBtn.closest(".passage-controls")
-            commonControls.querySelectorAll('.modal-btn-passage-type').forEach((btn) => {
-                resetButton(btn)
-            })
-            activeButton(commonPassageTypeBtn)
-
-            if(dataType == 'text'){
-                commonContentContainer.innerHTML = createPassageTextHtml(questionModalNum)
-            } else if(dataType == 'image'){
-                commonContentContainer.innerHTML = createPassageImageHtml(questionModalNum)
-
-                const commonContentFile = commonContentContainer.querySelector('.passage-image-file')
-                if(commonContentFile){
-                    commonContentFile.addEventListener('change', (e) => {
-                        const file = e.target.files[0]
-                        if(!file) return
-
-                        // 파일 타입 체크
-                        if(!file.type.trim().startsWith('image/')){
-                            alert('이미지 파일만 업로드 가능합니다.')
-                            commonContentFile.value = ''
-                            return
-                        }
-
-                        // 파일 크기 체크(5MB 제한)
-                        if(file.size > 5 * 1024 * 1024){
-                            alert('5MB 이하의 파일만 업로드 가능합니다.')
-                            commonContentFile.value = ''
-                            return
-                        }
-                    })
-                }
-            }
-        }
-
-        // 공통 지문 임시 저장 버튼
-        const commonPassageSaveBtn = e.target.closest('#btnSaveCommonPassageModal')
-        const controls = commonPassageModal.querySelector(".passage-controls")
-        let passageData = {}
-        let content = null
-        if(commonPassageSaveBtn) {
-            // 1. 지문 유형 저장
-            const activeBtn = controls.querySelector(".modal-btn-passage-type.active")
-            if(!activeBtn){
-                alert('지문 유형을 선택해주세요.')
-                return
-            }
-            const type = activeBtn.dataset.type
-            passageData.type = type
-
-            // 2. 지문 내용 저장
-            if(type == 'text'){
-                content = commonContentContainer.querySelector("textarea").value.trim()
-                if(!content){
-                    alert('내용을 입력해주세요.')
-                    return
-                }
-            } else if(type == 'image'){
-                const fileInput = commonContentContainer.querySelector("input[type='file']")
-                if(fileInput.files.length == 0){
-                    alert('이미지 파일을 선택해주세요.')
-                    return
-                } 
-
-                // 파일 타입 체크
-                if(!fileInput.files[0].type.trim().startsWith('image/')){
-                    alert('이미지 파일만 업로드 가능합니다.')
-                    fileInput.value = ''
-                    return
-                }
-
-                // 파일 크기 체크(5MB 제한)
-                if(fileInput.files[0].size > 5 * 1024 * 1024){
-                    alert('5MB 이하의 파일만 업로드 가능합니다.')
-                    fileInput.value = ''
-                    return
-                }
-
-                // 파일키, 파일 저장
-                const fileKey = `question_${rangeInput}_common_image`
-                passageData.fileKey = fileKey
-                passageData.file = commonContentContainer.querySelector("input[type='file']").files[0]
-                
-                content = fileInput.files[0].name
-            }
-            passageData.content = content
-            
-            // 3. 지문 적용 범위 저장
-            const rangeInput = commonPassageModal.querySelector("#common-passage-range").value.trim()
-            if(!rangeInput || !rangeInput.includes("~")){
-                alert('적용할 문항 범위를 올바르게 입력해주세요. (예: 1~3)')
-                return
-            }
-            const rangeArray = parseQuestionRange(rangeInput)
-            if(rangeArray.length == 0){
-                alert('적용할 문항 범위를 올바르게 입력해주세요. (예: 1~3)')
-                return
-            }
-            passageData.rangeText = rangeInput
-            passageData.rangeArray = rangeArray
-
-            // ★ 파일이 적용될 범위 저장
-            passageData.rangeArray = rangeArray
-
-            // 4. 공통 지문 id 저장
-            passageData.id = commonPassageCounter++
-
-            // 5. 임시 저장 버튼 클릭 시 공통 지문 id를 selectedPassageId 값에 저장
-            commonPassageModal.setAttribute("data-selected-passage-id", passageData.id)
-            commonPassageModal.setAttribute("data-selected-passage-type", passageData.type)
-
-            // 6. 공통 지문 관리 배열에 passageData 객체 저장
-            passages.push(passageData)
-            renderCommonPassageList()
-            showToastMessage('공통 지문이 등록되었습니다.')
-        }
-
-        // 공통 지문 목록 보기 버튼 리스너
-        const commonPassageShowListBtn = e.target.closest('#btnShowCommonPassageList')
-        if(commonPassageShowListBtn){
-            renderCommonPassageList()
-            const listContainer = document.querySelector("#commonPassageListContainer")
-
-            if(listContainer.classList.contains("show")){
-                listContainer.classList.remove('show')
-                commonPassageShowListBtn.innerHTML = `<i class="fas fa-list-alt"></i> 등록된 공통 지문 보기`
-            } else {
-                listContainer.classList.add('show')
-                commonPassageShowListBtn.innerHTML = `<i class="fas fa-chevron-up"></i> 목록 닫기`
-            }
-            return
-        }
-
-        // 공통 지문 목록 삭제 버튼 리스너
-        const commonPassageDeleteListBtn = e.target.closest('.btn-delete-common-passage')
-        if(commonPassageDeleteListBtn){
-            const passageId = commonPassageDeleteListBtn.getAttribute("data-passage-id")
-            passages = passages.filter(passage => passage.id != passageId) // 삭제 버튼을 누르지 않은 passage만 모아서 배열 업데이트
-            renderCommonPassageList()
-        }
-
-        // 공통 지문 목록 적용 버튼 리스너
-        const commonPassageApplyBtn = e.target.closest('.btn-apply-common-passage')
-        if(commonPassageApplyBtn){
-            const passageId = commonPassageApplyBtn.getAttribute('data-passage-id')
-            const passageType = commonPassageApplyBtn.getAttribute('data-passage-type')
-            // 임시 저장 목록에서 적용 버튼 클릭 시 selectedPassageId 값 갱신
-            commonPassageModal.setAttribute("data-selected-passage-id", passageId)
-            commonPassageModal.setAttribute("data-selected-passage-type", passageType)
-
-            const passageObj = passages.find(passage => passage.id == passageId)
-            let activeBtn = null
-            controls.querySelectorAll('.modal-btn-passage-type').forEach((btn) => {
-                resetButton(btn)
-            })
-            let output = ''
-            if(passageObj.type == 'text'){
-                activeBtn = controls.querySelector(".modal-btn-passage-type[data-type='text']")
-                output = 
-                `
-                    <textarea class="form-control no-resize passage-text" rows="6" data-q-num="${questionModalNum}" maxlength="1000">${passageObj.content}</textarea>
-                `
-            } else if(passageObj.type == 'image'){
-                activeBtn = controls.querySelector(".modal-btn-passage-type[data-type='image']")
-                output =
-                `
-                    <input type="file" class="form-control passage-image-file" accept=".jpg, .jpeg, .png" data-q-num="${questionModalNum}">
-                    <small class="form-text text-muted" style="color: #0056b3;">⚠️ ${passageObj.content} 파일을 다시 업로드해주세요.</small>
-                    <div class="image-preview" id="image-preview-${questionModalNum}"></div>
-                `
-            }
-            commonContentContainer.innerHTML = output.trim()
-            activeButton(activeBtn)
-            commonPassageModal.querySelector("#common-passage-range").value = passageObj.rangeText
-        }
-
-        // 공통 지문 작성 완료 버튼 리스너
-        const commonPassageCompleteBtn = e.target.closest("#btnCompleteCommonPassage")
-        
-        if(commonPassageCompleteBtn){
-            const selectedPassageId = commonPassageModal.getAttribute("data-selected-passage-id")
-            const selectedPassageType = commonPassageModal.getAttribute("data-selected-passage-type")
-            const activeType = controls.querySelector(".modal-btn-passage-type.active").getAttribute("data-type")
-            
-            // 1. 타입 불일치 체크
-            if(selectedPassageType != activeType){
-                alert('임시 저장 후 다시 이용해주세요.')
-                return
-            }
-            
-            // 2. 공통지문 ID 확인
-            if(!selectedPassageId){
-                alert('선택된 공통 지문이 없습니다. 임시 저장 후 다시 시도해주세요.')
-                return
-            }
-
-            // 3. 지문 내용 유효성 검사
-            let content = null
-            const savePassage = passages.find(p => p.id == selectedPassageId)
-
-            if(selectedPassageType == 'text'){
-                content = commonPassageModal.querySelector("textarea.passage-text").value.trim()
-                if(!content){
-                    alert('지문 내용을 입력해주세요.')
-                    return
-                } else if(content != savePassage.content.trim()){
-                    alert('지문 내용이 수정되었습니다. 임시 저장 후 다시 시도해주세요.')
-                    return
-                }
-            } else if(selectedPassageType == 'image'){
-                content = commonPassageModal.querySelector("input[type='file']").files // fileList 객체
-                if(content.length == 0){
-                    alert('이미지 지문 파일을 업로드해주세요.')
-                    return
-                }
-            }
-
-            // 4. 정상 처리
-            const card = questionContainer.querySelector(`.question-item[data-question-num="${questionModalNum}"]`)
-            card.setAttribute("data-selected-passage-id", selectedPassageId)
-            closeCommonPassageModal()
-            showToastMessage('공통 지문이 저장되었습니다.')
-        }
-    })
-    */
 })
 
 /* 시험 과목 UI 초기화
@@ -705,7 +480,7 @@ const createQuestionHml = (number) => {
                         </label>
                         <input class="form-check-input common-passage-toggle" type="checkbox" 
                             id="common-passage-toggle-${number}" data-q-num="${number}">
-                        <button id="commonPassageViewBtn-${number}" disabled>
+                        <button id="commonPassageViewBtn-${number}" class="btn-common-passage-view" disabled>
                             <i class="fas fa-search"></i> 공통 지문 설정
                         </button>
                     </div>
@@ -911,10 +686,26 @@ const parseQuestionRange = (rangeInput) => {
 
 // 등록된 공통 지문 목록 UI
 const createCommonPassageListHtml = (passage) => {
-    const contentPreview = 
-        passage.type == 'text'
-        ? passage.content.substring(0, 30) + (passage.content.length > 30 ? '...' : '')
-        : `[${passage.content} - 이미지 지문]` 
+    let contentPreview = ''
+    if(passage.type == 'text'){
+        // 1. HTML 태그 제거
+        const plainText = passage.content.replace(/<[^>]*>?/gm, '')
+
+        // 2. 텍스트가 있으면 길이를 자르고, 없는데 이미지만 있다면 안내 문구 표시
+        if(plainText.trim().length > 0){
+            // 텍스트만 있거나, 텍스트 + 이미지가 있거나
+            const hasImage = passage.content.includes('<img')
+            contentPreview = (hasImage ? '🖼️ ' : '') +
+                            plainText.substring(0, 30) +
+                            (plainText.length > 30 ? '...' : '')
+        } else if(passage.content.includes('<img')){
+            // 이미지만 있는 경우
+            contentPreview = '🖼️ [이미지 포함 지문]'
+        } else {
+            // 아무 내용도 없는 경우
+            contentPreview = '(내용 없음)'
+        }
+    } 
     return `
         <div class="common-passage-list-item" data-passage-id="${passage.id}" data-passage-type="${passage.type}">
             <div style="flex-grow: 1;">
@@ -957,7 +748,6 @@ const renderCommonPassageList = () => {
     passages.forEach((passage) => {
         listContainer.insertAdjacentHTML('afterbegin', createCommonPassageListHtml(passage))
     })
-    
 }
 
 // 보기 추가 함수
@@ -1167,10 +957,6 @@ const saveExam = () => {
     //     questions: examData
     // }
     
-    // POST 요청 시 JSON body 형태로 데이터를 전송
-    // 컨트롤러에서는 @RequestBody DTO, Map 으로 받음
-    // @RequestParam 으로 받으려면 URL 쿼리파라미터로 전달해야 함(보통은 비추천, URL 노출)
-     
     axios.post('/exam/saveExamByForm', formData)
         .then(response => {
             if(response.data){

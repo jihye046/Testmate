@@ -1,13 +1,10 @@
 package com.my.ex.controller;
 
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamFolderDto;
@@ -39,19 +35,14 @@ import com.my.ex.service.IExamSelectionService;
 public class AdminController {
 
 	@Autowired
-//	private AdminService service;
 	private IAdminService service;
 	
 	@Autowired
-//	private ExamSelectionService examService;
 	private IExamSelectionService examService;
 	
 	@Autowired
-//	private ExamAnswerService answerService;
 	private IExamAnswerService answerService;
 	
-	@Autowired
-	private EnvironmentConfig config;
 	
 	/**
 	 * 폴더 목록 페이지 보여줌 (동기식 요청)
