@@ -21,7 +21,8 @@ public interface IExamSelectionDao {
 	String getExamtypename(String examType);
 	List<ExamQuestionDto> getExamQuestions(Map<String, Object> map);
 	List<ExamQuestionDto> getExamQuestionsByExamId(int examId);
-	List<ExamChoiceDto> getExamChoices(int examId);
+	List<ExamChoiceDto> getExamChoicesByExamId(int examId);
+	List<ExamChoiceDto> getExamChoicesByQuestionId(int questionId);
 	List<ExamQuestionDto> getCommonPassageInfo(Map<String, Object> map);
 	int getTotalQuestionCount(int examId);
 	int deleteExams(List<Integer> examIds);
@@ -29,4 +30,9 @@ public interface IExamSelectionDao {
 	List<String> getSubjectsForExamType(String examTypeCode);
 	int findTypeIdByCode(String type);
 	String findExistingExamFolderId(ExamInfoDto examInfoDto);
+	ExamInfoDto getExamInfoByExamId(int examId);
+	ExamQuestionDto getExamQuestionByQuestionId(int questionId);
+	int findFolderIdByExamId(int examId);
+	void updateQuestion(ExamQuestionDto questionDto);
+	void updateQuestionChoices(ExamChoiceDto choiceDtos);
 }

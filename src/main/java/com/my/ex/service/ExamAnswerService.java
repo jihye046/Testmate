@@ -13,6 +13,7 @@ import com.my.ex.dao.ExamAnswerDao;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamInfoDto;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question.QuestionAnswer;
 import com.my.ex.parser.geomjeong.parse.answer.GeomjeongAnswerParser;
 import com.my.ex.parser.geomjeong.upload.answer.UploadedGeomjeongAnswerPdfTextExtractor;
 
@@ -99,6 +100,15 @@ public class ExamAnswerService implements IExamAnswerService {
 	public String examTypeCodeWithoutAnswer(String examTypeCode) {
 		return examTypeCode.substring(0, examTypeCode.length() - "Answer".length());
 	}
+	
+	// 정답지와 연결될 시험지의 examTypeCode에 Answer를 붙임
+	@Override
+	public String examTypeCodeWithAnswer(String examTypeCode) {
+		if(examTypeCode.endsWith("Answer")) {
+			return examTypeCode;
+		}
+		return examTypeCode + "Answer";
+	}
 
 	// 관리자가 정답지 PDF 업로드 시 DB 저장용 구조로 변환
 	// saveParsedAnswerData() 호출 전에 사용됨
@@ -139,8 +149,18 @@ public class ExamAnswerService implements IExamAnswerService {
 	}
 
 	@Override
-	public List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds) {
-		return dao.getAnswerByQuestionId(questionIds);
+	public List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds) {
+		return dao.getAnswersByQuestionIds(questionIds);
+	}
+
+	@Override
+	public ExamAnswerDto getAnswerByQuestionId(Integer questionId) {
+		return dao.getAnswerByQuestionId(questionId);
 	}
 	
+	public void updateQuestionAnswer(QuestionAnswer answer) {
+		ExamAnswerDto dto = new ExamAnswerDto(answer.getAnswerId(), answer.getCorrectAnswer());
+		dao.updateQuestionAnswer(dto);
+	}
+
 }

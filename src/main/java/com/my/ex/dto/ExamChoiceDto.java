@@ -19,5 +19,10 @@ public class ExamChoiceDto {
 		this.choiceText = choiceText;
 		this.choiceNum = choiceNum;
 	}
+
+	public ExamChoiceDto(int choiceId, String choiceText) {
+		this.choiceId = choiceId;
+		this.choiceText = choiceText;
+	}
 	
 }

@@ -1,13 +1,10 @@
 package com.my.ex.controller;
 
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamFolderDto;
@@ -39,19 +35,14 @@ import com.my.ex.service.IExamSelectionService;
 public class AdminController {
 
 	@Autowired
-//	private AdminService service;
 	private IAdminService service;
 	
 	@Autowired
-//	private ExamSelectionService examService;
 	private IExamSelectionService examService;
 	
 	@Autowired
-//	private ExamAnswerService answerService;
 	private IExamAnswerService answerService;
 	
-	@Autowired
-	private EnvironmentConfig config;
 	
 	/**
 	 * 폴더 목록 페이지 보여줌 (동기식 요청)
@@ -154,29 +145,31 @@ public class AdminController {
 		}
 		
 		/* 시험지인 경우 */
+		// 1. 시험지 문제
 		List<ExamQuestionDto> questions = examService.getExamQuestionsByExamId(examId);
 		if(questions == null || questions.isEmpty()) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
 		
-		List<ExamChoiceDto> choices = examService.getExamChoices(examId);
+		// 2. 선택지
+		List<ExamChoiceDto> choices = examService.getExamChoicesByExamId(examId);
+		
+		// 3. 공통 지문 
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto = 
 				examService.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
+		
+		// 4. 폴더 정보
 		ExamFolderDto folderDto = service.getFolderInfoByExamId(examId);
 		
+		// 5. 정답지
 		List<Integer> questionIds = questions.stream()
 			.map(ExamQuestionDto::getQuestionId)
 			.collect(Collectors.toList());
-		 List<ExamAnswerDto> answers = answerService.getAnswerByQuestionId(questionIds);
+		List<ExamAnswerDto> answers = answerService.getAnswersByQuestionIds(questionIds);
 		
-		// question_id 조회 후 [exam_answer] 테이블에서 같은 question_id를 가진 correctAnswer을 조회
-//		for(ExamQuestionDto dto: questions) {
-//			answers.add(answerService.getAnswerByQuestionId(dto.getQuestionId()));
-//		}
-		
+		// 6. 데이터 담기
 		ExamPageDto response = 
 				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto, answers);
-		// getAnswersByQuestionIds(List<Integer> questionIds)
 		
 		model.addAttribute("examPageDto", response);
 		model.addAttribute("folderDto", folderDto);
@@ -184,29 +177,6 @@ public class AdminController {
 		return "/admin/exam_page";
 	}
 	
-	@GetMapping("/getExamImagePath")
-	@ResponseBody
-	public Resource getExamImagePath(
-		@RequestParam String examType,
-		@RequestParam String examRound,
-		@RequestParam String examSubject,
-		@RequestParam String filename)
-	{
-		String path = 
-				config.getImageUploadPath() +
-				examType + "\\" +
-				examRound + "\\" +
-				examSubject + "\\" +
-				filename;
-		// C:\server_program\project\testmate\images\2025년도 제1회\국어
-		File file = new File(path);
-		if (file.exists()) {
-			return new FileSystemResource(file); // file자체를 보내는 것은 X, HTTP 본문 응답으로 자동 변환해주는 API(FileSystemResource())를 이용해서 보내야 함
-		} else {
-			throw new RuntimeException("File not found: " + file.getAbsolutePath());
-		}
-	}
-
 	/**
 	 * 새 폴더 생성
 	 * 

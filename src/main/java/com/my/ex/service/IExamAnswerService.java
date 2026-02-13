@@ -17,5 +17,7 @@ public interface IExamAnswerService {
 	String examTypeCodeWithoutAnswer(String examTypeCode);
 	List<ExamAnswerDto> buildParsedAnswerData(Map<Integer, String> answerMap, ExamInfoDto examInfoDto);
 	boolean updateAnswers(List<ExamAnswerDto> answerDtos);
-	List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds);
+	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
+	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
+	String examTypeCodeWithAnswer(String examTypeCode);
 }

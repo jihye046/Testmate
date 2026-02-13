@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+/* 초소형 모바일 (480px 이하) */
+@media (max-width: 480px) {
+    .ql-container.ql-snow {
+        height: 200px;
+    }
+
+    .ql-container {
+        font-size: 0.9rem;
+    }
+
+    /* 툴바 내 버튼 간격 조정 */
+    .ql-snow.ql-toolbar button {
+        margin: 1px;
+    }
+    
+    .ql-editor.ql-blank::before {
+        font-size: 0.9rem;
+    }
+}

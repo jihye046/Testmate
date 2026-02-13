@@ -13,5 +13,7 @@ public interface IExamAnswerDao {
 	int saveParsedAnswerData(ExamAnswerDto answersList);
 	List<ExamAnswerDto> getAnswersByExamId(int examId);
 	int updateAnswers(ExamAnswerDto answerDto);
-	List<ExamAnswerDto> getAnswerByQuestionId(List<Integer> questionIds);
+	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
+	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
+	void updateQuestionAnswer(ExamAnswerDto answerDto);
 }
