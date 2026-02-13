@@ -13,6 +13,7 @@ import com.my.ex.dao.ExamAnswerDao;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamInfoDto;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question.QuestionAnswer;
 import com.my.ex.parser.geomjeong.parse.answer.GeomjeongAnswerParser;
 import com.my.ex.parser.geomjeong.upload.answer.UploadedGeomjeongAnswerPdfTextExtractor;
 
@@ -155,6 +156,11 @@ public class ExamAnswerService implements IExamAnswerService {
 	@Override
 	public ExamAnswerDto getAnswerByQuestionId(Integer questionId) {
 		return dao.getAnswerByQuestionId(questionId);
+	}
+	
+	public void updateQuestionAnswer(QuestionAnswer answer) {
+		ExamAnswerDto dto = new ExamAnswerDto(answer.getAnswerId(), answer.getCorrectAnswer());
+		dao.updateQuestionAnswer(dto);
 	}
 
 }

@@ -64,11 +64,18 @@
 	
 	<!-- 특정 문항 수정 클릭 시 해당 문제 정답만 조회 -->
 	<select id="getAnswerByQuestionId" parameterType="Integer" resultType="ExamAnswerDto">
-		SELECT q.question_num, a.correct_answer, a.question_id
+		SELECT q.question_num, a.correct_answer, a.question_id, a.answer_id
 		  FROM exam_answer a
 		  JOIN exam_question  q on q.question_id = a.question_id
 		 WHERE a.question_id = #{questionId}
 		 ORDER BY question_num
 	</select>
+	
+	<!-- 시험지 단일 문항 정답지 수정 -->
+	<update id="updateQuestionAnswer" parameterType="ExamAnswerDto">
+		UPDATE exam_answer
+		   SET correct_answer = #{correctAnswer}
+		 WHERE answer_id = #{answerId}
+	</update>
 	
 </mapper>

@@ -16,6 +16,7 @@ public class ExamPageDto {
 	private List<ExamQuestionDto> examQuestions;
 	private ExamQuestionDto examQuestion;
 	
+	private String examTypeEng;							  // middle-geomjeong
 	private String examType; 							  // 중졸 검정고시
 	private String examRound; 							  // 2025년 제1회
 	private String examSubject; 						  // 국어
@@ -24,6 +25,8 @@ public class ExamPageDto {
 	
 	private List<ExamAnswerDto> examAnswers;			  // 시험지 전체 정답 조회용
 	private ExamAnswerDto examAnswer;					  // 특정 문제 수정 시 해당 문제 정답 조회용
+	
+	private int folderId;								  // 폴더id
 	
 	// 공통지문 관리 dto
 	@Data
@@ -58,14 +61,16 @@ public class ExamPageDto {
 	}
 
 	// 관리자: 관리자가 특정 시험 문제를 수정할 때, 해당 문제 정답만 조회
-	public ExamPageDto(ExamQuestionDto examQuestion, String examType, String examRound, String examSubject,
-			List<ExamChoiceDto> examChoices, ExamAnswerDto examAnswer) {
+	public ExamPageDto(ExamQuestionDto examQuestion, String examTypeEng, String examType, String examRound, String examSubject,
+			List<ExamChoiceDto> examChoices, ExamAnswerDto examAnswer, int folderId) {
 		this.examQuestion = examQuestion;
+		this.examTypeEng = examTypeEng;
 		this.examType = examType;
 		this.examRound = examRound;
 		this.examSubject = examSubject;
 		this.examChoices = examChoices;
 		this.examAnswer = examAnswer;
+		this.folderId = folderId;
 	}
 
 }

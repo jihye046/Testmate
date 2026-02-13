@@ -41,4 +41,6 @@ public interface IExamSelectionService {
 	ExamQuestionDto getExamQuestionByQuestionId(int questionId);
 	String saveEditorImage(MultipartFile image) throws IOException;
 	String processHtmlEmbeddedImages(String content, String examType, String examRound, String examSubject);
+	int findFolderIdByExamId(int examId);
+	void updateExamByForm(ExamCreateRequestDto request);
 }

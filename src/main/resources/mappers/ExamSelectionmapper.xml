@@ -312,4 +312,28 @@
 		   AND i.isdeleted = 'N'
 	</select>
 	
+	<!-- examId로부터 folderId 조회 -->
+	<select id="findFolderIdByExamId" parameterType="int" resultType="int">
+		SELECT folder_id
+		  FROM exam_info
+		 WHERE exam_id = #{examId}
+	</select>
+	
+	<!-- 시험지 단일 문항 수정 -->
+	<update id="updateQuestion" parameterType="ExamQuestionDto">
+		UPDATE exam_question
+		   SET question_text = #{questionText},
+			   individualpassage = #{individualPassage},
+			   commonpassage = #{commonPassage},
+			   passage_scope = #{passageScope}
+		 WHERE question_id = #{questionId}
+	</update>
+	
+	<!-- 시험지 단일 문항 선택지 수정 -->
+	<update id="updateQuestionChoices" parameterType="ExamChoiceDto">
+		UPDATE exam_choice
+		   SET choice_text = #{choiceText}
+		 WHERE choice_id = #{choiceId}
+	</update>
+	
 </mapper>

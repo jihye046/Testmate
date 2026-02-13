@@ -32,4 +32,7 @@ public interface IExamSelectionDao {
 	String findExistingExamFolderId(ExamInfoDto examInfoDto);
 	ExamInfoDto getExamInfoByExamId(int examId);
 	ExamQuestionDto getExamQuestionByQuestionId(int questionId);
+	int findFolderIdByExamId(int examId);
+	void updateQuestion(ExamQuestionDto questionDto);
+	void updateQuestionChoices(ExamChoiceDto choiceDtos);
 }

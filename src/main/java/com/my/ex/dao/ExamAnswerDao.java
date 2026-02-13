@@ -47,4 +47,9 @@ public class ExamAnswerDao implements IExamAnswerDao {
 		return session.selectOne(NAMESPACE + "getAnswerByQuestionId", questionId);
 	}
 
+	@Override
+	public void updateQuestionAnswer(ExamAnswerDto answerDto) {
+		session.update(NAMESPACE + "updateQuestionAnswer", answerDto);
+	}
+
 }

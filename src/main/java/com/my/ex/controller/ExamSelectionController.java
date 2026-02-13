@@ -36,6 +36,7 @@ import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
@@ -249,7 +250,7 @@ public class ExamSelectionController {
 	public boolean saveExamByForm(
 			@RequestParam("examInfo") String examInfoStr,
 			@RequestParam("questions") String questionsStr,
-			@RequestParam Map<String, MultipartFile> fileMap) throws IOException
+			@RequestParam(required = false) Map<String, MultipartFile> fileMap) throws IOException
 	{
 		ObjectMapper mapper = new ObjectMapper();
 		ExamCreateRequestDto requestDto = new ExamCreateRequestDto();
@@ -258,7 +259,7 @@ public class ExamSelectionController {
 		requestDto.setQuestions(
 				mapper.readValue(
 						questionsStr,
-						new TypeReference<List<ExamCreateRequestDto.Questions>>() {}
+						new TypeReference<List<ExamCreateRequestDto.Question>>() {}
 				)
 		);
 		requestDto.setFileMap(fileMap);
@@ -356,8 +357,6 @@ public class ExamSelectionController {
 	}
 	
 	@GetMapping("/editQuestion/{questionId}/{examId}")
-//	@ResponseBody
-//	public ExamPageDto editQuestionPage(
 	public String editQuestionPage(
 			@PathVariable int questionId,
 			@PathVariable int examId,
@@ -374,16 +373,22 @@ public class ExamSelectionController {
 		if(question == null) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
+		question.setExamId(examId);
+		question.setQuestionId(questionId);
 		
 		// 2. 선택지
 		List<ExamChoiceDto> choices = service.getExamChoicesByQuestionId(questionId);
 		
 		// 3. 정답지
 		ExamAnswerDto answer = answerService.getAnswerByQuestionId(questionId);
+		answer.setQuestionNum(question.getQuestionNum());
+		
+		// 4. 폴더id
+		int folderId = service.findFolderIdByExamId(examId);
 		
 		/* 데이터 담기 */
 		ExamPageDto response = 
-				new ExamPageDto(question, examTypeKor, examRound, examSubject, choices, answer);
+				new ExamPageDto(question, examTypeEng, examTypeKor, examRound, examSubject, choices, answer, folderId);
 		model.addAttribute("examPageDto", response); // jsp용
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -394,16 +399,39 @@ public class ExamSelectionController {
 			throw new IllegalStateException("JSON 변환 실패", e);
 		}
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("examId", examId);
-		map.put("examTypeEng", examTypeEng);
-		map.put("examTypeKor", examTypeKor);
-		map.put("examRound", examRound);
-		map.put("examSubject", examSubject);
-		model.addAttribute("map", map); // 수정페이지에서 시험지 페이지로 돌아갈 수 있도록 필요한 파라미터값(/admin/showExamPage?)
-		
 		return "/admin/exam_edit_page";
-//		return response;
 	}
 	
+	@PostMapping("/updateExamByForm")
+	@ResponseBody
+	public String updateExamByForm(
+			@RequestParam(value="examInfo", required = false) String examInfoStr,
+			@RequestParam(value="question", required = false) String questionStr,
+			@RequestParam(required = false) Map<String, MultipartFile> fileMap) throws IOException 
+	{
+		
+		ObjectMapper mapper = new ObjectMapper();
+		CreateExamInfo createExamInfo = mapper.readValue(examInfoStr, CreateExamInfo.class);
+		Question question = mapper.readValue(questionStr, Question.class);
+		
+		ExamCreateRequestDto requestDto = new ExamCreateRequestDto();
+		requestDto.setExamInfo(createExamInfo);
+		requestDto.setQuestion(question);
+		requestDto.setFileMap(fileMap);
+		
+		service.updateExamByForm(requestDto);
+		
+		Integer examId = requestDto.getExamInfo().getExamId();
+		String examTypeEng = requestDto.getExamInfo().getType();
+		String examTypeKor = requestDto.getExamInfo().getTypeKor();
+		String examRound = requestDto.getExamInfo().getRound();
+		String examSubject = requestDto.getExamInfo().getSubject();
+		return "/admin/showExamPage?"
+				+ "examId=" + examId + "&"
+				+ "examTypeEng=" + examTypeEng + "&"
+				+ "examTypeKor=" + examTypeKor + "&"
+				+ "examRound=" + examRound + "&"
+				+ "examSubject=" + examSubject;
+		
+	}
 }

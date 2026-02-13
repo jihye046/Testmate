@@ -131,6 +131,19 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		return session.selectOne(NAMESPACE + "getExamQuestionByQuestionId", questionId);
 	}
 
-	
+	@Override
+	public int findFolderIdByExamId(int examId) {
+		return session.selectOne(NAMESPACE + "findFolderIdByExamId", examId);
+	}
+
+	@Override
+	public void updateQuestion(ExamQuestionDto questionDto) {
+		session.update(NAMESPACE + "updateQuestion", questionDto);
+	}
+
+	@Override
+	public void updateQuestionChoices(ExamChoiceDto choiceDtos) {
+		session.update(NAMESPACE + "updateQuestionChoices", choiceDtos);
+	}
 
 }

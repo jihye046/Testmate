@@ -22,10 +22,11 @@
 <body>
 	<div class="exam_edit_page">
 		<div id="exam-creation-form">
+			<c:set var="q" value="${examPageDto.examQuestion}" />
 			<div class="exam-info-header edit" style="display: flex;">
 				<h2>시험지 수정</h2>
 				<button class="btn btn-back" 
-					onclick="location.href='/admin/showExamPage?examId=${map.examId}&examTypeEng=${map.examTypeEng}&examTypeKor=${map.examTypeKor}&examRound=${map.examRound}&examSubject=${map.examSubject}'"
+					onclick="location.href='/admin/showExamPage?examId=${q.examId}&examTypeEng=${examPageDto.examTypeEng}&examTypeKor=${examPageDto.examType}&examRound=${examPageDto.examRound}&examSubject=${examPageDto.examSubject}'"
 				>
 					시험지로 돌아가기
 				</button>
@@ -33,11 +34,10 @@
 			
 			<!-- 문제 컨테이너 -->
 			<div id="question-list-container"> 
-				<c:set var="q" value="${examPageDto.examQuestion}" />
 
 				<div class="question-item card" data-question-num="${q.questionNum}">
 					<div class="question-header">
-						<h4>제 ${examPageDto.examQuestion.questionNum} 문항</h4>
+						<h4>제 ${q.questionNum} 문항</h4>
 	<%-- 	                <button class="btn btn-sm btn-danger btn-remove-question" data-question-num="${q.questionNum}"> --%>
 	<!-- 	                    <i class="fas fa-trash-alt"></i> 삭제 -->
 	<!-- 	                </button> -->
@@ -54,9 +54,11 @@
 										type="checkbox" 
 										id="common-passage-toggle-${q.questionNum}" 
 										data-q-num="${q.questionNum}"
-										<c:if test="${not empty q.commonPassage}">checked</c:if> 
+										${not empty q.commonPassage ? 'checked' : ''} 
 									>		
-									<button <c:if test="${empty q.commonPassage}">disabled</c:if> id="commonPassageViewBtn">
+									<button id="commonPassageViewBtn-${q.questionNum}" 
+											class="btn-common-passage-view"
+											${empty q.commonPassage ? 'disabled' : ''}>
 										<i class="fas fa-search"></i> 공통 지문 설정
 									</button>
 							</div>
@@ -78,7 +80,7 @@
 							</div>
 						</div>
 		
-						<div class="form-group">
+						<div class="form-group question-group">
 							<label>문항 내용</label>
 							<textarea 
 								class="form-control no-resize question-text" 
@@ -91,10 +93,11 @@
 							<label>선택지</label>
 							<div class="option-inputs">
 								<c:forEach items="${examPageDto.examChoices}" var="choices">
-									<div class="option-item-1">
+									<div class="option-item-${choices.choiceNum}" >
 										<input type="text" 
 											class="form-control option-input" 
 											data-choice-num="${choices.choiceNum}" 
+											data-choice-id="${choices.choiceId}"
 											placeholder="보기 ${choices.choiceNum}"
 											value="${choices.choiceText}"
 										>
@@ -112,7 +115,8 @@
 						<div class="form-group answer-group">
 							<label for="answer-${examPageDto.examAnswer.correctAnswer}">정답</label>
 							<input type="number" 
-								id="answer-${examPageDto.examAnswer.correctAnswer}" 
+<%-- 								id="answer-${examPageDto.examAnswer.correctAnswer}"  --%>
+								id="${examPageDto.examAnswer.answerId}"
 								class="form-control question-answer" 
 								min="1" 
 								max="5" 

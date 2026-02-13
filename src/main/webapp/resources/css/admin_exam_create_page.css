@@ -618,19 +618,49 @@ button:focus,
     width: 100%;
 }
 
-.passage-content .image-preview {
-    margin-top: 10px;
+/* 이미지 미리보기 컨테이너 */
+.image-preview.show{
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6; 
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 10px;
+}
+
+/* "현재 등록된 지문 이미지" 텍스트 */
+.image-preview p.text-muted {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d !important;
+    margin-bottom: 5px;
+}
+
+/* 실제 이미지 스타일 */
+.image-preview img {
     max-width: 100%;
     height: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 0.9em;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    background-color: #ffffff;
+    border: 1px solid #eee;
 }
+
+/* "파일을 새로 선택하지 않으면..." 안내 문구 */
+.image-preview p.text-primary {
+    font-size: 0.8rem;
+    color: #0d6efd !important;
+    background-color: #e7f1ff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 5px;
+}
+
 
 /* --------------------------------------------------------------- */
 /* 🌟🌟🌟 개별 지문 에디터 상단 안내 메시지 박스 스타일 🌟🌟🌟 */
@@ -906,5 +936,38 @@ button:focus,
     
     .ql-editor.ql-blank::before {
         font-size: 0.95rem;
+    }
+
+    /* 이미지 미리보기 */
+    .image-preview {
+        padding: 12px;
+        margin-top: 10px;
+        gap: 8px; 
+    }
+
+    .image-preview img {
+        max-height: 200px;
+        width: 100%;     
+        object-fit: contain;
+    }
+
+    .image-preview p.text-muted {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    .image-preview p.text-primary {
+        font-size: 0.75rem;
+        width: 100%;     
+        text-align: center;
+        padding: 6px;
+        line-height: 1.4;
+        word-break: keep-all;
+    }
+    
+    /* 파일 선택 input 높이 조절 (터치 영역 확보) */
+    .passage-image-file {
+        height: auto;
+        padding: 10px;
     }
 }

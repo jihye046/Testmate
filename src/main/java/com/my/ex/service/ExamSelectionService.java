@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.my.ex.config.EnvironmentConfig;
@@ -28,8 +29,11 @@ import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
-import com.my.ex.dto.request.ExamCreateRequestDto.Questions;
-import com.my.ex.dto.request.ExamCreateRequestDto.Questions.QuestionChoices;
+import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question.CommonPassage;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question.IndividualPassage;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question.QuestionChoice;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
@@ -108,6 +112,7 @@ public class ExamSelectionService implements IExamSelectionService {
 		
 		// 시험 문제 저장
 		List<ExamAnswerDto> answersList = new ArrayList<>();
+		boolean hasAnswerData = false; // 정답 데이터 존재 여부
 		for(Map<String, Object> question : questions) {
 			question.put("examId", examId);
 			dao.saveParsedQuestionInfo(question); // 문제 저장 후 questionId 받아옴
@@ -126,16 +131,24 @@ public class ExamSelectionService implements IExamSelectionService {
 			}
 			
 			// 시험 정답지 저장
-			ExamAnswerDto answerDto = new ExamAnswerDto();
-			answerDto.setQuestionId(questionId);
-			answerDto.setCorrectAnswer(Integer.parseInt(question.get("answer").toString()));
-			answersList.add(answerDto);
+			Object answerObj = question.get("answer");
+			if(answerObj != null) {
+				ExamAnswerDto answerDto = new ExamAnswerDto();
+				answerDto.setQuestionId(questionId);
+				answerDto.setCorrectAnswer(Integer.parseInt(question.get("answer").toString()));
+				answersList.add(answerDto);
+				hasAnswerData = true;
+			}
 		}
-		String examTypeCodeWithAnswer = answerService.
-				examTypeCodeWithAnswer(examInfo.getExamTypeEng()); 
-		int answerExamTypeId = findTypeIdByCode(examTypeCodeWithAnswer);
-		examInfo.setExamTypeId(answerExamTypeId);
-		answerService.saveParsedAnswerData(examInfo, answersList);
+		
+		// 정답 데이터가 있는 경우에만 호출
+		if(hasAnswerData) {
+			String examTypeCodeWithAnswer = answerService.
+					examTypeCodeWithAnswer(examInfo.getExamTypeEng()); 
+			int answerExamTypeId = findTypeIdByCode(examTypeCodeWithAnswer);
+			examInfo.setExamTypeId(answerExamTypeId);
+			answerService.saveParsedAnswerData(examInfo, answersList);
+		}
 		
 		return true;
 	}
@@ -234,9 +247,9 @@ public class ExamSelectionService implements IExamSelectionService {
 		examInfo.setFolderId(request.getExamInfo().getFolderId());
 		examInfo.setExamTypeEng(engType);
 		
-		List<Questions> questions = request.getQuestions();
+		List<Question> questions = request.getQuestions();
 		List<Map<String, Object>> newList = new ArrayList<>();
-		for(Questions q : questions) {
+		for(Question q : questions) {
 			Map<String, Object> map = new HashMap<>();
 			// 문제번호
 			map.put("questionNum", q.getQuestionNum());
@@ -297,9 +310,9 @@ public class ExamSelectionService implements IExamSelectionService {
 			}
 			
 			// 선택지
-			List<QuestionChoices> choices = q.getQuestionChoices();
+			List<QuestionChoice> choices = q.getQuestionChoices();
 			List<ExamChoiceDto> newChoiceList = new ArrayList<>();
-			for(QuestionChoices c : choices) {
+			for(QuestionChoice c : choices) {
 				newChoiceList.add(new ExamChoiceDto(c.getChoiceLabel(), c.getChoiceText(), c.getChoiceNum()));
 			}
 			map.put("options", newChoiceList);
@@ -402,7 +415,9 @@ public class ExamSelectionService implements IExamSelectionService {
 
 	/**
 	 * 1. 임시 폴더(temp)에 저장된 이미지를 실제 시험지 폴더로 이동
-	 * 2. DB에 저장될 HTML 내 <img> 태그의 src 경로를 완성형 파라미터로 치환
+	 * 2. DB에 저장될 HTML 내 <img> 태그의 src 경로를 파일이름으로 치환
+	 * 수정 전: <img src=\"/exam/getExamImagePath?filename=img.png\">
+	 * 수정 후: <img src=\"img.png\">
 	 */
 	@Override
 	public String processHtmlEmbeddedImages(String content, String examType, String examRound, String examSubject) {
@@ -445,6 +460,115 @@ public class ExamSelectionService implements IExamSelectionService {
 	    }
 		
 		return updatedContent;
+	}
+
+	@Override
+	public int findFolderIdByExamId(int examId) {
+		return dao.findFolderIdByExamId(examId);
+	}
+
+	@Override
+	@Transactional
+	public void updateExamByForm(ExamCreateRequestDto request) {
+		updateQuestion(request.getExamInfo(), request.getQuestion(), request.getFileMap());
+		updateQuestionChoices(request.getQuestion().getQuestionChoices());
+		answerService.updateQuestionAnswer(request.getQuestion().getQuestionAnswer());
+	}
+	
+	private void updateQuestion(CreateExamInfo i, Question q, Map<String, MultipartFile> fileMap) {
+		// 시험지 정보
+		String examType = i.getTypeKor();
+		String examRound = i.getRound();
+		String examSubject = i.getSubject();
+		
+		// 시험지
+		Integer questionid = q.getQuestionId();
+		String questionText = q.getQuestionText();
+		char useCommonPassage = q.getUseCommonPassage();
+		char useIndividualPassage = q.getUseIndividualPassage();
+		
+		// 시험지 객체에 데이터 파싱
+		ExamQuestionDto dto = new ExamQuestionDto();
+		dto.setQuestionId(questionid);
+		dto.setQuestionText(questionText);
+		if(useCommonPassage == 'Y') {
+			CommonPassage commonPassage = q.getCommonPassage();
+			String type = commonPassage.getType();
+			String content = commonPassage.getContent();
+			String rangeText = commonPassage.getRangeText();
+			
+			String newContent = content;
+			if(type.equals("image")) {
+				String fileKey = commonPassage.getFileKey();
+				
+				if(fileKey != null && !fileKey.isEmpty()) {
+					// 폴더이름 생성
+					String folderPath = Paths.get(examType, examRound, examSubject).toString();
+					
+					// 파일이름 생성
+					String filename = content.trim().replace(" ", "");
+					String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
+					
+					// 파일 저장
+					MultipartFile file = fileMap.get(fileKey);
+					
+					ensureImageFolderExists(folderPath, uniqueFilename, file);
+					newContent = uniqueFilename;
+				}
+			} else if(type.equals("text")) {
+				newContent = processHtmlEmbeddedImages(
+						content, 
+						examType, 
+						examRound, 
+						examSubject
+				);
+			}
+			dto.setCommonPassage(newContent);
+			dto.setPassageScope(rangeText);
+		}
+		
+		if(useIndividualPassage == 'Y') {
+			IndividualPassage individualPassage = q.getIndividualPassage();
+			String type = individualPassage.getType();
+			String content = individualPassage.getContent();
+			
+			String newContent = content;
+			if(type.equals("image")) {
+				String individualFileKey = individualPassage.getFileKey();
+				
+				if(individualFileKey != null && !individualFileKey.isEmpty()) {
+					// 폴더이름 생성
+					String folderPath = Paths.get(examType, examRound, examSubject).toString();
+					
+					// 파일이름 생성
+					String filename = content.trim().replace(" ", "_");
+					String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
+					
+					// 파일 저장
+					MultipartFile file = fileMap.get(individualFileKey);
+					
+					ensureImageFolderExists(folderPath, uniqueFilename, file);
+					newContent = uniqueFilename; // 새로운 파일 이름을 content로 재생성
+				} 
+			} else if(type.equals("text")) {
+				newContent = processHtmlEmbeddedImages(
+						content, 
+						examType, 
+						examRound, 
+						examSubject
+				); // <img>태그의 src경로를 파일이름만 남긴채로 content를 재생성
+			}
+			dto.setIndividualPassage(newContent);
+		}
+		
+		dao.updateQuestion(dto);
+	}
+	
+	private void updateQuestionChoices(List<QuestionChoice> choice) {
+		for(QuestionChoice c : choice) {
+			ExamChoiceDto dto = new ExamChoiceDto(c.getChoiceId(), c.getChoiceText());
+			dao.updateQuestionChoices(dto);
+		}
 	}
 
 }
