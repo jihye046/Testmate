@@ -158,9 +158,18 @@ public class ExamAnswerService implements IExamAnswerService {
 		return dao.getAnswerByQuestionId(questionId);
 	}
 	
-	public void updateQuestionAnswer(QuestionAnswer answer) {
-		ExamAnswerDto dto = new ExamAnswerDto(answer.getAnswerId(), answer.getCorrectAnswer());
-		dao.updateQuestionAnswer(dto);
+	public void updateQuestionAnswer(Integer questionId, QuestionAnswer answer, Integer examId) {
+		Integer answerId = answer.getAnswerId();
+		int correctAnswer = answer.getCorrectAnswer();
+		
+		if((answerId == null || answerId == 0) 
+				&& correctAnswer > 0) {
+			ExamAnswerDto dto = new ExamAnswerDto(questionId, correctAnswer, examId);
+			dao.saveParsedAnswerData(dto);
+		} else {
+			ExamAnswerDto dto = new ExamAnswerDto(answerId, correctAnswer);
+			dao.updateQuestionAnswer(dto);
+		}
 	}
 
 }

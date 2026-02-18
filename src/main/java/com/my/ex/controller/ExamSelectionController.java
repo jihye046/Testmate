@@ -381,7 +381,9 @@ public class ExamSelectionController {
 		
 		// 3. 정답지
 		ExamAnswerDto answer = answerService.getAnswerByQuestionId(questionId);
-		answer.setQuestionNum(question.getQuestionNum());
+		if(answer != null) {
+			answer.setQuestionNum(question.getQuestionNum());
+		}
 		
 		// 4. 폴더id
 		int folderId = service.findFolderIdByExamId(examId);
@@ -432,6 +434,5 @@ public class ExamSelectionController {
 				+ "examTypeKor=" + examTypeKor + "&"
 				+ "examRound=" + examRound + "&"
 				+ "examSubject=" + examSubject;
-		
 	}
 }

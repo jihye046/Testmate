@@ -15,5 +15,5 @@ public interface IExamAnswerDao {
 	int updateAnswers(ExamAnswerDto answerDto);
 	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
 	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
-	void updateQuestionAnswer(ExamAnswerDto answerDto);
+	void updateQuestionAnswer(ExamAnswerDto dto);
 }

@@ -472,7 +472,10 @@ public class ExamSelectionService implements IExamSelectionService {
 	public void updateExamByForm(ExamCreateRequestDto request) {
 		updateQuestion(request.getExamInfo(), request.getQuestion(), request.getFileMap());
 		updateQuestionChoices(request.getQuestion().getQuestionChoices());
-		answerService.updateQuestionAnswer(request.getQuestion().getQuestionAnswer());
+		answerService.updateQuestionAnswer(
+				request.getQuestion().getQuestionId(),
+				request.getQuestion().getQuestionAnswer(),
+				request.getExamInfo().getExamId());
 	}
 	
 	private void updateQuestion(CreateExamInfo i, Question q, Map<String, MultipartFile> fileMap) {
