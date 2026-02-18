@@ -48,8 +48,8 @@ public class ExamAnswerDao implements IExamAnswerDao {
 	}
 
 	@Override
-	public void updateQuestionAnswer(ExamAnswerDto answerDto) {
-		session.update(NAMESPACE + "updateQuestionAnswer", answerDto);
+	public void updateQuestionAnswer(ExamAnswerDto dto) {
+		session.update(NAMESPACE + "updateQuestionAnswer", dto);
 	}
 
 }

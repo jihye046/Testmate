@@ -352,12 +352,13 @@ const QuestionEditHandler = {
 
                 axios.post('/exam/updateExamByForm', formData)
                     .then(response => {
+                        alert('수정이 완료되었습니다.')
                         location.href = response.data
                     })
                     .catch(error => {
                         console.error(error)
                         alert('수정 중 오류가 발생했습니다.\n메인페이지로 이동합니다.')
-                        // window.location.href = '/'
+                        window.location.href = '/'
                     })
             }
         }
@@ -416,9 +417,11 @@ const QuestionEditHandler = {
             }))
 
             // 정답
-            this.questionObj.questionAnswer = {
-                answerId: p.examAnswer.answerId,
-                correctAnswer: parseInt(p.examAnswer.correctAnswer)
+            if(p.examAnswer){
+                this.questionObj.questionAnswer = {
+                    answerId: p.examAnswer.answerId,
+                    correctAnswer: parseInt(p.examAnswer.correctAnswer)
+                }
             }
         } catch (error) {
             console.error("데이터 파싱 중 오류 발생: ", error)
