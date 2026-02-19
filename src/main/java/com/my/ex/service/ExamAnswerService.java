@@ -7,13 +7,16 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.my.ex.dao.ExamAnswerDao;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamAnswerDto;
+import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.Question.QuestionAnswer;
+import com.my.ex.dto.response.ExamResultDto;
 import com.my.ex.parser.geomjeong.parse.answer.GeomjeongAnswerParser;
 import com.my.ex.parser.geomjeong.upload.answer.UploadedGeomjeongAnswerPdfTextExtractor;
 
@@ -170,6 +173,22 @@ public class ExamAnswerService implements IExamAnswerService {
 			ExamAnswerDto dto = new ExamAnswerDto(answerId, correctAnswer);
 			dao.updateQuestionAnswer(dto);
 		}
+	}
+
+	@Override
+	public List<ExamResultDto> checkAnswers(Map<String, Object> map) {
+		List<ExamChoiceDto> list = new ArrayList<>();
+		for(Map.Entry<String, Object> entry : map.entrySet()) {
+			String key = entry.getKey();
+			String questionIdStr = key.substring(key.indexOf("_") + 1);
+			int questionId = Integer.parseInt(questionIdStr);
+			int choiceId = (Integer.parseInt(map.get(key).toString()));
+			ExamChoiceDto dto = new ExamChoiceDto(choiceId, questionId);
+//			ExamResultDto result =  dao.checkAnswer(dto);
+			list.add(dto);
+		}
+		
+		return dao.checkAnswers(list);
 	}
 
 }

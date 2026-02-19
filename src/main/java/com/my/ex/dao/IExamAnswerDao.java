@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.my.ex.dto.ExamAnswerDto;
+import com.my.ex.dto.ExamChoiceDto;
+import com.my.ex.dto.response.ExamResultDto;
 
 @Repository
 public interface IExamAnswerDao {
@@ -16,4 +18,5 @@ public interface IExamAnswerDao {
 	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
 	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
 	void updateQuestionAnswer(ExamAnswerDto dto);
+	List<ExamResultDto> checkAnswers(List<ExamChoiceDto> dto);
 }

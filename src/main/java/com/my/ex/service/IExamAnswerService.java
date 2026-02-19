@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.my.ex.dto.ExamAnswerDto;
 import com.my.ex.dto.ExamInfoDto;
+import com.my.ex.dto.response.ExamResultDto;
 
 public interface IExamAnswerService {
 	Map<Integer, String> parsePdfToAnswers(MultipartFile file) throws Exception ;
@@ -20,4 +21,5 @@ public interface IExamAnswerService {
 	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
 	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
 	String examTypeCodeWithAnswer(String examTypeCode);
+	List<ExamResultDto> checkAnswers(Map<String, Object> map);
 }

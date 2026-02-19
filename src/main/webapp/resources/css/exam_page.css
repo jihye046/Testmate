@@ -70,6 +70,11 @@ body {
     padding: 20px;
 }
 
+.exam-content-wrapper.result-mode {
+	pointer-events: none; /* 클릭 이벤트 차단 */
+    user-select: none;    /* 드래그 방지 */
+}
+
 .question-area {
     width: 100%;
     background-color: #fff;
@@ -86,12 +91,59 @@ body {
     border-bottom: 1px dashed #ddd;
 }
 
+/* .question-number { */
+/*     font-size: 1.1em;  */
+/*     font-weight: bold; */
+/*     color: #333; */
+/*     margin-bottom: 15px; */
+/*     line-height: 1.5; */
+/* } */
+
+/* 채점 마크의 기준이 되는 문제 번호 스타일 업데이트 */
 .question-number {
-    font-size: 1.1em; 
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
-    line-height: 1.5;
+    position: relative; /* 가상 요소의 위치 기준점 */
+    display: inline-block; /* 마크가 번호 크기에 맞춰지도록 설정 */
+    padding: 5px 10px;
+    z-index: 1;
+}
+
+/* [정답] 빨간 동그라미 스타일 */
+.mark-correct::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: -5px;
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 0, 0, 0.5); /* 약간 투명한 빨간색 */
+    border-radius: 50% 45% 52% 48% / 51% 49% 53% 47%; /* 약간 찌그러진 손맛 */
+    transform: rotate(-10deg);
+    z-index: -1; /* 텍스트 뒤로 가도록 설정 */
+}
+
+/* [오답] 빨간 빗금 스타일 */
+.mark-wrong::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: -10px;
+    width: 6px;
+    height: 70px;
+    background-color: rgba(255, 0, 0, 0.5);
+    transform: rotate(45deg); /* 대각선 빗금 */
+    z-index: -1;
+}
+
+/* 결과 모드 시 오답 문제의 실제 정답 강조 (선택 사항) */
+.option-label.actual-answer {
+    border: 2px solid #27ae60 !important; /* 초록색 테두리 */
+    background-color: #f1f9f5 !important;
+}
+
+.option-label.actual-answer .omr-bubble {
+    background-color: #27ae60 !important;
+    color: white !important;
+    border-color: #27ae60 !important;
 }
 
 .options-group {

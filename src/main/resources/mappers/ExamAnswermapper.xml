@@ -78,4 +78,22 @@
 		 WHERE answer_id = #{answerId}
 	</update>
 	
+	<!-- 체점 -->
+	<select id="checkAnswers" parameterType="ExamChoiceDto" resultType="ExamResultDto">
+		SELECT 
+		     a.question_id AS questionId,
+		     a.correct_answer AS correctAnswer,
+		     c.choice_num AS userAnswer,
+		     c.choice_id AS choiceId,
+		     CASE 
+		        WHEN a.correct_answer = c.choice_num THEN 'Y'
+		        ELSE 'N'
+		      END AS iscorrect
+		  FROM exam_choice c
+		  JOIN exam_answer a ON a.question_id = c.question_id
+		 WHERE (a.question_id, c.choice_id) IN
+		 <foreach collection="list" item="item" open="(" separator="," close=")">
+		 	(#{item.questionId}, #{item.choiceId})
+		 </foreach>
+	</select>
 </mapper>
