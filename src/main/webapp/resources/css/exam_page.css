@@ -61,6 +61,10 @@ body {
     transition: background-color 0.2s;
 }
 
+.submit-button.hidden{
+	display: hidden;
+}
+
 .submit-button:hover {
     background-color: #2980b9;
 }
@@ -84,66 +88,75 @@ body {
     box-sizing: border-box;
 }
 
-/* 문제 및 선택지 스타일 */
+/* 문제 컨테이너 */
 .question-item {
     margin-bottom: 35px;
     padding-bottom: 15px;
     border-bottom: 1px dashed #ddd;
 }
 
-/* .question-number { */
-/*     font-size: 1.1em;  */
-/*     font-weight: bold; */
-/*     color: #333; */
-/*     margin-bottom: 15px; */
-/*     line-height: 1.5; */
-/* } */
-
-/* 채점 마크의 기준이 되는 문제 번호 스타일 업데이트 */
+/* 문제 */
 .question-number {
-    position: relative; /* 가상 요소의 위치 기준점 */
-    display: inline-block; /* 마크가 번호 크기에 맞춰지도록 설정 */
-    padding: 5px 10px;
+    font-size: 1.15em;
+    font-weight: 800;
+    color: #2c3e50;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    
+    position: relative;
+    display: inline-block;
+	padding: 10px 12px;
     z-index: 1;
 }
 
 /* [정답] 빨간 동그라미 스타일 */
 .mark-correct::before {
-    content: '';
+	content: '';
     position: absolute;
-    left: -10px;
-    top: -5px;
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(255, 0, 0, 0.5); /* 약간 투명한 빨간색 */
-    border-radius: 50% 45% 52% 48% / 51% 49% 53% 47%; /* 약간 찌그러진 손맛 */
-    transform: rotate(-10deg);
-    z-index: -1; /* 텍스트 뒤로 가도록 설정 */
+    left: -8px;
+    top: -4px;
+    width: 55px;
+    height: 55px;
+    border: 4px solid rgba(231, 76, 60, 0.5); 
+    border-radius: 48% 52% 54% 46% / 55% 45% 57% 43%;
+    box-shadow: 0 0 2px rgba(231, 76, 60, 0.2);
+    transform: rotate(-12deg);
+    z-index: -1;
 }
 
 /* [오답] 빨간 빗금 스타일 */
 .mark-wrong::before {
-    content: '';
+	content: '';
     position: absolute;
-    left: 20px;
-    top: -10px;
-    width: 6px;
-    height: 70px;
-    background-color: rgba(255, 0, 0, 0.5);
-    transform: rotate(45deg); /* 대각선 빗금 */
+    left: 10px;      
+    top: -5px;      
+    width: 5px; 
+    height: 70px; 
+    background-color: rgba(231, 76, 60, 0.5);
+    
+    border-radius: 20% 80% 20% 80% / 50%; 
+    transform: rotate(40deg); 
     z-index: -1;
 }
 
-/* 결과 모드 시 오답 문제의 실제 정답 강조 (선택 사항) */
+/* 정답 강조 */
 .option-label.actual-answer {
-    border: 2px solid #27ae60 !important; /* 초록색 테두리 */
-    background-color: #f1f9f5 !important;
+	border: none !important;
+    background: linear-gradient(to top, rgba(231, 76, 60, 0.2) 25%, transparent 35%) !important;
+    position: relative;
+}
+
+.option-label.actual-answer .option-text {
+    color: #e74c3c !important;
+    font-weight: bold !important;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8); 
 }
 
 .option-label.actual-answer .omr-bubble {
-    background-color: #27ae60 !important;
+	background-color: #e74c3c !important;
     color: white !important;
-    border-color: #27ae60 !important;
+    border-color: #e74c3c !important;
+    box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
 }
 
 .options-group {
@@ -298,15 +311,38 @@ body {
         margin: 4px 0;
     }
     
-    /* 모바일 omr-bubble 최종 크기 */
-    .omr-bubble {
-        width: 1.3em; 
-        height: 1.3em;
-        font-size: 0.8em; 
-        margin-right: 10px;
+	.question-number {
+        font-size: 1.05em;
+        padding: 6px 10px;
+    }
+
+    /* [정답] 모바일용 동그라미 */
+    .mark-correct::before {
+        left: -5px;
+        top: -2px;
+        width: 42px;
+        height: 42px;
+        border-width: 3px;
+    }
+
+    /* [오답] 모바일용 빗금 */
+    .mark-wrong::before {
+        left: 8px;
+        top: -3px;
+        width: 4px;
+        height: 55px;
+        transform: rotate(35deg);
+    }
+
+    .option-label.actual-answer {
+        background: linear-gradient(to top, rgba(231, 76, 60, 0.18) 30%, transparent 40%) !important;
+    }
+
+	.option-label.actual-answer .omr-bubble {
+        transform: scale(1.05);
     }
     
-    /* 모바일 옵션 텍스트 최종 크기 */
+    /* 모바일 옵션 텍스트 크기 */
     .option-text {
         font-size: 0.85em; 
     }

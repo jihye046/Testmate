@@ -23,6 +23,7 @@ const submitHandler = {
         const form = document.querySelector("#examForm")
         axios.post('/exam/checkAnswers', new FormData(form))
             .then(response => {
+                console.log(response.data)
                 this._showResult(response.data)
             })
             .catch(error => {
@@ -54,6 +55,7 @@ const submitHandler = {
 
     _showResult(data){
         document.querySelector(".exam-content-wrapper").classList.add('result-mode')
+        document.querySelector(".submit-button").classList.add('hidden')
         document.querySelector("#timer").innerHTML = `최종 점수: ??점`
 
         data.forEach((dto) => {
@@ -62,9 +64,22 @@ const submitHandler = {
                 qElement.classList.add('mark-correct')
             } else {
                 qElement.classList.add('mark-wrong')
-                this._highlightCorrect(dto.questionId, dto.correctAnswer)
+                this._highlightCorrect(dto.questionId, dto.correctAnswer, dto.userAnswer)
             }
         })
+    },
+
+    _highlightCorrect(questionId, correctAnswerNum, userAnswer){
+        const questionContainer = document.querySelector(`.question-item[data-question-id="${questionId}"]`)
+        const correctChoice = questionContainer.querySelector(`.option-label[data-choice-num="${correctAnswerNum}"]`)
+        
+        if(correctChoice){
+            correctChoice.classList.add('actual-answer')
+        }
+
+        if(userAnswer == null || userAnswer == 0){
+            correctChoice.classList.add('actual-answer')
+        }
     }
 }
 

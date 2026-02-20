@@ -31,7 +31,7 @@
 
                     <!-- 문제들 -->
                     <c:forEach items="${examPageDto.examQuestions}" var="questionDto" varStatus="status" >
-                        <div class="question-item">
+                        <div class="question-item" data-question-id="${questionDto.questionId}">
                             <!-- 공통 지문 -->
                             <c:forEach items="${examPageDto.distinctPassageDto}" var="commonPassageDto">
                             	<c:if test="${questionDto.questionNum == commonPassageDto.commonPassageStartNum}">
@@ -103,7 +103,7 @@
                     		<div class="options-group">
                     			<c:forEach items="${examPageDto.examChoices}" var="choiceDto">
                   					<c:if test="${choiceDto.questionId == questionDto.questionId}">
-                  						<label class="option-label full-click">
+                  						<label class="option-label full-click" data-choice-num="${choiceDto.choiceNum}">
                   						
                   							<!-- 선택지 번호 -->
                   							<c:if test="${not empty choiceDto.choiceLabel}">

@@ -229,7 +229,8 @@
 			   choice_id,
 		       choice_label,
 		       choice_text,
-		       choice_image
+		       choice_image,
+		       choice_num
 		  FROM exam_choice
 		 WHERE exam_Id = #{examId}
 		 ORDER BY question_id ASC, choice_label ASC
