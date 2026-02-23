@@ -16,6 +16,8 @@ public class ExamPageDto {
 	private List<ExamQuestionDto> examQuestions;
 	private ExamQuestionDto examQuestion;
 	
+	private int examId;
+	
 	private String examTypeEng;							  // middle-geomjeong
 	private String examType; 							  // 중졸 검정고시
 	private String examRound; 							  // 2025년 제1회
@@ -37,9 +39,10 @@ public class ExamPageDto {
 	}
 
 	// 사용자: 시험지 조회용 (전체 문제/선택지/공통 지문)
-	public ExamPageDto(List<ExamQuestionDto> examQuestions, String examType, String examRound, String examSubject,
+	public ExamPageDto(List<ExamQuestionDto> examQuestions, int examId, String examType, String examRound, String examSubject,
 			List<ExamChoiceDto> examChoices, Set<ExamCommonpassageDto> distinctPassageDto) {
 		this.examQuestions = examQuestions;
+		this.examId = examId;
 		this.examType = examType;
 		this.examRound = examRound;
 		this.examSubject = examSubject;

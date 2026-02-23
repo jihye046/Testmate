@@ -24,8 +24,9 @@
             <button type="button" form="examForm" class="submit-button">시험 종료 및 제출</button>
         </header>
 
-        <!-- <form id="examForm" action="/exam/submitExam" method="post"> -->
         <form id="examForm">
+           <input type="hidden" name="examId" value="${examPageDto.examId}">
+
             <div class="exam-content-wrapper no-omr">
                 <div class="question-area full-width">
 

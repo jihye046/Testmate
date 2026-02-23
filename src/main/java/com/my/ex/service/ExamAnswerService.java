@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -176,18 +178,67 @@ public class ExamAnswerService implements IExamAnswerService {
 
 	@Override
 	public List<ExamResultDto> checkAnswers(Map<String, Object> map) {
-		List<ExamChoiceDto> list = new ArrayList<>();
-		for(Map.Entry<String, Object> entry : map.entrySet()) {
-			String key = entry.getKey();
-			String questionIdStr = key.substring(key.indexOf("_") + 1);
-			int questionId = Integer.parseInt(questionIdStr);
-			int choiceId = (Integer.parseInt(map.get(key).toString()));
-			ExamChoiceDto dto = new ExamChoiceDto(choiceId, questionId);
-//			ExamResultDto result =  dao.checkAnswer(dto);
-			list.add(dto);
+		// 0. 필수 파라미터 검증 (시험 ID 존재 여부 확인)
+		if(map.get("examId") == null) throw new IllegalArgumentException("examId가 없음");
+		int examId = Integer.parseInt(map.get("examId").toString());
+		
+		
+		// ★ 1. 전체 문항 조회 (채점 기준 데이터)
+		// 해당 시험(examId)의 전체 문항 ID 조회
+		List<Integer> allQuestionIds = examSelectionDao.getQuestionIdByExamId(examId);
+		
+
+		// ★ 2. 사용자가 제출한 답안 추출
+		// key 형식: question_XXX (XXX = questionId)
+		List<ExamChoiceDto> submittedDtos = new ArrayList<>();
+		
+		for(String key : map.keySet()) {
+			if(!key.equals("examId") && key.contains("_")) {
+				// key에서 questionId 추출
+				String questionIdStr = key.substring(key.indexOf("_") + 1);
+				Integer questionId = Integer.parseInt(questionIdStr);
+				
+				// key를 이용해서 사용자가 선택한 choiceId 추출
+				int choiceId = (Integer.parseInt(map.get(key).toString()));
+				
+				submittedDtos.add(new ExamChoiceDto(choiceId, questionId));
+			} 
 		}
 		
-		return dao.checkAnswers(list);
-	}
+		
+		// ★ 3. 사용자가 제출한 문제 채점 처리
+		List<ExamResultDto> results = new ArrayList<>();
+		
+		// 제출된 답안이 존재하는 경우에만 채점 
+		if(!submittedDtos.isEmpty()) {
+			results.addAll(dao.checkAnswers(submittedDtos));
+		}
+		
+		
+		// ★ 4. 미제출(미응답) 문제 처리
+		// 제출된 문제들의 questionId만 Set으로 추출
+		Set<Integer> submittedIds = submittedDtos.stream()
+				.map(ExamChoiceDto::getQuestionId)
+				.collect(Collectors.toSet());
 
+		// 전체 문항 중 제출되지 않은 questionId 추출
+		List<Integer> missedIds = allQuestionIds.stream()
+				.filter(id -> !submittedIds.contains(id))
+				.collect(Collectors.toList());
+		
+		if(!missedIds.isEmpty()) {
+			// 미응답 문항의 정답을 한번에 조회
+			List<ExamResultDto> missedAnswers = dao.findAnswersByQuestionIds(missedIds);
+			
+			for(ExamResultDto dto : missedAnswers) {
+				dto.setChoiceId(0);    // 사용자 미선택
+				dto.setUserAnswer(0);  // 사용자 미선택
+				dto.setIsCorrect("N"); // 오답 처리
+				results.add(dto);
+			}
+		}
+		
+		return results;
+	}
+	
 }

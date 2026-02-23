@@ -19,11 +19,9 @@ const submitHandler = {
 
     _submitExam(){
         if(this.countdown) clearInterval(this.countdown)
-        // document.querySelector("#examForm").submit()
         const form = document.querySelector("#examForm")
         axios.post('/exam/checkAnswers', new FormData(form))
             .then(response => {
-                console.log(response.data)
                 this._showResult(response.data)
             })
             .catch(error => {

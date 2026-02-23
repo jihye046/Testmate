@@ -59,4 +59,9 @@ public class ExamAnswerDao implements IExamAnswerDao {
 		return session.selectList(NAMESPACE + "checkAnswers", dto);
 	}
 
+	@Override
+	public List<ExamResultDto> findAnswersByQuestionIds(List<Integer> missedIds) {
+		return session.selectList(NAMESPACE + "findAnswersByQuestionIds", missedIds);
+	}
+
 }

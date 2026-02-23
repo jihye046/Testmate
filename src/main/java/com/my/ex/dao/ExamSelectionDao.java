@@ -146,4 +146,14 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		session.update(NAMESPACE + "updateQuestionChoices", choiceDtos);
 	}
 
+	@Override
+	public int getExamIdByExamTypeId(Map<String, Object> map) {
+		return session.selectOne(NAMESPACE + "getExamIdByExamTypeId", map);
+	}
+
+	@Override
+	public List<Integer> getQuestionIdByExamId(int examId) {
+		return session.selectList(NAMESPACE + "getQuestionIdByExamId", examId);
+	}
+
 }

@@ -19,4 +19,5 @@ public interface IExamAnswerDao {
 	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
 	void updateQuestionAnswer(ExamAnswerDto dto);
 	List<ExamResultDto> checkAnswers(List<ExamChoiceDto> dto);
+	List<ExamResultDto> findAnswersByQuestionIds(List<Integer> missedIds);
 }
