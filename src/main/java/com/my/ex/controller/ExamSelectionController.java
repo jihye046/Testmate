@@ -13,7 +13,6 @@ import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamPdfPreview;
-import com.my.ex.dto.response.ExamResultDto;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
