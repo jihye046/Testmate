@@ -4,11 +4,18 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.my.ex.ExamSelectionMapper">
 
+	<!-- 정답지를 제외하고 시험지 유형만 가져옴 -->
 	<select id="getExamTypes" resultType="ExamTypeDto">
 		SELECT exam_type_code,
 			   exam_type_name
 		  FROM exam_type
 		 WHERE is_deleted = 0
+		   AND exam_type_code NOT LIKE '%Answer'
+		   AND exam_type_id IN (
+		   		SELECT exam_type_id
+		   		  FROM exam_info
+		   		 WHERE isdeleted = 'N'
+		   )
 		 ORDER BY exam_type_id
 	</select>
 	
@@ -57,17 +64,31 @@
 	</select>
 	
 	<!-- 특정 시험 회차에 대해 등록된 시험 과목을 불러옴  -->
+	<!-- 정답지와 연결된 시험지의 과목만 불러옴 -->
 	<select id="getSubjectsByExamRound" parameterType="java.util.HashMap" resultType="String">
-		SELECT distinct exam_subject
-		  FROM exam_info
-		 WHERE exam_type_id = (
+		SELECT DISTINCT i.exam_subject
+		  FROM exam_info i
+		 WHERE i.exam_type_id = (
 		 	SELECT exam_type_id
 			  FROM exam_type
 			 WHERE exam_type_code = #{examTypeCode}
 		 )
-		   AND exam_round = #{examRound}
-		   AND isdeleted = 'N'
-		 ORDER BY exam_subject
+		   AND i.exam_round = #{examRound}
+		   AND i.isdeleted = 'N'
+		   AND EXISTS (
+		   	   SELECT 1
+		   	     FROM exam_info info
+		   	     JOIN exam_answer a ON a.exam_id = info.exam_id
+		   	    WHERE info.exam_type_id = (
+		   	    	SELECT exam_type_id
+		   	    	  FROM exam_type
+		   	    	 WHERE exam_type_code = CONCAT(#{examTypeCode}, 'Answer')
+		   	    )
+		   	      AND info.exam_round = i.exam_round
+		   	      AND info.exam_subject = i.exam_subject
+		   	      AND info.isdeleted = 'N'
+		   )
+		 ORDER BY i.exam_subject
 	</select>
 	
 	<!-- 특정 폴더에 있는 모든 시험지/정답지 정보 가져옴 -->
