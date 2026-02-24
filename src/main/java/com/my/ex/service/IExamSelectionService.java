@@ -18,6 +18,8 @@ import com.my.ex.dto.service.ParsedExamData;
 
 public interface IExamSelectionService {
 	List<ExamTypeDto> getExamTypes();
+	List<ExamTypeDto> getAllExamTypes();
+	List<ExamTypeDto> getExamPaperTypes();
 	List<String> getExamRounds(String examTypeCode);
 	List<String> getSubjectsByExamRound(String examTypeCode, String examRound);
 	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId);

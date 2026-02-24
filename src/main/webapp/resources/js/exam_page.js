@@ -21,8 +21,7 @@ const submitHandler = {
                 this._showResult(
                     response.data.result,
                     response.data.totalScore,
-                    false)
-                    // response.data.isPassed)
+                    response.data.isPassed)
             })
             .catch(error => {
                 console.error('error: ', error)

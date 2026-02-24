@@ -67,6 +67,16 @@ public class ExamSelectionService implements IExamSelectionService {
 	public List<ExamTypeDto> getExamTypes() {
 		return dao.getExamTypes();
 	}
+	
+	@Override
+	public List<ExamTypeDto> getAllExamTypes() {
+		return dao.getAllExamTypes();
+	}
+
+	@Override
+	public List<ExamTypeDto> getExamPaperTypes() {
+		return dao.getExamPaperTypes();
+	}
 
 	@Override
 	public List<String> getExamRounds(String examTypeCode) {

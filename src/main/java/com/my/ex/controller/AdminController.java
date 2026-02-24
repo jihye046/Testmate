@@ -234,7 +234,7 @@ public class AdminController {
 	
 	@GetMapping("/createExamPage")
 	public String createExamPage(Model model, int folderId) {
-		List<ExamTypeDto> list = examService.getExamTypes();
+		List<ExamTypeDto> list = examService.getExamPaperTypes();
 		model.addAttribute("examtypes", list);
 		return "/admin/exam_create_page";
 	}

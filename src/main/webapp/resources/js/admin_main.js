@@ -894,7 +894,7 @@ const validateExamInfo = () => {
 
 // 시험 유형 가져오기
 const fetchGetExamTypes = () => {
-    axios.get('/exam/getExamTypes')
+    axios.get('/exam/getAllExamTypes')
         .then(response => {
             updateExamTypes(response.data)
         })
