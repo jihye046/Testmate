@@ -61,6 +61,12 @@ public class ExamSelectionController {
 		return service.getExamTypes();
 	}
 	
+	@GetMapping("/getAllExamTypes")
+	@ResponseBody
+	public List<ExamTypeDto> getAllExamTypes(){
+		return service.getAllExamTypes();
+	}
+	
 	@GetMapping("/getExamRounds")
 	@ResponseBody
 	public ExamInfoGroup getExamInfo(@RequestParam String examTypeCode) {

@@ -11,6 +11,8 @@ import java.util.Map;
 
 public interface IExamSelectionDao {
 	List<ExamTypeDto> getExamTypes();
+	List<ExamTypeDto> getAllExamTypes();
+	List<ExamTypeDto> getExamPaperTypes();
 	List<String> getExamRounds(String examTypeCode);
 	List<String> getSubjectsByExamRound(Map<String, String> map);
 	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId);

@@ -25,6 +25,16 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	public List<ExamTypeDto> getExamTypes() {
 		return session.selectList(NAMESPACE + "getExamTypes");
 	}
+	
+	@Override
+	public List<ExamTypeDto> getAllExamTypes() {
+		return session.selectList(NAMESPACE + "getAllExamTypes");
+	}
+
+	@Override
+	public List<ExamTypeDto> getExamPaperTypes() {
+		return session.selectList(NAMESPACE + "getExamPaperTypes");
+	}
 
 	@Override
 	public List<String> getExamRounds(String examTypeCode) {
