@@ -43,4 +43,6 @@ public interface IExamSelectionService {
 	String processHtmlEmbeddedImages(String content, String examType, String examRound, String examSubject);
 	int findFolderIdByExamId(int examId);
 	void updateExamByForm(ExamCreateRequestDto request);
+	int getExamIdByExamTypeId(String examTypeCode,String examRound, String examSubject);
+	int getExamTypeIdByExamTypeCode(String examTypeCode);
 }

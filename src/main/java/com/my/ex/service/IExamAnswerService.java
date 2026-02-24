@@ -20,4 +20,5 @@ public interface IExamAnswerService {
 	List<ExamAnswerDto> getAnswersByQuestionIds(List<Integer> questionIds);
 	ExamAnswerDto getAnswerByQuestionId(Integer questionId);
 	String examTypeCodeWithAnswer(String examTypeCode);
+	Map<String, Object> checkAnswers(Map<String, Object> map);
 }

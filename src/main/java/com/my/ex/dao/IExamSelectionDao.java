@@ -1,13 +1,13 @@
 package com.my.ex.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.response.ExamTitleDto;
+
+import java.util.List;
+import java.util.Map;
 
 public interface IExamSelectionDao {
 	List<ExamTypeDto> getExamTypes();
@@ -35,4 +35,7 @@ public interface IExamSelectionDao {
 	int findFolderIdByExamId(int examId);
 	void updateQuestion(ExamQuestionDto questionDto);
 	void updateQuestionChoices(ExamChoiceDto choiceDtos);
+	int getExamIdByExamTypeId(Map<String, Object> map);
+	List<Integer> getQuestionIdByExamId(int examId);
+	int getExamTypeIdByExamTypeCode(String examTypeCode);
 }

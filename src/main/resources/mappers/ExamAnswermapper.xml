@@ -78,4 +78,36 @@
 		 WHERE answer_id = #{answerId}
 	</update>
 	
+	<!-- 전체 문항 개수 체크 -->
+	<select id=""></select>
+	
+	<!-- 체점 -->
+	<select id="checkAnswers" parameterType="ExamChoiceDto" resultType="ExamResultDto">
+		SELECT 
+		     a.question_id AS questionId,
+		     a.correct_answer AS correctAnswer,
+		     c.choice_num AS userAnswer,
+		     c.choice_id AS choiceId,
+		     CASE 
+		        WHEN a.correct_answer = c.choice_num THEN 'Y'
+		        ELSE 'N'
+		      END AS iscorrect
+		  FROM exam_choice c
+		  JOIN exam_answer a ON a.question_id = c.question_id
+		 WHERE (a.question_id, c.choice_id) IN
+		 <foreach collection="list" item="item" open="(" separator="," close=")">
+		 	(#{item.questionId}, #{item.choiceId})
+		 </foreach>
+	</select>
+	
+	<!-- 안 푼 문제들 정답 조회 -->
+	<select id="findAnswersByQuestionIds" parameterType="java.util.List" resultType="ExamResultDto">
+		SELECT question_id, 
+			   correct_answer
+		  FROM exam_answer
+		 WHERE question_id IN
+		 <foreach collection="list" item="item" open="(" separator="," close=")">
+		 	#{item}
+		 </foreach>
+	</select>
 </mapper>

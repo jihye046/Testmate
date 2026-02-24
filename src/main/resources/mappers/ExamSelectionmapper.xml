@@ -35,6 +35,26 @@
 		 WHERE exam_id = #{examId}
 		   AND isdeleted = 'N'
 	</select>
+
+	<!-- examTypeId로 examId 조회 -->
+	<select id="getExamIdByExamTypeId" parameterType="java.util.HashMap" resultType="int">
+		SELECT exam_id
+		  FROM exam_info
+		 WHERE exam_type_id = (
+			SELECT exam_type_id
+			  FROM exam_type
+			 WHERE exam_type_code = #{examTypeEng}
+		 )
+		   AND ISDELETED = 'N'
+		   AND EXAM_ROUND = #{examRound}
+		   AND EXAM_SUBJECT = #{examSubject}
+	</select>
+	
+	<select id="getExamTypeIdByExamTypeCode" parameterType="String" resultType="int">
+		SELECT exam_type_id
+		  FROM exam_type
+		 WHERE exam_type_code = #{examTypeEng}
+	</select>
 	
 	<!-- 특정 시험 회차에 대해 등록된 시험 과목을 불러옴  -->
 	<select id="getSubjectsByExamRound" parameterType="java.util.HashMap" resultType="String">
@@ -229,7 +249,8 @@
 			   choice_id,
 		       choice_label,
 		       choice_text,
-		       choice_image
+		       choice_image,
+		       choice_num
 		  FROM exam_choice
 		 WHERE exam_Id = #{examId}
 		 ORDER BY question_id ASC, choice_label ASC
@@ -335,5 +356,12 @@
 		   SET choice_text = #{choiceText}
 		 WHERE choice_id = #{choiceId}
 	</update>
+	
+	<!-- 시험지에 포함된 문제 개수 조회 -->
+	<select id="getQuestionIdByExamId" parameterType="int" resultType="int">
+		SELECT question_id
+		  FROM exam_question
+		 WHERE exam_id = #{examId}
+	</select>
 	
 </mapper>

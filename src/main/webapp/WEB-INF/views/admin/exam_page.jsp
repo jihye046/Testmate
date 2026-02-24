@@ -113,7 +113,7 @@
                                     
                                     <div class="option-item">
                                     	<!-- 선택지 번호 -->
-                                    	<c:if test="${not empty choiceDto.choiceText}">
+                                    	<c:if test="${not empty choiceDto.choiceLabel}">
                                     		<span class="choice-label">${choiceDto.choiceLabel}</span>
                                     	</c:if>
                                     	

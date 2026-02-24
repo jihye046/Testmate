@@ -1,6 +1,30 @@
 package com.my.ex.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.my.ex.config.EnvironmentConfig;
+import com.my.ex.dto.*;
+import com.my.ex.dto.request.ExamCreateRequestDto;
+import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
+import com.my.ex.dto.request.ExamCreateRequestDto.Question;
+import com.my.ex.dto.request.MoveExamsToFolderDto;
+import com.my.ex.dto.response.ExamInfoGroup;
+import com.my.ex.dto.response.ExamPageDto;
+import com.my.ex.dto.response.ExamPdfPreview;
+import com.my.ex.dto.response.ExamResultDto;
+import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
+import com.my.ex.service.IExamAnswerService;
+import com.my.ex.service.IExamSelectionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -9,41 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.my.ex.config.EnvironmentConfig;
-import com.my.ex.dto.ExamAnswerDto;
-import com.my.ex.dto.ExamChoiceDto;
-import com.my.ex.dto.ExamInfoDto;
-import com.my.ex.dto.ExamQuestionDto;
-import com.my.ex.dto.ExamTypeDto;
-import com.my.ex.dto.request.ExamCreateRequestDto;
-import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
-import com.my.ex.dto.request.ExamCreateRequestDto.Question;
-import com.my.ex.dto.request.MoveExamsToFolderDto;
-import com.my.ex.dto.response.ExamInfoGroup;
-import com.my.ex.dto.response.ExamPageDto;
-import com.my.ex.dto.response.ExamPdfPreview;
-import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
-import com.my.ex.service.IExamAnswerService;
-import com.my.ex.service.IExamSelectionService;
 
 // 시험지 선택/조회 등 관리 영역 
 @Controller
@@ -125,7 +114,7 @@ public class ExamSelectionController {
 	/**
 	 * 사용자 시험 응시 페이지
 	 * 
-	 * @param examType 시험 종류 (예: "middle-geomjeong")
+	 * @param examTypeEng 시험 종류 (예: "middle-geomjeong")
 	 * @param examRound 시험 회차 정보 (예: "2025년도 제1회")
 	 * @param examSubject 과목명 (예: "국어")
 	 * 
@@ -146,17 +135,30 @@ public class ExamSelectionController {
 		if(questions == null || questions.isEmpty()) {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
+
+		// 2. 시험지 정보
+		int examId = service.getExamIdByExamTypeId(examTypeEng, examRound, examSubject);
+		int examTypeId = service.getExamTypeIdByExamTypeCode(examTypeEng);
 		
-		// 2. 선택지
+		// 3. 선택지
 		List<ExamChoiceDto> choices = service.getExamChoicesByExamId(questions.get(0).getExamId());
 		
-		// 3. 공통 지문
+		// 4. 공통 지문
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto =
 				service.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		
 		/* 데이터 담기 */
 		ExamPageDto response = 
-				new ExamPageDto(questions, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
+				new ExamPageDto(
+						questions, 
+						examId, 
+						examTypeId, 
+						examTypeKor, 
+						examRound, 
+						examSubject, 
+						choices, 
+						distinctPassageDto
+				);
 		model.addAttribute("examPageDto", response);
 		
 		return "/exam/exam_page";
@@ -215,7 +217,7 @@ public class ExamSelectionController {
 	 * - 단일 삭제와 일괄 삭제 요청을 동일한 엔드포인트로 처리하기 위해 
 	 * 	 단일 삭제 요청도 List<Integer>로 받음
 	 * 
-	 * @param MoveExamToFolderDto 삭제할 시험지 ID 리스트를 담은 DTO 
+	 * @param dto 삭제할 시험지 ID 리스트를 담은 DTO
 	 * 
 	 * @return true/false
 	 */
@@ -228,7 +230,7 @@ public class ExamSelectionController {
 	/**
 	 * 선택한 시험 유형의 전체 과목들을 조회
 	 * 
-	 * @param examTypeCode
+	 * @param examTypeCode "middle-geomjeong"
 	 * @return List<String> 과목들
 	 */
 	@GetMapping("/getSubjectsForExamType")
@@ -239,11 +241,6 @@ public class ExamSelectionController {
 	
 	/**
 	 * 관리자가 시험지를 직접 작성하여 등록하는 경우
-	 * @param examInfoStr
-	 * @param questionsStr
-	 * @param fileMap
-	 * @return
-	 * @throws IOException
 	 */
 	@PostMapping("/saveExamByForm")
 	@ResponseBody
@@ -269,10 +266,6 @@ public class ExamSelectionController {
 	
 	/**
 	 * 관리자가 시험지 PDF를 업로드하여 등록하는 경우
-	 * @param examInfo
-	 * @param pdfFile
-	 * @param folderId
-	 * @return
 	 */
 	@PostMapping("/loadPdfFile")
 	@ResponseBody
@@ -434,5 +427,11 @@ public class ExamSelectionController {
 				+ "examTypeKor=" + examTypeKor + "&"
 				+ "examRound=" + examRound + "&"
 				+ "examSubject=" + examSubject;
+	}
+	
+	@PostMapping("/checkAnswers")
+	@ResponseBody
+	public Map<String, Object> checkAnswers(@RequestParam Map<String, Object> map) {
+		return answerService.checkAnswers(map);
 	}
 }

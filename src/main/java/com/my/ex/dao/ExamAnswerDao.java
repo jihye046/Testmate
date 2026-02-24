@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.my.ex.dto.ExamAnswerDto;
+import com.my.ex.dto.ExamChoiceDto;
+import com.my.ex.dto.response.ExamResultDto;
 
 @Repository
 public class ExamAnswerDao implements IExamAnswerDao {
@@ -50,6 +52,16 @@ public class ExamAnswerDao implements IExamAnswerDao {
 	@Override
 	public void updateQuestionAnswer(ExamAnswerDto dto) {
 		session.update(NAMESPACE + "updateQuestionAnswer", dto);
+	}
+
+	@Override
+	public List<ExamResultDto> checkAnswers(List<ExamChoiceDto> dto) {
+		return session.selectList(NAMESPACE + "checkAnswers", dto);
+	}
+
+	@Override
+	public List<ExamResultDto> findAnswersByQuestionIds(List<Integer> missedIds) {
+		return session.selectList(NAMESPACE + "findAnswersByQuestionIds", missedIds);
 	}
 
 }

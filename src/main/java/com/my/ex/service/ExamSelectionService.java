@@ -573,5 +573,20 @@ public class ExamSelectionService implements IExamSelectionService {
 			dao.updateQuestionChoices(dto);
 		}
 	}
+	
+	@Override
+	public int getExamIdByExamTypeId(String examTypeCode, String examRound, String examSubject) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("examTypeEng", examTypeCode);
+		map.put("examRound", examRound);
+		map.put("examSubject", examSubject);
+		
+		return dao.getExamIdByExamTypeId(map);
+	}
+
+	@Override
+	public int getExamTypeIdByExamTypeCode(String examTypeCode) {
+		return dao.getExamTypeIdByExamTypeCode(examTypeCode);
+	}
 
 }

@@ -24,5 +24,10 @@ public class ExamChoiceDto {
 		this.choiceId = choiceId;
 		this.choiceText = choiceText;
 	}
+
+	public ExamChoiceDto(int choiceId, int questionId) {
+		this.choiceId = choiceId;
+		this.questionId = questionId;
+	}
 	
 }
