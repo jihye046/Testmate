@@ -100,7 +100,7 @@
 		 </foreach>
 	</select>
 	
-	<!-- 사용자가 풀지 않은 문제(들)의 정답(들)을 조회 -->
+	<!-- 안 푼 문제들 정답 조회 -->
 	<select id="findAnswersByQuestionIds" parameterType="java.util.List" resultType="ExamResultDto">
 		SELECT question_id, 
 			   correct_answer

@@ -38,16 +38,22 @@
 
 	<!-- examTypeId로 examId 조회 -->
 	<select id="getExamIdByExamTypeId" parameterType="java.util.HashMap" resultType="int">
-		SELECT EXAM_ID
-		  FROM EXAM_INFO
-		 WHERE EXAM_TYPE_ID = (
-			SELECT EXAM_TYPE_ID
-			  FROM EXAM_TYPE
-			 WHERE EXAM_TYPE_CODE = #{examTypeEng}
+		SELECT exam_id
+		  FROM exam_info
+		 WHERE exam_type_id = (
+			SELECT exam_type_id
+			  FROM exam_type
+			 WHERE exam_type_code = #{examTypeEng}
 		 )
 		   AND ISDELETED = 'N'
 		   AND EXAM_ROUND = #{examRound}
 		   AND EXAM_SUBJECT = #{examSubject}
+	</select>
+	
+	<select id="getExamTypeIdByExamTypeCode" parameterType="String" resultType="int">
+		SELECT exam_type_id
+		  FROM exam_type
+		 WHERE exam_type_code = #{examTypeEng}
 	</select>
 	
 	<!-- 특정 시험 회차에 대해 등록된 시험 과목을 불러옴  -->

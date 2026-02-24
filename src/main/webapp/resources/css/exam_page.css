@@ -41,32 +41,65 @@ body {
 	text-decoration: none;
 }
 
+.header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 오른쪽 그룹 내의 모든 박스 공통 */
+.timer-box, .submit-button, .result-badge {
+    height: 45px;             
+    display: flex;            
+    align-items: center;      
+    justify-content: center;  
+    box-sizing: border-box;   
+    border-radius: 5px;       
+    font-size: 1.1em;        
+}
+
+/* 타이머 */
 .timer-box {
-    font-size: 1.4em; 
     font-weight: bold;
     color: #e74c3c;
     background-color: #fceceb;
-    padding: 6px 15px; 
-    border-radius: 5px;
+    padding: 0 20px;
 }
 
+/* 전송 버튼 */
 .submit-button {
     background-color: #3498db;
     color: white;
-    padding: 10px 20px;
     border: none;
-    border-radius: 5px;
-    font-size: 1em;
+    padding: 0 25px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
-.submit-button.hidden{
-	display: hidden;
-}
-
 .submit-button:hover {
     background-color: #2980b9;
+}
+
+/* 합격 여부 뱃지 */
+.result-badge {
+    padding: 0 20px;
+    font-weight: bold;
+}
+
+.result-badge.pass {
+    background-color: #2ecc71;
+    color: white;
+    box-shadow: 0 2px 4px rgba(46, 204, 113, 0.3);
+}
+.result-badge.fail {
+    background-color: #e74c3c;
+    color: white;
+    box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+}
+
+/* 숨김 처리 (공통) */
+.hidden {
+    display: none;
 }
 
 /* 문제 영역 레이아웃 */
@@ -141,15 +174,31 @@ body {
 
 /* 정답 강조 */
 .option-label.actual-answer {
-	border: none !important;
-    background: linear-gradient(to top, rgba(231, 76, 60, 0.2) 25%, transparent 35%) !important;
+	border: 1px solid rgba(46, 204, 113, 0.3) !important; 
+    background-color: rgba(46, 204, 113, 0.05) !important; 
+    border-left: 5px solid #2ecc71 !important;
+    border-radius: 8px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
     position: relative;
+    overflow: hidden;
 }
 
 .option-label.actual-answer .option-text {
-    color: #e74c3c !important;
-    font-weight: bold !important;
-    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8); 
+	color: #27ae60 !important;
+    font-weight: 700 !important;
+}
+
+.option-label.actual-answer::after {
+    content: '✓ 정답';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: #2ecc71;
+    font-weight: bold;
+    opacity: 0.8;
 }
 
 .option-label.actual-answer .omr-bubble {
@@ -289,19 +338,34 @@ body {
 /* 4. 반응형 디자인 (모바일 환경) */
 @media (max-width: 768px) {
     .exam-header {
-        padding: 0 15px;
-        height: 60px;
+		padding: 0 10px;
+        height: 60px; 
+        display: flex;
+        justify-content: space-between; 
+        align-items: center;
     }
+    .header-right-group {
+        gap: 8px;
+    }
+    
     .exam-title {
         font-size: 1.05em;
     }
+    .timer-box, .submit-button, .result-badge {
+        height: 34px;      
+        font-size: 0.85em;
+        border-radius: 4px;
+    }
     .timer-box {
-        font-size: 1.2em; 
-        padding: 4px 10px;
+        padding: 0 10px;   
+        white-space: nowrap;
     }
     .submit-button {
-        padding: 7px 12px;
-        font-size: 0.85em;
+        padding: 0 12px;   
+        min-width: fit-content;
+    }
+    .result-badge {
+        padding: 0 10px;
     }
     .question-area {
         padding: 15px;
@@ -335,8 +399,36 @@ body {
     }
 
     .option-label.actual-answer {
-        background: linear-gradient(to top, rgba(231, 76, 60, 0.18) 30%, transparent 40%) !important;
+/*         background: linear-gradient(to top, rgba(231, 76, 60, 0.18) 30%, transparent 40%) !important; */
+
+		background-color: rgba(46, 204, 113, 0.08) !important; /* 연한 초록 바탕 */
+	    border: 1px solid #2ecc71 !important; /* 테두리로 명확하게 구분 */
+	    border-radius: 10px;
+	    padding: 10px 12px;
+	    position: relative;
+	    transition: transform 0.2s ease;
     }
+    
+    /* 정답 텍스트 강조 */
+	.option-label.actual-answer .option-text {
+	    color: #27ae60 !important;
+	    font-weight: 800 !important;
+	}
+	
+	/* 모바일 전용: 우측 상단에 작은 '정답' 뱃지 */
+	.option-label.actual-answer::after {
+	    content: '정답';
+	    position: absolute;
+	    top: -8px;
+	    right: 10px;
+	    background-color: #2ecc71;
+	    color: white;
+	    font-size: 10px;
+	    padding: 2px 6px;
+	    border-radius: 4px;
+	    font-weight: bold;
+	    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	}
 
 	.option-label.actual-answer .omr-bubble {
         transform: scale(1.05);

@@ -37,4 +37,5 @@ public interface IExamSelectionDao {
 	void updateQuestionChoices(ExamChoiceDto choiceDtos);
 	int getExamIdByExamTypeId(Map<String, Object> map);
 	List<Integer> getQuestionIdByExamId(int examId);
+	int getExamTypeIdByExamTypeCode(String examTypeCode);
 }

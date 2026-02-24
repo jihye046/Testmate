@@ -136,19 +136,29 @@ public class ExamSelectionController {
 			throw new IllegalStateException("해당 시험에 대한 문제가 존재하지 않습니다.");
 		}
 
-		// examId
+		// 2. 시험지 정보
 		int examId = service.getExamIdByExamTypeId(examTypeEng, examRound, examSubject);
+		int examTypeId = service.getExamTypeIdByExamTypeCode(examTypeEng);
 		
-		// 2. 선택지
+		// 3. 선택지
 		List<ExamChoiceDto> choices = service.getExamChoicesByExamId(questions.get(0).getExamId());
 		
-		// 3. 공통 지문
+		// 4. 공통 지문
 		Set<ExamPageDto.ExamCommonpassageDto> distinctPassageDto =
 				service.getCommonPassageInfo(examTypeEng, examRound, examSubject); // 공통지문 시작번호 추출
 		
 		/* 데이터 담기 */
 		ExamPageDto response = 
-				new ExamPageDto(questions, examId, examTypeKor, examRound, examSubject, choices, distinctPassageDto);
+				new ExamPageDto(
+						questions, 
+						examId, 
+						examTypeId, 
+						examTypeKor, 
+						examRound, 
+						examSubject, 
+						choices, 
+						distinctPassageDto
+				);
 		model.addAttribute("examPageDto", response);
 		
 		return "/exam/exam_page";
@@ -421,7 +431,7 @@ public class ExamSelectionController {
 	
 	@PostMapping("/checkAnswers")
 	@ResponseBody
-	public List<ExamResultDto> checkAnswers(@RequestParam Map<String, Object> map) {
+	public Map<String, Object> checkAnswers(@RequestParam Map<String, Object> map) {
 		return answerService.checkAnswers(map);
 	}
 }

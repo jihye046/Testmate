@@ -10,6 +10,9 @@
 <link href="<c:url value="/resources/css/exam_page.css"/>" rel="stylesheet">
 <!-- axios -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- effect -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 	<div class="exam-container">
@@ -18,14 +21,19 @@
             <h1 class="exam-title">
             	<a href="/">${examPageDto.examType} (${examPageDto.examRound}) ${examPageDto.examSubject}</a>
            	</h1>
-            <div class="timer-box">
-                <span id="timer">00:00</span>
+
+            <div class="header-right-group">
+                <div class="timer-box">
+                    <span id="timer">00:00</span>
+                </div>
+                <div id="result-badge" class="result-badge hidden"></div>
+                <button type="button" form="examForm" class="submit-button">시험 종료 및 제출</button>
             </div>
-            <button type="button" form="examForm" class="submit-button">시험 종료 및 제출</button>
         </header>
 
         <form id="examForm">
            <input type="hidden" name="examId" value="${examPageDto.examId}">
+           <input type="hidden" name="examTypeId" value="${examPageDto.examTypeId}">
 
             <div class="exam-content-wrapper no-omr">
                 <div class="question-area full-width">

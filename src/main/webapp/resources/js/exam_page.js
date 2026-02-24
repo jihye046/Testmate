@@ -1,8 +1,4 @@
 const submitHandler = {
-    examInfo: {},
-
-    questionObj: {},
-
     countdown: null, // 타이머 인스턴스
 
     init(){
@@ -22,7 +18,11 @@ const submitHandler = {
         const form = document.querySelector("#examForm")
         axios.post('/exam/checkAnswers', new FormData(form))
             .then(response => {
-                this._showResult(response.data)
+                this._showResult(
+                    response.data.result,
+                    response.data.totalScore,
+                    false)
+                    // response.data.isPassed)
             })
             .catch(error => {
                 console.error('error: ', error)
@@ -51,12 +51,29 @@ const submitHandler = {
         }, 1000)
     },
 
-    _showResult(data){
+    _showResult(result, totalScore, isPassed){
         document.querySelector(".exam-content-wrapper").classList.add('result-mode')
         document.querySelector(".submit-button").classList.add('hidden')
-        document.querySelector("#timer").innerHTML = `최종 점수: ??점`
 
-        data.forEach((dto) => {
+        // 점수 표시
+        document.querySelector("#timer").innerHTML = `${totalScore} / 100`
+
+        // 합격/불합격 배지 표시
+        const badge = document.querySelector(".result-badge")
+        if(badge){
+            badge.classList.remove('hidden')
+
+            if(isPassed){
+                badge.textContent = "합격"
+                badge.className = "result-badge pass"
+            } else {
+                badge.textContent = "불합격"
+                badge.className = "result-badge fail"
+            }
+        }
+        
+        // 각 문제별 정답/오답 표시
+        result.forEach((dto) => {
             const qElement = document.querySelector(`#qnum_${dto.questionId}`)
             if(dto.isCorrect == 'Y'){
                 qElement.classList.add('mark-correct')
@@ -65,6 +82,9 @@ const submitHandler = {
                 this._highlightCorrect(dto.questionId, dto.correctAnswer, dto.userAnswer)
             }
         })
+
+        // 결과 효과 트리거
+        this._triggerResultEffect(isPassed)
     },
 
     _highlightCorrect(questionId, correctAnswerNum, userAnswer){
@@ -78,6 +98,36 @@ const submitHandler = {
         if(userAnswer == null || userAnswer == 0){
             correctChoice.classList.add('actual-answer')
         }
+    },
+
+    _triggerResultEffect(isPassed){
+        if(isPassed){
+            // 합격 시: 화려한 폭죽 효과
+            const duration = 3 * 1000; // 3초 동안
+            const end = Date.now() + duration;
+
+            const successColors = ['#FFD700', '#2ecc71', '#ffffff', '#FFB800'];
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }, // 왼쪽에서 발사
+                    colors: successColors
+                })
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }, // 오른쪽에서 발사
+                    colors: successColors
+                })
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame)
+                }
+            }())
+        } 
     }
 }
 

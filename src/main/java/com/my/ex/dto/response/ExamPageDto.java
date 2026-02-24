@@ -17,6 +17,7 @@ public class ExamPageDto {
 	private ExamQuestionDto examQuestion;
 	
 	private int examId;
+	private int examTypeId;
 	
 	private String examTypeEng;							  // middle-geomjeong
 	private String examType; 							  // 중졸 검정고시
@@ -39,10 +40,19 @@ public class ExamPageDto {
 	}
 
 	// 사용자: 시험지 조회용 (전체 문제/선택지/공통 지문)
-	public ExamPageDto(List<ExamQuestionDto> examQuestions, int examId, String examType, String examRound, String examSubject,
-			List<ExamChoiceDto> examChoices, Set<ExamCommonpassageDto> distinctPassageDto) {
+	public ExamPageDto(
+			List<ExamQuestionDto> examQuestions, 
+			int examId, 
+			int examTypeId, 
+			String examType, 
+			String examRound, 
+			String examSubject,
+			List<ExamChoiceDto> examChoices, 
+			Set<ExamCommonpassageDto> distinctPassageDto) 
+	{
 		this.examQuestions = examQuestions;
 		this.examId = examId;
+		this.examTypeId = examTypeId;
 		this.examType = examType;
 		this.examRound = examRound;
 		this.examSubject = examSubject;
@@ -51,9 +61,15 @@ public class ExamPageDto {
 	}
 
 	// 관리자: 시험지 검토 화면 조회용 (전체 문제/선택지/공통 지문/정답지) 
-	public ExamPageDto(List<ExamQuestionDto> examQuestions, String examType, String examRound, String examSubject,
-			List<ExamChoiceDto> examChoices, Set<ExamCommonpassageDto> distinctPassageDto,
-			List<ExamAnswerDto> examAnswers) {
+	public ExamPageDto(
+			List<ExamQuestionDto> examQuestions, 
+			String examType, 
+			String examRound, 
+			String examSubject,
+			List<ExamChoiceDto> examChoices, 
+			Set<ExamCommonpassageDto> distinctPassageDto,
+			List<ExamAnswerDto> examAnswers) 
+	{
 		this.examQuestions = examQuestions;
 		this.examType = examType;
 		this.examRound = examRound;
@@ -64,8 +80,16 @@ public class ExamPageDto {
 	}
 
 	// 관리자: 관리자가 특정 시험 문제를 수정할 때, 해당 문제 정답만 조회
-	public ExamPageDto(ExamQuestionDto examQuestion, String examTypeEng, String examType, String examRound, String examSubject,
-			List<ExamChoiceDto> examChoices, ExamAnswerDto examAnswer, int folderId) {
+	public ExamPageDto(
+			ExamQuestionDto examQuestion, 
+			String examTypeEng, 
+			String examType, 
+			String examRound, 
+			String examSubject,
+			List<ExamChoiceDto> examChoices, 
+			ExamAnswerDto examAnswer, 
+			int folderId) 
+	{
 		this.examQuestion = examQuestion;
 		this.examTypeEng = examTypeEng;
 		this.examType = examType;

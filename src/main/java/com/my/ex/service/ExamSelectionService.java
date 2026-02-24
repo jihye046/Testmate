@@ -584,4 +584,9 @@ public class ExamSelectionService implements IExamSelectionService {
 		return dao.getExamIdByExamTypeId(map);
 	}
 
+	@Override
+	public int getExamTypeIdByExamTypeCode(String examTypeCode) {
+		return dao.getExamTypeIdByExamTypeCode(examTypeCode);
+	}
+
 }

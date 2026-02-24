@@ -44,4 +44,5 @@ public interface IExamSelectionService {
 	int findFolderIdByExamId(int examId);
 	void updateExamByForm(ExamCreateRequestDto request);
 	int getExamIdByExamTypeId(String examTypeCode,String examRound, String examSubject);
+	int getExamTypeIdByExamTypeCode(String examTypeCode);
 }
