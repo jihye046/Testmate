@@ -97,22 +97,22 @@
 					</div>
 			
 					<div class="select-group">
-						<select id="selectExamType" name="type" class="form-control select-filter ">
+						<select id="searchType" name="type" class="form-control select-filter ">
 							<option value="" disabled selected>유형 선택</option>
 							<!-- 서버로부터 받은 데이터로 동적으로 설정 -->
 						</select>
 
-						<select id="selectSubject" name="subject" class="form-control select-filter">
+						<select id="searchSubject" name="subject" class="form-control select-filter">
 							<option value="" disabled selected>시험 유형을 선택해주세요</option>
 							<!-- 시험 유형에 따라 동적으로 설정 -->
 						</select>
 
-						<select id="selectYear" name="year" class="form-control select-filter">
+						<select id="searchYear" name="year" class="form-control select-filter">
 							<option value="" disabled selected>시험 유형을 선택해주세요</option>
 							<!-- 현재 연도부터 과거 10년치를 동적으로 설정 -->
 						</select>
 
-						<select id="selectRound" name="round" class="form-control select-filter">
+						<select id="searchRound" name="round" class="form-control select-filter">
 							<option value="" disabled selected>시험 유형을 선택해주세요</option>
 							<!-- 시험 유형에 따라 동적으로 설정 -->
 						</select>

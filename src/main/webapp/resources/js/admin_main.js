@@ -13,6 +13,12 @@ const selectYear = document.querySelector("#selectYear")
 const selectSubject = document.querySelector("#selectSubject")
 const selectRound = document.querySelector("#selectRound")
 
+// 검색 필터 관련 DOM 요소
+const searchType = document.querySelector("#searchType")
+const searchSubject = document.querySelector("#searchSubject")
+const searchYear = document.querySelector("#searchYear")
+const searchRound = document.querySelector("#searchRound")
+
 // 🌐 시험 유형별 회차 매핑 (⭐ 시험 유형 추가 시 회차 매핑해줄것 ⭐)
 const examRoundMap = {
     geomjeong: 4,
@@ -64,6 +70,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector(".btn-back-to-folders").addEventListener('click', loadFolderView)
 
     // 시험지 검색 리스너
+    searchType.addEventListener('change', (e) => {
+        // selectbox 값 초기화
+        searchSubject.value = ''
+        searchYear.value = ''
+        searchRound.value = ''
+
+        const selectedType = e.target.value 
+        
+		// 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
+        fetchGetSubjects(selectedType, searchSubject, searchRound)
+        searchYear.innerHTML = updateExamYears() 
+    }) 
+
     document.querySelector("#searchForm").addEventListener('submit', (e) => {
         // 엔터키와 검색 버튼 클릭 모두 감지
         e.preventDefault()
@@ -195,8 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
         selectRound.value = ''
 		
 		// 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
-        fetchGetSubjects(selectedType)
-        updateExamYears() 
+        fetchGetSubjects(selectedType, selectSubject, selectRound)
+        selectYear.innerHTML = updateExamYears()
     }) 
 
 
@@ -617,10 +636,10 @@ const fetchExamDelete = (examIds) => {
 const handleSearch = () => {
     const form = document.querySelector("#searchForm")
     const keyword = form.querySelector("#searchKeyword").value.trim()
-    const type = form.querySelector("#selectExamType").value
-    const subject = form.querySelector("#selectSubject").value
-    const year = form.querySelector("#selectYear").value
-    const round = form.querySelector("#selectRound").value
+    const type = form.querySelector("#searchType").value
+    const subject = form.querySelector("#searchSubject").value
+    const year = form.querySelector("#searchYear").value
+    const round = form.querySelector("#searchRound").value
     
     if(!keyword && !type && !subject && !year && !round){
         alert("최소 하나 이상의 검색 조건을 선택하거나 키워드를 입력해주세요.")
@@ -860,7 +879,8 @@ const updateExamSubjects = (examSubjects) => {
         options += `<option value="${subject}">${subject}</option>`
     })
 
-    selectSubject.innerHTML = options
+    return options
+    // selectSubject.innerHTML = options
 }
 
 // 시험 유형 UI 동적으로 설정
@@ -884,7 +904,8 @@ const updateExamYears = () => {
         options += `<option value="${year}">${year}년</option>`
     }
 
-    selectYear.innerHTML = options
+    return options
+    // selectYear.innerHTML = options
 }
 
 // 시험 시행 회차 UI 동적으로 설정
@@ -894,7 +915,7 @@ const updateExamRounds = (selectedType) => {
     const examType = selectedType.split("-").pop() 
     const round = examRoundMap[examType] || 1
     
-    createRoundOptions(round)
+    return createRoundOptions(round)
 }
 
 // 2. 회차 옵션 생성 함수
@@ -905,7 +926,8 @@ const createRoundOptions = (round) => {
         options += `<option value="${i}">${i}회</option>`
     }
 
-    selectRound.innerHTML = options
+    return options
+    // selectRound.innerHTML = options
 }
 
 // 시험지 정보 유효성 검사
@@ -931,8 +953,8 @@ const validateExamInfo = () => {
 const fetchGetExamTypes = () => {
     axios.get('/exam/getAllExamTypes')
         .then(response => {
-            // updateExamTypes(response.data)
             selectExamType.innerHTML = updateExamTypes(response.data)
+            searchType.innerHTML = updateExamTypes(response.data)
         })
         .catch(error => {
             console.error('error: ', error)
@@ -940,7 +962,7 @@ const fetchGetExamTypes = () => {
 }
 
 // 시험 유형에 따라 시험 과목 및 시행 회차 옵션 동적 변경
-const fetchGetSubjects = (selectedType) => {
+const fetchGetSubjects = (selectedType, selectSubjectBox, selectRoundBox) => {
     const params = {
         examTypeCode: selectedType
     }
@@ -948,8 +970,11 @@ const fetchGetSubjects = (selectedType) => {
     axios.get('/exam/getSubjectsForExamType', { params })
         .then(response => {
             const examSubjects = response.data
-            updateExamSubjects(examSubjects)
-            updateExamRounds(selectedType)
+            selectSubjectBox.innerHTML = updateExamSubjects(examSubjects)
+            selectRoundBox.innerHTML = updateExamRounds(selectedType)
+
+            const output = updateExamRounds(selectedType)
+            console.log(`round output: ${output}`)
         })
         .catch(error => {
             console.error('error: ', error)
