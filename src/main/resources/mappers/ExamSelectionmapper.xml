@@ -4,19 +4,25 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.my.ex.ExamSelectionMapper">
 
-	<!-- 사용자용: 정답지를 제외하고 시험지 유형만 가져옴 -->
+	<!-- 사용자용: 정답지가 존재하는 시험 유형만 조회 -->
 	<select id="getExamTypes" resultType="ExamTypeDto">
-		SELECT exam_type_code,
-			   exam_type_name
-		  FROM exam_type
-		 WHERE is_deleted = 0
-		   AND exam_type_code NOT LIKE '%Answer'
-		   AND exam_type_id IN (
-		   		SELECT exam_type_id
-		   		  FROM exam_info
-		   		 WHERE isdeleted = 'N'
+		SELECT main_type.exam_type_code,
+		       main_type.exam_type_name
+		  FROM exam_type main_type
+		 WHERE main_type.is_deleted = 0
+		   AND main_type.exam_type_code NOT LIKE '%Answer'
+		   AND main_type.exam_type_id IN (
+		       SELECT paper.exam_type_id
+		         FROM exam_info paper
+		         JOIN exam_info ans ON paper.exam_round = ans.exam_round 
+		                           AND paper.exam_subject = ans.exam_subject
+		                           AND paper.folder_id = ans.folder_id
+		         JOIN exam_type ans_type ON ans.exam_type_id = ans_type.exam_type_id
+		        WHERE paper.isdeleted = 'N'
+		          AND ans.isdeleted = 'N'
+		          AND ans_type.exam_type_code LIKE '%Answer'
 		   )
-		 ORDER BY exam_type_id
+		 ORDER BY main_type.exam_type_id
 	</select>
 	
 	<!-- 관리자용: 시험지 및 정답지 PDF 업로드시 전체 유형 가져옴 (시험지 + 정답지 유형 포함) -->
