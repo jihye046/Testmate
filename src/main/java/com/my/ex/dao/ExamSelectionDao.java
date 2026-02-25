@@ -11,6 +11,7 @@ import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.response.ExamTitleDto;
 
 @Repository
@@ -169,6 +170,11 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	@Override
 	public int getExamTypeIdByExamTypeCode(String examTypeCode) {
 		return session.selectOne(NAMESPACE + "getExamTypeIdByExamTypeCode", examTypeCode);
+	}
+
+	@Override
+	public List<ExamTitleDto> searchExams(ExamSearchDto dto) {
+		return session.selectList(NAMESPACE + "searchExams", dto);
 	}
 
 }

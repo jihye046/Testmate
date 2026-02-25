@@ -54,6 +54,7 @@ public class AdminController {
 	public String adminMainPage(Model model) {
 		// 시험 종류, 시험 회차, 시험 과목 불러오기
 //		model.addAttribute("examList", examService.getAllExamTitles());
+		model.addAttribute("examtypes", examService.getAllExamTypes());
 		model.addAttribute("folderList", service.getFolderList()); 
 		
 		return "/admin/main";

@@ -404,4 +404,59 @@
 		 WHERE exam_id = #{examId}
 	</select>
 	
+	<!-- 시험지 검색 -->
+	<select id="searchExams" parameterType="ExamSearchDto" resultType="ExamTitleDto">
+		SELECT
+			 i.exam_type_id AS examTypeId,
+			 t.exam_type_code AS examTypeCode,
+			 t.exam_type_name AS examTypeName, 
+		     
+		     i.exam_id AS examId,
+		     i.exam_round AS examRound,
+		     i.exam_subject AS examSubject,
+		     
+		     CASE
+		     	WHEN t.exam_type_code LIKE '%Answer' THEN
+		     	    (SELECT COUNT(*) 
+		               FROM exam_answer a 
+		              WHERE a.exam_id = i.exam_id)
+		        ELSE
+				    (SELECT COUNT(*) 
+		               FROM exam_question q 
+		              WHERE q.exam_id = i.exam_id)
+			END AS totalCount,
+			
+             i.created_date,
+             f.folder_id
+		  FROM exam_info i
+		  JOIN exam_type t ON i.exam_type_id = t.exam_type_id
+		  JOIN exam_folder f ON i.folder_id = f.folder_id
+		  <where>
+			  	AND f.folder_id = #{activeFolderId}
+			    AND i.isdeleted = 'N'
+			    
+			    <if test="keyword != null and keyword != ''">
+		            AND (t.exam_type_name LIKE '%' || #{keyword} || '%' 
+		            	OR i.exam_subject LIKE '%' || #{keyword} ||'%'
+		            	OR i.exam_round LIKE '%' || #{keyword} ||'%')
+		        </if>
+		        
+		        <if test="type != null and type != ''">
+		            AND t.exam_type_code = #{type}
+		        </if>
+		        
+		        <if test="subject != null and subject != ''">
+		            AND i.exam_subject = #{subject}
+		        </if>
+		        
+		        <if test="year != null and year != ''">
+		            AND i.exam_round LIKE '%' || #{year} || '%'
+		        </if>
+		        
+		        <if test="round != null and round != ''">
+		            AND i.exam_round LIKE '%' || #{round} || '%'
+		        </if>
+		  </where>
+		  ORDER BY i.created_date DESC	
+	</select>
 </mapper>

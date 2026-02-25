@@ -63,8 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 폴더 목록으로 돌아가기 버튼 리스너
     document.querySelector(".btn-back-to-folders").addEventListener('click', loadFolderView)
 
-    // 시험지 검색 버튼 리스너
-    document.querySelector(".btn-search-go").addEventListener('click', searchExams)
+    // 시험지 검색 리스너
+    document.querySelector("#searchForm").addEventListener('submit', (e) => {
+        // 엔터키와 검색 버튼 클릭 모두 감지
+        e.preventDefault()
+        handleSearch()
+    })
 
     // 새 폴더 모달 닫기 버튼 리스너
     document.querySelector(".modal-close-btn").addEventListener('click', closeCreateFolderModal)
@@ -461,17 +465,6 @@ const loadPdfFile = () => {
             if(isSaved){
                 // 분석 상태 변수 업데이트
                 isAnalyzed = true
-
-                
-
-                // 미리보기 컨테이너 보이기
-                // previewContainer.style.display = 'block'
-
-                // 추출된 텍스트 미리보기 영역에 표시
-                // const textPreview = document.querySelector("#textPreview")
-                // response.data.questions.forEach((map) => {
-                //     console.log(map)
-                // })
                 
                 // 시험지 목록 새로고침
                 loadExamListData(activeFolderId)
@@ -508,7 +501,60 @@ const loadBulkActionBtn = () => {
     listAction.innerHTML = output
 }
 
-// 시험지 목록 로드 함수
+// 폴더 내 시험지 목록 UI
+const renderExamList = (exaxmList, noDataMessage) => {
+    let output = ''
+
+    if(exaxmList.length == 0){
+        output += 
+        `
+            <div class="no-exams-message">
+                <i class="fas fa-box-open"></i>
+                <p>${noDataMessage}</p>
+            </div>
+        `
+    } else {
+        exaxmList.forEach((examTitleDto) => {
+
+            output += 
+            `
+                <div class="exam-card" data-id="${examTitleDto.examId}">
+                    <input type="checkbox" class="exam-select-checkbox" data-exam-id="${examTitleDto.examId}">
+
+                    <div class="card-header">
+                        <span class="tag tag-${examTitleDto.examSubject}">${examTitleDto.examSubject}</span>
+                        <span class="tag tag-round">${examTitleDto.examRound}</span>
+                    </div>
+                    <h3 class="card-title">${examTitleDto.displayTitle}</h3>
+                    <div class="card-meta">
+                        <p><i class="fas fa-question-circle"></i> 문항 수: <strong>${examTitleDto.totalCount}개</strong></p>
+                        <p><i class="fas fa-calendar-alt"></i> 등록일: ${examTitleDto.createdDate}</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-action btn-view" 
+                            data-examId="${examTitleDto.examId}"
+                            data-examTypeCode="${examTitleDto.examTypeCode}"
+                            data-examTypeName="${examTitleDto.examTypeName}"
+                            data-examRound="${examTitleDto.examRound}"
+                            data-examSubject="${examTitleDto.examSubject}"
+                        >
+                            보기
+                        </button>
+                        <button class="btn btn-action btn-delete" data-examId="${examTitleDto.examId}">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            `
+        })
+
+        loadBulkActionBtn()
+    }
+
+    return output
+}
+
+// 폴더 내 시험지 목록 UI 로드 함수
 const loadExamListData = (folderId) => {
 
     // 시험지 이동 버튼 컨테이너
@@ -527,56 +573,7 @@ const loadExamListData = (folderId) => {
     
     axios.get('/admin/examList', { params })
         .then(response => {
-            const list = response.data
-            let output = ''
-
-            if(list.length == 0){
-                output += 
-                `
-                    <div class="no-exams-message">
-                        <i class="fas fa-box-open"></i>
-                        <p>등록된 시험지 목록이 없습니다. 새로운 시험지를 등록해주세요.</p>
-                    </div>
-                `
-            } else {
-                list.forEach((examTitleDto) => {
-
-                    output += 
-                    `
-                        <div class="exam-card" data-id="${examTitleDto.examId}">
-                            <input type="checkbox" class="exam-select-checkbox" data-exam-id="${examTitleDto.examId}">
-
-                            <div class="card-header">
-                                <span class="tag tag-${examTitleDto.examSubject}">${examTitleDto.examSubject}</span>
-                                <span class="tag tag-round">${examTitleDto.examRound}</span>
-                            </div>
-                            <h3 class="card-title">${examTitleDto.displayTitle}</h3>
-                            <div class="card-meta">
-                                <p><i class="fas fa-question-circle"></i> 문항 수: <strong>${examTitleDto.totalCount}개</strong></p>
-                                <p><i class="fas fa-calendar-alt"></i> 등록일: ${examTitleDto.createdDate}</p>
-                            </div>
-                            <div class="card-actions">
-                                <button class="btn btn-action btn-view" 
-                                    data-examId="${examTitleDto.examId}"
-                                    data-examTypeCode="${examTitleDto.examTypeCode}"
-                                    data-examTypeName="${examTitleDto.examTypeName}"
-                                    data-examRound="${examTitleDto.examRound}"
-                                    data-examSubject="${examTitleDto.examSubject}"
-                                >
-                                    보기
-                                </button>
-                                <button class="btn btn-action btn-delete" data-examId="${examTitleDto.examId}">
-                                    삭제
-                                </button>
-                            </div>
-                        </div>
-                    `
-                })
-
-                loadBulkActionBtn()
-            }
-            examCard.innerHTML = output
-
+            examCard.innerHTML = renderExamList(response.data, '등록된 시험지 목록이 없습니다. 새로운 시험지를 등록해주세요.')
         })
         .catch(error => {
             console.error('error: ', error)
@@ -616,11 +613,48 @@ const fetchExamDelete = (examIds) => {
         })
 }
 
-// 시험지 검색 함수 (AJAX로 구현 예정)
-const searchExams = () => {}
+// 검색 데이터 유효성 검사
+const handleSearch = () => {
+    const form = document.querySelector("#searchForm")
+    const keyword = form.querySelector("#searchKeyword").value.trim()
+    const type = form.querySelector("#selectExamType").value
+    const subject = form.querySelector("#selectSubject").value
+    const year = form.querySelector("#selectYear").value
+    const round = form.querySelector("#selectRound").value
+    
+    if(!keyword && !type && !subject && !year && !round){
+        alert("최소 하나 이상의 검색 조건을 선택하거나 키워드를 입력해주세요.")
+        return
+    }
 
-// 시험지 목록 페이징 처리 함수 (AJAX로 구현 예정)
-// const pagination = () => {}
+    const params = {
+        keyword,
+        type,
+        subject,
+        year,
+        round,
+        activeFolderId
+    }
+
+    fetchSearchExams(params)
+}
+
+// 검색 조건에 맞는 시험지 목록 요청 함수
+const fetchSearchExams = (params) => {
+    const examCard = document.querySelector(".exam-card-grid")
+    axios.get('/exam/searchExams', { params })
+        .then(response => {
+            console.log(response.data.size)
+            examCard.innerHTML = renderExamList(response.data, "검색 결과가 없습니다.")
+
+            folderView.style.display = 'none'               // 폴더 뷰 숨김
+            examListView.style.display = 'block'            // 시험지 뷰 표시
+            btnCreateExam.style.display = 'inline-flex'     // 새 시험지 등록 버튼 표시
+        })
+        .catch(error => {
+            console.error('error: ', error)
+        })
+}
 
 
 /* 시험지 이동 버튼 관련 함수
@@ -836,20 +870,21 @@ const updateExamTypes = (examTypes) => {
         options += `<option value="${examType.examTypeCode}">${examType.examTypeName}</option>`
     })
 
-    selectExamType.innerHTML = options
+    // selectExamType.innerHTML = options
+    return options
 }
 
 // 시험 시행 연도 UI 동적으로 설정
 const updateExamYears = () => {
-    const currentYear = new Date().getFullYear()
+    let options = `<option value="" disabled selected>연도 선택</option>`
     
+    const currentYear = new Date().getFullYear()
 	// 현재 연도 ~ 과거 10년치
     for(let year = currentYear; year >= currentYear - 10; year--){
-        const option = document.createElement('option')
-        option.value = year
-        option.textContent = `${year}년`
-        selectYear.appendChild(option)
+        options += `<option value="${year}">${year}년</option>`
     }
+
+    selectYear.innerHTML = options
 }
 
 // 시험 시행 회차 UI 동적으로 설정
@@ -896,7 +931,8 @@ const validateExamInfo = () => {
 const fetchGetExamTypes = () => {
     axios.get('/exam/getAllExamTypes')
         .then(response => {
-            updateExamTypes(response.data)
+            // updateExamTypes(response.data)
+            selectExamType.innerHTML = updateExamTypes(response.data)
         })
         .catch(error => {
             console.error('error: ', error)
@@ -919,6 +955,8 @@ const fetchGetSubjects = (selectedType) => {
             console.error('error: ', error)
         })
 }
+
+
 
 /* 초기화 함수
 ================================================== */
@@ -949,6 +987,6 @@ const clearPdfUploadSelectbox = () => {
 
     selectExamType.innerHTML = '<option value="" disabled selected>유형 선택</option>'
     selectSubject.innerHTML = '<option value="" disabled selected>시험 유형을 선택해주세요</option>'
-    selectYear.innerHTML = '<option value="" disabled selected>연도 선택</option>'
+    selectYear.innerHTML = '<option value="" disabled selected>시험 유형을 선택해주세요</option>'
     selectRound.innerHTML = '<option value="" disabled selected>시험 유형을 선택해주세요</option>'
 }
