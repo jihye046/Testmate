@@ -17,9 +17,11 @@
 </head>
 <body>
 	<div class="admin-container">
-		<div>
-			<a href="/exam/main">사용자 메인으로 이동</a> 
-		</div>
+		<div class="admin-top-bar">
+            <a href="${pageContext.request.contextPath}/exam/main" class="back-to-user-link">
+                <i class="fas fa-external-link-alt"></i> 사용자 메인으로 이동
+            </a>
+        </div>
 
 		<header class="admin-header">
 			<h1 class="header-title" id="main-dashboard-title">시험 카테고리 관리</h1> 

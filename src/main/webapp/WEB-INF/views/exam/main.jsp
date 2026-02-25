@@ -11,17 +11,18 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-	<!-- URL: 로그인페이지 또는 로그아웃 -->
 	<c:set var="loginUrl" value="${pageContext.request.contextPath}${empty sessionScope.userId ? '/user/loginPage' : '/user/logout'}"></c:set>
-	<!-- TEXT: 로그인 또는 로그아웃 텍스트 -->
 	<c:set var="loginText" value="${empty sessionScope.userId ? '로그인' : '로그아웃'}"></c:set>
 	
 	<div class="container">
-		<div>
-			<a href="/admin/main">관리자 메인으로 이동</a>
-		</div> 
-	
 		<div class="top-utility">
+            <c:if test="${sessionScope.userId eq 'admin'}">
+                <a href="${pageContext.request.contextPath}/admin/main" class="admin-link">
+                    관리자 페이지
+                </a>
+                <span class="divider">|</span> 
+            </c:if>
+
 			<a href="${loginUrl}" class="login-link">
 				${loginText}
 			</a>

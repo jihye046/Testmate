@@ -25,7 +25,27 @@ body {
 /* 제목 및 부제 */
 .top-utility {
     text-align: right;
-    margin-bottom: 20px;
+    margin-bottom: 3rem;
+}
+
+.admin-link {
+    font-size: 0.9em;
+    color: #e74c3c;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.admin-link:hover {
+    color: #c0392b;
+    /* background-color: #fdf2f2; */
+}
+
+.divider {
+    margin: 0 10px;
+    color: #ccc;
 }
 
 .main-title {
@@ -55,7 +75,7 @@ body {
 
 .login-link:hover {
     color: #2980b9;
-    background-color: #ecf0f1;
+    /* background-color: #ecf0f1; */
 }
 
 /* 폼 컨테이너 */

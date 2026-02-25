@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(folderViewBtn){
             activeFolderId = folderViewBtn.getAttribute('data-id')
             activeFolderName = folderViewBtn.getAttribute('data-name')
+            document.querySelector(".admin-top-bar").classList.add("hidden")
 
             loadExamList(activeFolderId, activeFolderName)
             return // btn-delete까지 타지 않도록 return
@@ -231,6 +232,8 @@ const loadFolderView = () => {
     examListView.style.display = 'none'             // 시험지 뷰 숨김
     folderView.style.display = 'block'              // 폴더 뷰 표시
     btnCreateExam.style.display = 'none'            // 새 시험지 등록 버튼 숨김
+
+    document.querySelector(".admin-top-bar").classList.remove("hidden")
 
     clearSelections()                               // 초기화
 }

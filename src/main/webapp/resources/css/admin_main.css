@@ -41,12 +41,41 @@ body {
  * 2. ACTION HEADERS & BUTTONS (Enhanced)
  * ================================================================= */
 
+/* 상단 유틸리티 바 스타일 */
+.admin-top-bar {
+    padding: 15px; 
+    background: transparent;
+}
+
+.back-to-user-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b; 
+    font-size: 1.0em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+}
+
+.hidden {
+	display: none;
+}
+
+.back-to-user-link:hover {
+    color: #64748b;
+    text-decoration: underline;
+}
+
 /* Header */
 .admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 60px;
     padding-bottom: 10px;
 }
 
