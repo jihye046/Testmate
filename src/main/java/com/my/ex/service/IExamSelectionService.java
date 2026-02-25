@@ -12,6 +12,7 @@ import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamCreateRequestDto;
+import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
@@ -47,4 +48,5 @@ public interface IExamSelectionService {
 	void updateExamByForm(ExamCreateRequestDto request);
 	int getExamIdByExamTypeId(String examTypeCode,String examRound, String examSubject);
 	int getExamTypeIdByExamTypeCode(String examTypeCode);
+	List<ExamTitleDto> searchExams(ExamSearchDto dto);
 }

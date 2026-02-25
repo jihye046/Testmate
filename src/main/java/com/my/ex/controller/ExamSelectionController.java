@@ -7,12 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.*;
 import com.my.ex.dto.request.ExamCreateRequestDto;
+import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
 import com.my.ex.dto.request.ExamCreateRequestDto.Question;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamPdfPreview;
+import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
@@ -438,5 +440,11 @@ public class ExamSelectionController {
 	@ResponseBody
 	public Map<String, Object> checkAnswers(@RequestParam Map<String, Object> map) {
 		return answerService.checkAnswers(map);
+	}
+	
+	@GetMapping("/searchExams")
+	@ResponseBody
+	public List<ExamTitleDto> searchExams(ExamSearchDto dto) {
+		return service.searchExams(dto);
 	}
 }

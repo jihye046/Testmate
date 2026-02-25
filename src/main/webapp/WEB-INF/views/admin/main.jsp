@@ -89,30 +89,32 @@
             
 			<!-- 검색 필터 섹션 -->
             <div class="filter-box">
-				<form id="searchForm" class="filter-controls" onsubmit="return false;">
+				<form id="searchForm" class="filter-controls">
 					<div class="input-group main-search">
 						<i class="fas fa-search search-icon"></i>
-						<input type="text" id="searchKeyword" placeholder="시험지 제목, 과목, 유형 등으로 검색하세요" class="form-control">
+						<input type="text" id="searchKeyword" name="keyword" placeholder="시험지 제목, 과목, 유형 등으로 검색하세요" class="form-control">
 						<button type="submit" class="btn btn-search-go">검색</button>
 					</div>
 			
 					<div class="select-group">
-						<select id="filterSubject" class="form-control select-filter">
-							<option value="">전체 과목</option>
-							<option value="국어">국어</option>
-							<option value="수학">수학</option>
-							<option value="영어">영어</option>
+						<select id="selectExamType" name="type" class="form-control select-filter ">
+							<option value="" disabled selected>유형 선택</option>
+							<!-- 서버로부터 받은 데이터로 동적으로 설정 -->
 						</select>
-						<select id="filterGrade" class="form-control select-filter">
-							<option value="">전체 학년</option>
-							<option value="고1">고등학교 1학년</option>
-							<option value="고2">고등학교 2학년</option>
-							<option value="고3">고등학교 3학년</option>
+
+						<select id="selectSubject" name="subject" class="form-control select-filter">
+							<option value="" disabled selected>시험 유형을 선택해주세요</option>
+							<!-- 시험 유형에 따라 동적으로 설정 -->
 						</select>
-						<select id="filterType" class="form-control select-filter">
-							<option value="">전체 유형</option>
-							<option value="모의고사">모의고사</option>
-							<option value="기출">기출</option>
+
+						<select id="selectYear" name="year" class="form-control select-filter">
+							<option value="" disabled selected>시험 유형을 선택해주세요</option>
+							<!-- 현재 연도부터 과거 10년치를 동적으로 설정 -->
+						</select>
+
+						<select id="selectRound" name="round" class="form-control select-filter">
+							<option value="" disabled selected>시험 유형을 선택해주세요</option>
+							<!-- 시험 유형에 따라 동적으로 설정 -->
 						</select>
 					</div>
 				</form>
@@ -269,7 +271,7 @@
 							<div class="form-group">
 								<label><i class="fas fa-calendar-check"></i> 시행 연도</label>
 								<select id="selectYear" class="form-select">
-									<option value="" disabled selected>연도 선택</option>
+									<option value="" disabled selected>시험 유형을 선택해주세요</option>
 									<!-- 현재 연도부터 과거 10년치를 동적으로 설정 -->
 								</select>
 							</div>
