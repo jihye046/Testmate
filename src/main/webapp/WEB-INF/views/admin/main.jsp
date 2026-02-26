@@ -14,6 +14,9 @@
 
 <!-- font-awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 	<div class="admin-container">
@@ -29,6 +32,25 @@
 				<i class="fas fa-file-circle-plus"></i> 새 시험지 등록
 			</button>
 		</header>
+
+		<!-- 차트 -->
+		<div class="chart-container">
+		    <div class="chart-box">
+		        <canvas id="totalPaperChart"></canvas>
+		        <div class="chart-value">100</div>
+		        <p>전체 시험지</p>
+		    </div>
+		    <div class="chart-box">
+		        <canvas id="missingAnswerChart"></canvas>
+		        <div class="chart-value" style="color: #ff6b6b;">8</div>
+		        <p>정답지 누락</p>
+		    </div>
+		    <div class="chart-box">
+		        <canvas id="missingPaperChart"></canvas>
+		        <div class="chart-value" style="color: #ffa502;">3</div>
+		        <p>시험지 누락</p>
+		    </div>
+		</div>
 
 		<!-- 폴더 view -->
 		<div id="folder-view" class="dashboard-content-area">

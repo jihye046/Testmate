@@ -61,7 +61,7 @@ body {
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 .back-to-user-link:hover {
@@ -87,6 +87,42 @@ body {
     border-left: 5px solid #3498db; /* 타이틀에 액센트 라인 */
     padding-left: 15px;
 }
+
+/* 차트 */
+.chart-container {
+    display: flex; 
+    justify-content: space-around; 
+    gap: 20px;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+.chart-box {
+    position: relative; 
+    width: 180px; 
+    text-align: center;
+}
+.chart-box p {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #444;
+    font-size: 0.95rem;
+}
+/* 차트 중앙 숫자 스타일 */
+.chart-value {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+}
+
 
 /* Dashboard Content Areas */
 .dashboard-content-area {
@@ -153,11 +189,14 @@ body {
 
 /* 폴더 목록으로 돌아가기 */
 .btn-back-to-folders {
-    background-color: #bdc3c7;
-    color: #34495e;
+    /* background-color: #bdc3c7;
+    color: #34495e; */
+    background-color: #94a3b8;
+    color: white;
 }
 .btn-back-to-folders:hover {
-    background-color: #95a5a6;
+    /* background-color: #95a5a6; */
+    opacity: 0.9;
 }
 
 

@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         activeFolderId = params.get("folderId")
         activeFolderName = params.get("folderName")
         loadExamList(params.get("folderId"), params.get("folderName"))
+        document.querySelector(".admin-top-bar").classList.toggle("hidden")
+        document.querySelector(".chart-container").classList.toggle("hidden")
     } else {
         // URL에 폴더 정보가 없으면 폴더 목록 화면으로
         loadFolderView()
@@ -47,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(folderViewBtn){
             activeFolderId = folderViewBtn.getAttribute('data-id')
             activeFolderName = folderViewBtn.getAttribute('data-name')
-            document.querySelector(".admin-top-bar").classList.add("hidden")
+            document.querySelector(".admin-top-bar").classList.toggle("hidden")
+            document.querySelector(".chart-container").classList.toggle("hidden")
 
             loadExamList(activeFolderId, activeFolderName)
             return // btn-delete까지 타지 않도록 return
@@ -230,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         location.href = `/admin/createExamPage?folderId=${activeFolderId}`
     })
 
+    ChartHandler.init()
 })
 
 
@@ -253,6 +257,7 @@ const loadFolderView = () => {
     btnCreateExam.style.display = 'none'            // 새 시험지 등록 버튼 숨김
 
     document.querySelector(".admin-top-bar").classList.remove("hidden")
+    document.querySelector(".chart-container").classList.remove("hidden")
 
     clearSelections()                               // 초기화
 }
@@ -981,57 +986,54 @@ const fetchGetSubjects = (selectedType, selectSubjectBox, selectRoundBox) => {
 }
 
 // 차트
-const initDashboardCharts = () => {
-    const commonOptions = {
-        cutout: '70%',
-        plugins: {
-            legend: { display: false }, // 범례는 따로 p태그가 있기때문에 숨김
-            tooltip: { enabled: true }  // 마우스 올렸을 때 정보 표시
+const ChartHandler = {
+    init(){
+        this._createChart('totalPaperChart', ['등록 완료'], [100], ['#4facfe'], ['#3892e0'], 0)
+        this._createChart('missingAnswerChart', ['누락', '정상'], [8, 92], ['#ff6b6b', '#f1f2f6'], ['#ff4757', '#e2e5ec'], 4)
+        this._createChart('missingPaperChart', ['누락', '정상'], [3, 97], ['#ffa502', '#f1f2f6'], ['#ff9f00', '#e2e5ec'], 4)
+    },
+
+    // 공통 옵션 설정
+    _getCommonOptions(){
+        return {
+            cutout: '80%', // 두께
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#333',
+                    bodyColor: '#333',
+                    borderColor: '#eee',
+                    borderWidth: 2,
+                    padding: 10,
+                    displayColors: false
+                }
+            },
+            borderRadius: 5 
         }
+    },
+
+    _createChart(id, labels, data, color, hoverColor, hoverOffset){
+        if(!document.getElementById(id)) return
+
+        new Chart(id, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: color,
+                    hoverBackgroundColor: hoverColor || color,
+                    activeBackgroundColor: hoverColor || color,
+                    hoverOffset: hoverOffset,
+                    borderWidth: 0
+                }]
+            },
+            options: this._getCommonOptions()
+        })
     }
-
-    // 2. 전체 시험지 차트
-    const ctxTotal = document.getElementById('totalPaperChart').getContext('2d');
-    new Chart(ctxTotal, {
-        type: 'doughnut',
-        data: {
-            labels: ['등록된 시험지'],
-            datasets: [{
-                data: [100],
-                backgroundColor: ['#4facfe'],
-                borderWidth: 0
-            }]
-        },
-        options: commonOptions
-    })
-
-    // 3. 정답지 누락 차트 (시험지 기준)
-    const ctxMissingAns = document.getElementById('missingAnswerChart').getContext('2d');
-    new Chart(ctxMissingAns, {
-        type: 'doughnut',
-        data: {
-            labels: ['누락', '정상'],
-            datasets: [{
-                data: [8, 112], // [누락건수, 정상건수]
-                backgroundColor: ['#ff6b6b', '#f1f2f6']
-            }]
-        },
-        options: commonOptions
-    })
-
-    // 4. 시험지 누락 차트 (정답지 기준)
-    const ctxMissingPaper = document.getElementById('missingPaperChart').getContext('2d');
-    new Chart(ctxMissingPaper, {
-        type: 'doughnut',
-        data: {
-            labels: ['누락', '정상'],
-            datasets: [{
-                data: [3, 117], // [누락건수, 정상건수]
-                backgroundColor: ['#ffa502', '#f1f2f6']
-            }]
-        },
-        options: commonOptions
-    })
 }
 
 /* 초기화 함수
