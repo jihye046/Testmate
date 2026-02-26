@@ -666,7 +666,6 @@ const fetchSearchExams = (params) => {
     const examCard = document.querySelector(".exam-card-grid")
     axios.get('/exam/searchExams', { params })
         .then(response => {
-            console.log(response.data.size)
             examCard.innerHTML = renderExamList(response.data, "검색 결과가 없습니다.")
 
             folderView.style.display = 'none'               // 폴더 뷰 숨김
@@ -975,16 +974,65 @@ const fetchGetSubjects = (selectedType, selectSubjectBox, selectRoundBox) => {
             const examSubjects = response.data
             selectSubjectBox.innerHTML = updateExamSubjects(examSubjects)
             selectRoundBox.innerHTML = updateExamRounds(selectedType)
-
-            const output = updateExamRounds(selectedType)
-            console.log(`round output: ${output}`)
         })
         .catch(error => {
             console.error('error: ', error)
         })
 }
 
+// 차트
+const initDashboardCharts = () => {
+    const commonOptions = {
+        cutout: '70%',
+        plugins: {
+            legend: { display: false }, // 범례는 따로 p태그가 있기때문에 숨김
+            tooltip: { enabled: true }  // 마우스 올렸을 때 정보 표시
+        }
+    }
 
+    // 2. 전체 시험지 차트
+    const ctxTotal = document.getElementById('totalPaperChart').getContext('2d');
+    new Chart(ctxTotal, {
+        type: 'doughnut',
+        data: {
+            labels: ['등록된 시험지'],
+            datasets: [{
+                data: [100],
+                backgroundColor: ['#4facfe'],
+                borderWidth: 0
+            }]
+        },
+        options: commonOptions
+    })
+
+    // 3. 정답지 누락 차트 (시험지 기준)
+    const ctxMissingAns = document.getElementById('missingAnswerChart').getContext('2d');
+    new Chart(ctxMissingAns, {
+        type: 'doughnut',
+        data: {
+            labels: ['누락', '정상'],
+            datasets: [{
+                data: [8, 112], // [누락건수, 정상건수]
+                backgroundColor: ['#ff6b6b', '#f1f2f6']
+            }]
+        },
+        options: commonOptions
+    })
+
+    // 4. 시험지 누락 차트 (정답지 기준)
+    const ctxMissingPaper = document.getElementById('missingPaperChart').getContext('2d');
+    new Chart(ctxMissingPaper, {
+        type: 'doughnut',
+        data: {
+            labels: ['누락', '정상'],
+            datasets: [{
+                data: [3, 117], // [누락건수, 정상건수]
+                backgroundColor: ['#ffa502', '#f1f2f6']
+            }]
+        },
+        options: commonOptions
+    })
+}
 
 /* 초기화 함수
 ================================================== */
