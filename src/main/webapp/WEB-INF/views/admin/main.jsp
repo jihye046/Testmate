@@ -14,6 +14,9 @@
 
 <!-- font-awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 	<div class="admin-container">
@@ -29,6 +32,27 @@
 				<i class="fas fa-file-circle-plus"></i> 새 시험지 등록
 			</button>
 		</header>
+
+		<!-- 차트 -->
+		<div class="chart-container">
+		    <div class="chart-box">
+		        <canvas id="totalPaperChart"></canvas>
+		        <div class="chart-value" data-target="totalValue">0</div>
+		        <p>전체 시험지</p>
+		    </div>
+		    <div class="chart-box">
+		        <canvas id="missingAnswerChart"></canvas>
+		        <div class="chart-value" data-target="missingValue">0</div>
+		        <p>정답지 누락</p>
+		    </div>
+		    <div class="chart-box todo-container">
+		        <h3>🚨 조치 필요 (정답지 누락)</h3>
+		        <ul id="missingAnswerList" class="todo-list">
+		            <li class="empty-msg">누락된 정답지가 없습니다.</li>
+		        </ul>
+<!-- 		        <a href="/exam/list?filter=missingAnswer" class="btn-more">전체보기 ></a> -->
+		    </div>
+		</div>
 
 		<!-- 폴더 view -->
 		<div id="folder-view" class="dashboard-content-area">

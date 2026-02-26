@@ -177,4 +177,14 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		return session.selectList(NAMESPACE + "searchExams", dto);
 	}
 
+	@Override
+	public int getTotalExamCount() {
+		return session.selectOne(NAMESPACE + "getTotalExamCount");
+	}
+
+	@Override
+	public List<ExamInfoDto> getMissingAnswerExams() {
+		return session.selectList(NAMESPACE + "getMissingAnswerExams");
+	}
+
 }

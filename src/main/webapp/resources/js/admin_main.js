@@ -1,6 +1,7 @@
 // folderId 전역변수
 let activeFolderId = null
 let activeFolderName = null
+let defaultFolderId = 1
 
 // PDF 분석 완료 여부
 let isAnalyzed = false
@@ -35,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         activeFolderId = params.get("folderId")
         activeFolderName = params.get("folderName")
         loadExamList(params.get("folderId"), params.get("folderName"))
+        document.querySelector(".admin-top-bar").classList.toggle("hidden")
+        document.querySelector(".chart-container").classList.toggle("hidden")
     } else {
         // URL에 폴더 정보가 없으면 폴더 목록 화면으로
         loadFolderView()
@@ -47,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(folderViewBtn){
             activeFolderId = folderViewBtn.getAttribute('data-id')
             activeFolderName = folderViewBtn.getAttribute('data-name')
-            document.querySelector(".admin-top-bar").classList.add("hidden")
+            document.querySelector(".admin-top-bar").classList.toggle("hidden")
+            document.querySelector(".chart-container").classList.toggle("hidden")
 
             loadExamList(activeFolderId, activeFolderName)
             return // btn-delete까지 타지 않도록 return
@@ -230,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         location.href = `/admin/createExamPage?folderId=${activeFolderId}`
     })
 
+    ChartHandler.init()
 })
 
 
@@ -253,6 +258,7 @@ const loadFolderView = () => {
     btnCreateExam.style.display = 'none'            // 새 시험지 등록 버튼 숨김
 
     document.querySelector(".admin-top-bar").classList.remove("hidden")
+    document.querySelector(".chart-container").classList.remove("hidden")
 
     clearSelections()                               // 초기화
 }
@@ -465,6 +471,7 @@ const closeCreateExamModal = () => {
 
 // 시험지 PDF 업로드 등록 함수
 const loadPdfFile = () => {
+    
     // uploadActionContainer.style.display = 'none'
     progressContainer.style.display = 'flex'
 
@@ -479,7 +486,7 @@ const loadPdfFile = () => {
     // 서버로 파일 전송
     formData.append('examInfo', JSON.stringify(examInfo))
     formData.append('pdfFile', pdfFileInput.files[0])
-    formData.append('folderId', activeFolderId)
+    formData.append('folderId', activeFolderId || defaultFolderId)
 
     axios.post('/exam/loadPdfFile', formData)
         .then(response => {
@@ -488,14 +495,20 @@ const loadPdfFile = () => {
                 // 분석 상태 변수 업데이트
                 isAnalyzed = true
                 
-                // 시험지 목록 새로고침
-                loadExamListData(activeFolderId)
+                // 시험지 목록 새로고침(특정 폴더 내에서 등록한 경우만 해당 폴더 시험지 목록 새로고침)
+                // 메인 페이지에서 바로 등록한 경우에는 폴더 리스트만 새로고침
+                if(activeFolderId){
+                    loadExamListData(activeFolderId)
+                }
 
                 // 폴더 리스트 새로고침
                 fetchFolderList()
 
                 // 모달 닫기
                 closeCreateExamModal()
+
+                // 차트 초기화
+                ChartHandler.init()
             } else {
                 // 모달은 닫지 않고 'PDF 분석중' 표시만 숨김
                 progressContainer.style.display = 'none'
@@ -981,57 +994,118 @@ const fetchGetSubjects = (selectedType, selectSubjectBox, selectRoundBox) => {
 }
 
 // 차트
-const initDashboardCharts = () => {
-    const commonOptions = {
-        cutout: '70%',
-        plugins: {
-            legend: { display: false }, // 범례는 따로 p태그가 있기때문에 숨김
-            tooltip: { enabled: true }  // 마우스 올렸을 때 정보 표시
+const ChartHandler = {
+    charts: {},
+
+    init(){
+        this._fetchChartData()
+    },
+    
+    _fetchChartData(){
+        axios.get('/exam/getChartStatistics')
+            .then(response => {
+                const { totalExamCount, missingAnswerExams } = response.data
+                const missingCount = missingAnswerExams ? missingAnswerExams.length : 0 
+                
+                this._createChart('totalPaperChart', ['등록 완료'], [totalExamCount], ['#4facfe'], ['#3892e0'], 0)
+                this._createChart('missingAnswerChart', ['누락', '정상'], [missingCount, Math.max(0, totalExamCount - missingCount)], ['#ff6b6b', '#f1f2f6'], ['#ff4757', '#e2e5ec'], 4)
+                this._updateChartValue(totalExamCount, missingCount)
+                this._updateMissingList(missingAnswerExams)
+            })
+            .catch(error => {
+                console.error('error: ', error)
+            })
+    },
+
+    // 차트 - 공통 옵션 설정
+    _getCommonOptions(){
+        return {
+            cutout: '80%', // 두께
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#333',
+                    bodyColor: '#da5c5c',
+                    borderColor: '#eee',
+                    borderWidth: 2,
+                    padding: 10,
+                    displayColors: false
+                }
+            },
+            borderRadius: 5 
         }
+    },
+
+    // 차트 생성
+    _createChart(id, labels, data, color, hoverColor, hoverOffset){
+        if(!document.getElementById(id)) return
+
+        if (this.charts[id]) {
+            this.charts[id].destroy();
+        }
+
+        this.charts[id] = new Chart(id, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: color,
+                    hoverBackgroundColor: hoverColor || color,
+                    activeBackgroundColor: hoverColor || color,
+                    hoverOffset: hoverOffset,
+                    borderWidth: 0
+                }]
+            },
+            options: this._getCommonOptions()
+        })
+    },
+
+    // 텍스트 업데이트
+    _updateChartValue(totalExamCount, missingCount){
+        const totalValueEl = document.querySelector('[data-target="totalValue"]')
+        totalValueEl.textContent = totalExamCount
+
+        const missingAnswerValueEl = document.querySelector('[data-target="missingValue"]')
+        if(missingCount > 0){
+            missingAnswerValueEl.style.color = '#ff6b6b'
+            missingAnswerValueEl.textContent = missingCount
+        } else {
+            missingAnswerValueEl.style.color = '#2ed573'
+            missingAnswerValueEl.innerHTML = '<i class="fas fa-check-circle"></i> 0'
+        }
+    },
+
+    // 알림창 업데이트
+    _updateMissingList(missingExams){
+        const listUl = document.querySelector("#missingAnswerList")
+        if(!listUl) return
+
+        listUl.innerHTML = '' // 기존 내용 초기화
+
+        if(!missingExams || missingExams.length == 0){
+            listUl.innerHTML = '<li class="empty-msg">🎉 모든 정답지가 등록되었습니다!</li>'
+            return
+        }
+
+        const displayItems = missingExams.slice(0, 5) // 최대 5개까지만 표시
+        displayItems.forEach(exam => {
+            const li = document.createElement('li')
+            li.innerHTML = `
+                <span class="exam-title">
+                    ${exam.examTypeKor} ${exam.examSubject}<br>
+                    <small style="color:#999; font-weight:400;">(${exam.examRound})</small>
+                </span>
+                <div class="item-footer">
+                    <button class="btn-reg" onclick="openCreateExamModal()">정답 등록</button>
+                </div>
+            `
+            listUl.appendChild(li)
+        })
     }
-
-    // 2. 전체 시험지 차트
-    const ctxTotal = document.getElementById('totalPaperChart').getContext('2d');
-    new Chart(ctxTotal, {
-        type: 'doughnut',
-        data: {
-            labels: ['등록된 시험지'],
-            datasets: [{
-                data: [100],
-                backgroundColor: ['#4facfe'],
-                borderWidth: 0
-            }]
-        },
-        options: commonOptions
-    })
-
-    // 3. 정답지 누락 차트 (시험지 기준)
-    const ctxMissingAns = document.getElementById('missingAnswerChart').getContext('2d');
-    new Chart(ctxMissingAns, {
-        type: 'doughnut',
-        data: {
-            labels: ['누락', '정상'],
-            datasets: [{
-                data: [8, 112], // [누락건수, 정상건수]
-                backgroundColor: ['#ff6b6b', '#f1f2f6']
-            }]
-        },
-        options: commonOptions
-    })
-
-    // 4. 시험지 누락 차트 (정답지 기준)
-    const ctxMissingPaper = document.getElementById('missingPaperChart').getContext('2d');
-    new Chart(ctxMissingPaper, {
-        type: 'doughnut',
-        data: {
-            labels: ['누락', '정상'],
-            datasets: [{
-                data: [3, 117], // [누락건수, 정상건수]
-                backgroundColor: ['#ffa502', '#f1f2f6']
-            }]
-        },
-        options: commonOptions
-    })
 }
 
 /* 초기화 함수
@@ -1052,6 +1126,8 @@ const clearSelections = () => {
 
     // 폴더 id 초기화
     activeFolderId = null
+
+    ChartHandler.init()
 }
 
 // 시험지 정보 [selectbox] UI 초기화
