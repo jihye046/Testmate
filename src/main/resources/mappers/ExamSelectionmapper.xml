@@ -486,7 +486,7 @@
 		    i.isdeleted,
 		    i.created_date,
 		    t.exam_type_code,
-		    t.exam_type_name
+		    t.exam_type_name AS examTypeKor
 		FROM exam_info i
 		JOIN exam_type t ON t.exam_type_id = i.exam_type_id
 		WHERE t.exam_type_code NOT LIKE '%Answer'

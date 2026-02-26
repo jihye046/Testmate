@@ -1,6 +1,7 @@
 // folderId 전역변수
 let activeFolderId = null
 let activeFolderName = null
+let defaultFolderId = 1
 
 // PDF 분석 완료 여부
 let isAnalyzed = false
@@ -470,6 +471,7 @@ const closeCreateExamModal = () => {
 
 // 시험지 PDF 업로드 등록 함수
 const loadPdfFile = () => {
+    
     // uploadActionContainer.style.display = 'none'
     progressContainer.style.display = 'flex'
 
@@ -484,7 +486,7 @@ const loadPdfFile = () => {
     // 서버로 파일 전송
     formData.append('examInfo', JSON.stringify(examInfo))
     formData.append('pdfFile', pdfFileInput.files[0])
-    formData.append('folderId', activeFolderId)
+    formData.append('folderId', activeFolderId || defaultFolderId)
 
     axios.post('/exam/loadPdfFile', formData)
         .then(response => {
@@ -493,14 +495,20 @@ const loadPdfFile = () => {
                 // 분석 상태 변수 업데이트
                 isAnalyzed = true
                 
-                // 시험지 목록 새로고침
-                loadExamListData(activeFolderId)
+                // 시험지 목록 새로고침(특정 폴더 내에서 등록한 경우만 해당 폴더 시험지 목록 새로고침)
+                // 메인 페이지에서 바로 등록한 경우에는 폴더 리스트만 새로고침
+                if(activeFolderId){
+                    loadExamListData(activeFolderId)
+                }
 
                 // 폴더 리스트 새로고침
                 fetchFolderList()
 
                 // 모달 닫기
                 closeCreateExamModal()
+
+                // 차트 초기화
+                ChartHandler.init()
             } else {
                 // 모달은 닫지 않고 'PDF 분석중' 표시만 숨김
                 progressContainer.style.display = 'none'
@@ -987,9 +995,10 @@ const fetchGetSubjects = (selectedType, selectSubjectBox, selectRoundBox) => {
 
 // 차트
 const ChartHandler = {
+    charts: {},
+
     init(){
         this._fetchChartData()
-        this._bindEvents()
     },
     
     _fetchChartData(){
@@ -1001,6 +1010,7 @@ const ChartHandler = {
                 this._createChart('totalPaperChart', ['등록 완료'], [totalExamCount], ['#4facfe'], ['#3892e0'], 0)
                 this._createChart('missingAnswerChart', ['누락', '정상'], [missingCount, Math.max(0, totalExamCount - missingCount)], ['#ff6b6b', '#f1f2f6'], ['#ff4757', '#e2e5ec'], 4)
                 this._updateChartValue(totalExamCount, missingCount)
+                this._updateMissingList(missingAnswerExams)
             })
             .catch(error => {
                 console.error('error: ', error)
@@ -1018,7 +1028,7 @@ const ChartHandler = {
                 tooltip: {
                     backgroundColor: 'rgba(255, 255, 255, 0.9)',
                     titleColor: '#333',
-                    bodyColor: '#333',
+                    bodyColor: '#da5c5c',
                     borderColor: '#eee',
                     borderWidth: 2,
                     padding: 10,
@@ -1033,7 +1043,11 @@ const ChartHandler = {
     _createChart(id, labels, data, color, hoverColor, hoverOffset){
         if(!document.getElementById(id)) return
 
-        new Chart(id, {
+        if (this.charts[id]) {
+            this.charts[id].destroy();
+        }
+
+        this.charts[id] = new Chart(id, {
             type: 'doughnut',
             data: {
                 labels: labels,
@@ -1065,9 +1079,31 @@ const ChartHandler = {
         }
     },
 
-    _bindEvents(){
-        document.querySelector('#missingAnswerChart').closest('.chart-box').addEventListener('click', () => {
-            console.log('누락 차트 click!')
+    // 알림창 업데이트
+    _updateMissingList(missingExams){
+        const listUl = document.querySelector("#missingAnswerList")
+        if(!listUl) return
+
+        listUl.innerHTML = '' // 기존 내용 초기화
+
+        if(!missingExams || missingExams.length == 0){
+            listUl.innerHTML = '<li class="empty-msg">🎉 모든 정답지가 등록되었습니다!</li>'
+            return
+        }
+
+        const displayItems = missingExams.slice(0, 5) // 최대 5개까지만 표시
+        displayItems.forEach(exam => {
+            const li = document.createElement('li')
+            li.innerHTML = `
+                <span class="exam-title">
+                    ${exam.examTypeKor} ${exam.examSubject}<br>
+                    <small style="color:#999; font-weight:400;">(${exam.examRound})</small>
+                </span>
+                <div class="item-footer">
+                    <button class="btn-reg" onclick="openCreateExamModal()">정답 등록</button>
+                </div>
+            `
+            listUl.appendChild(li)
         })
     }
 }
@@ -1090,6 +1126,8 @@ const clearSelections = () => {
 
     // 폴더 id 초기화
     activeFolderId = null
+
+    ChartHandler.init()
 }
 
 // 시험지 정보 [selectbox] UI 초기화

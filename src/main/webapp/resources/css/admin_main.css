@@ -88,10 +88,13 @@ body {
     padding-left: 15px;
 }
 
-/* 차트 */
+/* /* ================================================================= */
+/*  *  Chart */
+/*  * ================================================================= */ 
 .chart-container {
-    display: flex; 
+	display: flex; 
     justify-content: space-around; 
+    align-items: center;
     gap: 20px;
     padding: 40px 20px;
     background: rgba(255, 255, 255, 0.4); 
@@ -123,8 +126,117 @@ body {
     color: #333;
 }
 
+/* 오른쪽 조치 필요 리스트 박스 */
+.todo-container {
+	width: 300px;
+    height: 280px;
+    text-align: left;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
 
-/* Dashboard Content Areas */
+/* 제목 부분 (🚨 조치 필요) */
+.todo-container h3 {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: #333;
+    font-weight: 700;
+}
+
+/* 리스트 스타일 */
+.todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    flex-grow: 1;          
+    overflow-y: auto;   
+    padding-right: 5px;
+}
+
+/* 개별 리스트 아이템 */
+.todo-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.todo-list li:last-child {
+    border-bottom: none;
+}
+
+/* 시험지 정보 텍스트 */
+.exam-title {
+    font-size: 0.85rem;
+    color: #444;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* 정답 등록 버튼 */
+.btn-reg {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-reg:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+/* 하단 전체보기 링크 */
+/* .btn-more { */
+/*     display: block; */
+/*     text-align: center; */
+/*     margin-top: 12px; */
+/*     font-size: 0.8rem; */
+/*     color: #3892e0; */
+/*     text-decoration: none; */
+/*     font-weight: 600; */
+/* } */
+
+/* .btn-more:hover { */
+/*     text-decoration: underline; */
+/* } */
+
+/* 데이터가 없을 때 메시지 */
+.empty-msg {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #999;
+    padding: 20px 0;
+}
+
+/* 알림창 스크롤바 */
+.todo-list::-webkit-scrollbar {
+    width: 5px;
+}
+.todo-list::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
+}
+.todo-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+/* /* ================================================================= */
+/*  *  Dashboard Content Areas
+/*  * ================================================================= */ 
+
 .dashboard-content-area {
     min-height: 500px;
 }
@@ -1105,5 +1217,35 @@ body {
     #btnStartConversion {
         height: 55px;
         font-size: 17px;
+    }
+    
+    .chart-container {
+        flex-direction: column;
+        align-items: center;   
+        justify-content: center;
+        padding: 30px 20px;
+    }
+
+    .chart-box {
+        width: 100%;
+        max-width: 220px;       
+        margin: 0 auto;       
+    }
+
+    .todo-container {
+        width: 100%;           
+        max-width: 320px;     
+        margin: 0 auto;      
+        align-self: center;    
+        height: 250px;;
+        min-height: 200px;
+    }
+
+    .chart-value {
+        font-size: 1.1rem;     
+    }
+
+    .todo-list li {
+        padding: 12px 0;       
     }
 }
