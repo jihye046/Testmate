@@ -472,4 +472,40 @@
 		  </where>
 		  ORDER BY i.created_date DESC	
 	</select>
+	
+	<!-- 전체 시험지 개수 조회 -->
+	<select id="getTotalExamCount" resultType="int">
+		SELECT COUNT(i.exam_id) AS total_exam_count
+		  FROM exam_info i
+		  JOIN exam_type t ON t.exam_type_id = i.exam_type_id
+		 WHERE t.exam_type_code NOT LIKE '%Answer'
+		   AND i.isdeleted = 'N'
+	</select>
+	
+	<!-- 시험지는 있지만 대응하는 정답지가 없는 경우 조회 -->
+	<select id="getMissingAnswerExams" resultType="ExamInfoDto">
+		SELECT 
+		    i.exam_id,
+		    i.exam_type_id,
+		    i.exam_round,
+		    i.exam_subject,
+		    i.folder_id,
+		    i.isdeleted,
+		    i.created_date,
+		    t.exam_type_code,
+		    t.exam_type_name AS examTypeKor
+		FROM exam_info i
+		JOIN exam_type t ON t.exam_type_id = i.exam_type_id
+		WHERE t.exam_type_code NOT LIKE '%Answer'
+		AND i.isdeleted = 'N'
+		AND NOT EXISTS (
+		    SELECT 1
+		    FROM exam_info i2
+		    JOIN exam_type t2 ON t2.exam_type_id = i2.exam_type_id
+		    WHERE t2.exam_type_code LIKE '%Answer'
+		    AND i2.isdeleted = 'N'
+		    AND i.exam_round = i2.exam_round
+		    AND i.exam_subject = i2.exam_subject
+		)
+	</select>
 </mapper>

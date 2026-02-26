@@ -42,4 +42,6 @@ public interface IExamSelectionDao {
 	List<Integer> getQuestionIdByExamId(int examId);
 	int getExamTypeIdByExamTypeCode(String examTypeCode);
 	List<ExamTitleDto> searchExams(ExamSearchDto dto);
+	int getTotalExamCount();
+	List<ExamInfoDto> getMissingAnswerExams();
 }

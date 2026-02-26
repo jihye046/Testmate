@@ -35,6 +35,7 @@ import com.my.ex.dto.request.ExamCreateRequestDto.Question.CommonPassage;
 import com.my.ex.dto.request.ExamCreateRequestDto.Question.IndividualPassage;
 import com.my.ex.dto.request.ExamCreateRequestDto.Question.QuestionChoice;
 import com.my.ex.dto.request.ExamSearchDto;
+import com.my.ex.dto.response.ChartStatisticsDto;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
@@ -603,6 +604,14 @@ public class ExamSelectionService implements IExamSelectionService {
 	@Override
 	public List<ExamTitleDto> searchExams(ExamSearchDto dto) {
 		return dao.searchExams(dto);
+	}
+
+	@Override
+	public ChartStatisticsDto getChartStatistics() {
+		return new ChartStatisticsDto(
+				dao.getTotalExamCount(), 
+				dao.getMissingAnswerExams()
+		);
 	}
 
 }
