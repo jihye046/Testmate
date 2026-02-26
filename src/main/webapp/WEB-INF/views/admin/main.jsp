@@ -37,18 +37,13 @@
 		<div class="chart-container">
 		    <div class="chart-box">
 		        <canvas id="totalPaperChart"></canvas>
-		        <div class="chart-value">100</div>
+		        <div class="chart-value" data-target="totalValue">0</div>
 		        <p>전체 시험지</p>
 		    </div>
 		    <div class="chart-box">
 		        <canvas id="missingAnswerChart"></canvas>
-		        <div class="chart-value" style="color: #ff6b6b;">8</div>
+		        <div class="chart-value" data-target="missingValue">0</div>
 		        <p>정답지 누락</p>
-		    </div>
-		    <div class="chart-box">
-		        <canvas id="missingPaperChart"></canvas>
-		        <div class="chart-value" style="color: #ffa502;">3</div>
-		        <p>시험지 누락</p>
 		    </div>
 		</div>
 

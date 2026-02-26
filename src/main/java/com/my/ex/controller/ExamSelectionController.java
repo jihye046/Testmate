@@ -11,6 +11,7 @@ import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
 import com.my.ex.dto.request.ExamCreateRequestDto.Question;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
+import com.my.ex.dto.response.ChartStatisticsDto;
 import com.my.ex.dto.response.ExamInfoGroup;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamPdfPreview;
@@ -446,5 +447,11 @@ public class ExamSelectionController {
 	@ResponseBody
 	public List<ExamTitleDto> searchExams(ExamSearchDto dto) {
 		return service.searchExams(dto);
+	}
+	
+	@GetMapping("/getChartStatistics")
+	@ResponseBody
+	public ChartStatisticsDto getChartStatistics() {
+		return service.getChartStatistics();
 	}
 }

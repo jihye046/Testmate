@@ -988,12 +988,26 @@ const fetchGetSubjects = (selectedType, selectSubjectBox, selectRoundBox) => {
 // 차트
 const ChartHandler = {
     init(){
-        this._createChart('totalPaperChart', ['등록 완료'], [100], ['#4facfe'], ['#3892e0'], 0)
-        this._createChart('missingAnswerChart', ['누락', '정상'], [8, 92], ['#ff6b6b', '#f1f2f6'], ['#ff4757', '#e2e5ec'], 4)
-        this._createChart('missingPaperChart', ['누락', '정상'], [3, 97], ['#ffa502', '#f1f2f6'], ['#ff9f00', '#e2e5ec'], 4)
+        this._fetchChartData()
+        this._bindEvents()
+    },
+    
+    _fetchChartData(){
+        axios.get('/exam/getChartStatistics')
+            .then(response => {
+                const { totalExamCount, missingAnswerExams } = response.data
+                const missingCount = missingAnswerExams ? missingAnswerExams.length : 0 
+                
+                this._createChart('totalPaperChart', ['등록 완료'], [totalExamCount], ['#4facfe'], ['#3892e0'], 0)
+                this._createChart('missingAnswerChart', ['누락', '정상'], [missingCount, Math.max(0, totalExamCount - missingCount)], ['#ff6b6b', '#f1f2f6'], ['#ff4757', '#e2e5ec'], 4)
+                this._updateChartValue(totalExamCount, missingCount)
+            })
+            .catch(error => {
+                console.error('error: ', error)
+            })
     },
 
-    // 공통 옵션 설정
+    // 차트 - 공통 옵션 설정
     _getCommonOptions(){
         return {
             cutout: '80%', // 두께
@@ -1015,6 +1029,7 @@ const ChartHandler = {
         }
     },
 
+    // 차트 생성
     _createChart(id, labels, data, color, hoverColor, hoverOffset){
         if(!document.getElementById(id)) return
 
@@ -1032,6 +1047,27 @@ const ChartHandler = {
                 }]
             },
             options: this._getCommonOptions()
+        })
+    },
+
+    // 텍스트 업데이트
+    _updateChartValue(totalExamCount, missingCount){
+        const totalValueEl = document.querySelector('[data-target="totalValue"]')
+        totalValueEl.textContent = totalExamCount
+
+        const missingAnswerValueEl = document.querySelector('[data-target="missingValue"]')
+        if(missingCount > 0){
+            missingAnswerValueEl.style.color = '#ff6b6b'
+            missingAnswerValueEl.textContent = missingCount
+        } else {
+            missingAnswerValueEl.style.color = '#2ed573'
+            missingAnswerValueEl.innerHTML = '<i class="fas fa-check-circle"></i> 0'
+        }
+    },
+
+    _bindEvents(){
+        document.querySelector('#missingAnswerChart').closest('.chart-box').addEventListener('click', () => {
+            console.log('누락 차트 click!')
         })
     }
 }
