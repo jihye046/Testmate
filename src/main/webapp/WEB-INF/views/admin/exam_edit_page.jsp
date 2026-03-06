@@ -17,7 +17,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <!-- Quill 에디터 -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.bubble.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" />
 </head>
 <body>
 	<div class="exam_edit_page">
@@ -93,14 +94,21 @@
 							<label>선택지</label>
 							<div class="option-inputs">
 								<c:forEach items="${examPageDto.examChoices}" var="choices">
-									<div class="option-item-${choices.choiceNum}" >
-										<input type="text" 
+									<div class="option-item-${choices.choiceNum} d-flex align-items-center mb-2">
+										<!-- <input type="text" 
 											class="form-control option-input" 
 											data-choice-num="${choices.choiceNum}" 
 											data-choice-id="${choices.choiceId}"
 											placeholder="보기 ${choices.choiceNum}"
 											value="${choices.choiceText}"
-										>
+										> -->
+										<div id="choice-editor-${choices.choiceId}"
+											class="form-control choice-editor"
+											data-choice-num="${choices.choiceNum}"
+											data-choice-id="${choices.choiceId}"
+											contenteditable="true"
+											style="background: #fff;"
+										>${choices.choiceText}</div>
 										<button type="button" class="btn btn-danger btn-sm btn-remove-option">
 											<i class="fas fa-times"></i>
 										</button>

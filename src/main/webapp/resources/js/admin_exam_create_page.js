@@ -592,14 +592,26 @@ const createQuestionHml = (number) => {
                 <div class="form-group options-group">
                     <label>선택지</label>
                     <div class="option-inputs">
-                        <div class="option-item-1">
-                            <input type="text" class="form-control option-input" data-choice-num="1" placeholder="보기 1">
+                        <div class="option-item-1" d-flex align-items-center mb-2">
+                            <div id="choice-editor-${number}-1" 
+                                class="choice-editor form-control option-input" 
+                                data-choice-num="1"
+                                data-choice-id="${number}-1" 
+                                contenteditable="true" 
+                                style="background: #fff;"
+                            ></div>
                             <button type="button" class="btn btn-danger btn-sm btn-remove-option">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <div class="option-item-2">
-                            <input type="text" class="form-control option-input" data-choice-num="2" placeholder="보기 2">
+                        <div class="option-item-2" d-flex align-items-center mb-2">
+                            <div id="choice-editor-${number}-2" 
+                                class="choice-editor form-control option-input" 
+                                data-choice-num="2"
+                                data-choice-id="${number}-2" 
+                                contenteditable="true" 
+                                style="background: #fff;"
+                            ></div>
                             <button type="button" class="btn btn-danger btn-sm btn-remove-option">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -625,6 +637,7 @@ const addQuestion = () => {
     const newQuestionHtml = createQuestionHml(questionCounter)
 
     questionContainer.insertAdjacentHTML('beforeend', newQuestionHtml)
+    window.edit_common.initChoiceEditors()
 }
 
 // 문항 삭제 함수
@@ -847,8 +860,14 @@ const addOption = (questionItem) => {
         let output = ''
         output += 
         `
-            <div class="option-item-${nextCount}">
-                <input type="text" class="form-control option-input" data-choice-num="${nextCount}" placeholder="보기 ${nextCount}">
+            <div class="option-item-${nextCount}" d-flex align-items-center mb-2">
+                <div id="choice-editor-${questionNum}-${nextCount}"
+                    class="choice-editor form-control option-input"
+                    data-choice-num="${nextCount}" 
+                    data-choice-id="${questionNum}-${nextCount}"
+                    contenteditable="true"
+                    style="background: #fff;"
+                ></div>
                 <button type="button" class="btn btn-danger btn-sm btn-remove-option">
                     <i class="fas fa-times"></i>
                 </button>
@@ -1001,17 +1020,18 @@ const saveExam = () => {
 
         // 5. 선택지
         let choices = []
-        const optionInputs = card.querySelectorAll("input.option-input")
-        const choiceLabels = ['①', '②', '③', '④', '⑤']
 
-        for(const input of optionInputs){
-            const choiceContent = input ? input.value.trim() : ''
-            if(!choiceContent){
+        const divs = card.querySelectorAll(".choice-editor")
+        const choiceLabels = ['①', '②', '③', '④', '⑤']
+        for(const div of divs){
+            const choiceId = div.dataset.choiceId
+            const choiceContent = window.edit_common.getChoiceContent(choiceId)
+            if(!choiceContent || choiceContent.trim() === ''){
                 alert(`${questionNum}번 문항의 선택지를 입력해주세요.`)
                 return
             }
 
-            const choiceNum = parseInt(input.getAttribute("data-choice-num"), 10)
+            const choiceNum = parseInt(div.getAttribute("data-choice-num"), 10)
 
             choices.push({
                 choiceNum: choiceNum,
@@ -1019,6 +1039,7 @@ const saveExam = () => {
                 choiceLabel: choiceLabels[choiceNum - 1]
             })
         }
+
         questionObj.questionChoices = choices
 
         // 6. 정답
