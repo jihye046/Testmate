@@ -128,7 +128,7 @@ body {
 
 /* 오른쪽 조치 필요 리스트 박스 */
 .todo-container {
-	width: 300px;
+	width: 350px;
     height: 280px;
     text-align: left;
     background: #fff;
