@@ -287,9 +287,9 @@ const ExamEditor = {
             axios.post('/exam/uploadEditorImage', formData)
                 .then(response => {
                     const result = response.data
-                    if (result.fileName) {
+                    if (result.imageUrl) {
                         // 서버가 반환한 파일명으로 이미지 경로(URL) 생성 및 에디터 삽입
-                        const imageUrl = `/exam/getExamImagePath?filename=${result.fileName}`
+                        const imageUrl = result.imageUrl
                         const quill = this.editors[qNum]
                         const range = quill.getSelection() // 커서 위치
                         const index = range ? range.index : quill.getLength() // 커서가 없으면 맨 끝에 삽입
