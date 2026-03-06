@@ -210,7 +210,7 @@ public class ExamSelectionController {
 		try {
 			String savedFileName = service.saveEditorImage(image);
 			
-			response.put("fileName", savedFileName);
+			response.put("imageUrl", savedFileName);
 			response.put("status", "success");
 		} catch (Exception e) {
 			response.put("status", "error");
