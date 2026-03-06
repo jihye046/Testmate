@@ -48,6 +48,7 @@ const ExamEditor = {
             console.error("데이터 파싱 중 오류 발생: ", error)
         }
 
+        this.initChoiceEditors()
     },
 
     getData(){
@@ -55,11 +56,11 @@ const ExamEditor = {
     },
 
     getEditorContent(qNum){
-        const quill = ExamEditor.editors[qNum]
+        const quill = this.editors[qNum]
         if(quill){
             return quill.root.innerHTML
         }
-        return
+        return ''
     },
 
     initSection(category, id, passageData){
@@ -265,6 +266,75 @@ const ExamEditor = {
         } catch (error) {
             console.error("Quill 초기화 중 치명적 오류 발생:", error)
         }
+    },
+
+    initChoiceEditors(){
+        const choiceElements = document.querySelectorAll(".choice-editor")
+        choiceElements.forEach((el) => {
+            if (el.classList.contains('ql-container')) return
+
+            const choiceId = el.dataset.choiceId
+            const editorId = `#choice-editor-${choiceId}`
+            const initialData = el.innerHTML.trim() // 초기 데이터 (이미 HTML로 렌더링된 상태)
+
+            const quill = new Quill(editorId, {
+                theme: 'bubble', // 드래그 시 툴바가 뜨는 버블 테마
+                modules: {
+                    toolbar: ['bold', 'italic', 'underline', 'strike', 'clean'] // 최소 기능
+                },
+                placeholder: '보기를 입력하세요.'
+            })
+
+            // 텍스트 에디터에 초기값 주입
+            if(initialData){
+                quill.root.innerHTML = initialData
+            }
+
+            // 전역 객체에 저장
+            this.editors[`choice-${choiceId}`] = quill
+
+            // 드래그 감지 이벤트리스너
+            this._choiceEventHandler(quill, el)
+        })   
+    },
+
+    _choiceEventHandler(quill, el){
+        const tooltip = el.querySelector(".ql-tooltip")
+
+        // 1. 드래그 시작 전
+        el.addEventListener('mousedown', (e) => {
+            if (tooltip && tooltip.contains(e.target)) return
+
+            if (tooltip) {
+                tooltip.classList.add('ql-hidden')
+            }
+        })
+
+        // 2. 툴바 내부 클릭 시 이벤트 전파 차단
+        if (tooltip) {
+            tooltip.addEventListener('mousedown', (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+            });
+        }
+
+        // 3. 마우스 뗄 때
+        el.addEventListener('mouseup', (e) => {
+            if (tooltip && tooltip.contains(e.target)) return
+
+            setTimeout(() => {
+                const range = quill.getSelection()
+                if (range && range.length > 0 && tooltip) {
+                    tooltip.classList.remove('ql-hidden')
+                }
+            }, 50)
+        })
+
+    },
+
+    getChoiceContent(choiceId){
+        const quill = this.editors[`choice-${choiceId}`]
+        return quill ? quill.root.innerHTML : '' 
     },
 
     // Quill 에디터는 이미지 업로드 시 이미지를 서버로 전송하지 않고 브라우저 내에 텍스트로 변환하여 저장함
@@ -530,23 +600,22 @@ const QuestionEditHandler = {
     },
 
     _collectChoices(optionsGroup){
-        const inputs = optionsGroup.querySelectorAll("input.option-input")
-
-        for(const input of inputs){
-            const choiceText = input.value.trim()
-            if(!choiceText){
+        const divs = optionsGroup.querySelectorAll(".choice-editor")
+        for(const div of divs){
+            const choiceId = div.dataset.choiceId
+            const choiceText = ExamEditor.getChoiceContent(choiceId)
+            if(!choiceText || choiceText.trim() === ''){
                 alert('선택지를 작성해주세요.')
-                input.focus()
+                div.focus()
                 return false
             }
-            
-            const choiceId = input.dataset.choiceId
+
             const choice = this.questionObj.questionChoices.find(c => c.choiceId == choiceId)
             if(!choice){
                 alert('새로고침 후 다시 시도해주세요.')
                 return false
-            } 
-            
+            }
+
             choice.choiceText = choiceText
         }
 
@@ -616,5 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.edit_common = {
     renderPassageInput: ExamEditor.renderPassageInput.bind(ExamEditor),
-    bindPassageEvents: ExamEditor.bindPassageEvents.bind(ExamEditor)
+    bindPassageEvents: ExamEditor.bindPassageEvents.bind(ExamEditor),
+    initChoiceEditors: ExamEditor.initChoiceEditors.bind(ExamEditor),
+    getChoiceContent: ExamEditor.getChoiceContent.bind(ExamEditor)
 }
