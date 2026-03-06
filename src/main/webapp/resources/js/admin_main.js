@@ -557,7 +557,7 @@ const renderExamList = (exaxmList, noDataMessage) => {
                     <input type="checkbox" class="exam-select-checkbox" data-exam-id="${examTitleDto.examId}">
 
                     <div class="card-header">
-                        <span class="tag tag-${examTitleDto.examSubject}">${examTitleDto.examSubject}</span>
+                        <span class="tag tag-${examTitleDto.examSubject}">${examTitleDto.displaySubject}</span>
                         <span class="tag tag-round">${examTitleDto.examRound}</span>
                     </div>
                     <h3 class="card-title">${examTitleDto.displayTitle}</h3>
