@@ -1,5 +1,40 @@
 @charset "UTF-8";
 
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+}
+
+/* 폼 요소들이 body 폰트를 강제로 물려받게 함 */
+input, textarea, .ql-container, .ql-editor {
+    font-family: inherit !important;
+}
+
+input, 
+textarea, 
+.ql-container, 
+.ql-editor,
+.ql-editor * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif !important;
+    font-size: 14px;
+}
+
+.choice-editor .ql-editor.ql-blank::before,
+textarea::placeholder,
+input::placeholder {
+    font-style: normal !important; /* 기울임 해제 */
+    /* font-family: inherit !important; */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif !important;
+    color: #adb5bd;
+    opacity: 1;
+}
+
 /* =================================================================
  * EXAM CREATION UI STYLES
  * ================================================================= */
@@ -394,31 +429,49 @@
 /* 🌟🌟🌟 [최종 수정] 선택지 (Option) 스타일 및 삭제 버튼 (.btn-remove-option) 🌟🌟🌟 */
 /* --------------------------------------------------------------- */
 
-/* option-inputs: 모든 보기 쌍(.option-item)을 담는 컨테이너 */
 .options-group .option-inputs {
     display: flex;
-    flex-direction: column; /* 보기 쌍을 세로로 정렬 */
-    gap: 10px; /* 각 보기 쌍(.option-item) 간의 세로 간격 */
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 15px;
+    /* padding: 5px 0; */
 }
 
 /* 🌟 각 보기 쌍 컨테이너 (.option-item) 🌟 */
 .options-group .option-item {
     display: flex;
-    align-items: stretch; /* 높이 맞추기 */
+    align-items: stretch;
 }
 
-/* 입력 필드 */
-.options-group .option-item .option-input {
-    flex-grow: 1; 
-    border-radius: 8px 0 0 8px;
-    margin-right: -1px; /* 버튼과 겹치도록 설정 */
-    width: auto; 
-    min-width: 150px;
-    border-right-color: transparent; /* 오른쪽 테두리를 숨겨 버튼과 연결 */
-    /* 보기 입력 필드 높이 수정 */
-    padding: 12px 15px; /* 기본 form-control과 동일한 높이 유지 */
+/* 선택지 에디터 높이 및 스타일 보정 */
+.choice-editor.ql-container {
+    flex: 1;
+    min-height: 38px !important;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
 }
+
+.choice-editor .ql-editor {
+    padding: 8px 12px !important;
+    min-height: 38px !important;
+    line-height: 1.5;
+}
+
+.choice-editor .ql-editor.ql-blank::before {
+    left: 12px;
+    right: 12px;
+    content: attr(data-placeholder);
+    font-family: inherit !important;
+}
+
+.choice-editor .ql-editor p {
+    margin: 0;
+}
+
+.choice-editor {
+    vertical-align: middle;
+}
+
 
 /* 🌟 삭제 버튼 (깔끔한 아웃라인 스타일로 변경) 🌟 */
 .options-group .option-item .btn-remove-option {
@@ -660,7 +713,6 @@ button:focus,
     border-radius: 20px;
     margin-top: 5px;
 }
-
 
 /* --------------------------------------------------------------- */
 /* 🌟🌟🌟 개별 지문 에디터 상단 안내 메시지 박스 스타일 🌟🌟🌟 */

@@ -189,7 +189,7 @@ body {
 
 .option-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     padding: 10px 15px;
     margin: 8px 0;
     border-radius: 6px;
@@ -218,7 +218,7 @@ body {
 
 .choice-text {
     flex-grow: 1;
-    line-height: 1.6;
+    line-height: 0.5;
 }
 
 

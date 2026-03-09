@@ -216,9 +216,9 @@ body {
 /* 선택지 전체 클릭 가능 및 레이아웃 설정 */
 .option-label.full-click {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     cursor: pointer;
-    padding: 8px 10px;
+    padding: 4px 10px;
     margin: 6px 0;
     border-radius: 4px;
     transition: background-color 0.15s;

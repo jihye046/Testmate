@@ -597,7 +597,6 @@ const createQuestionHml = (number) => {
                                 class="choice-editor form-control option-input" 
                                 data-choice-num="1"
                                 data-choice-id="${number}-1" 
-                                contenteditable="true" 
                                 style="background: #fff;"
                             ></div>
                             <button type="button" class="btn btn-danger btn-sm btn-remove-option">
@@ -609,7 +608,6 @@ const createQuestionHml = (number) => {
                                 class="choice-editor form-control option-input" 
                                 data-choice-num="2"
                                 data-choice-id="${number}-2" 
-                                contenteditable="true" 
                                 style="background: #fff;"
                             ></div>
                             <button type="button" class="btn btn-danger btn-sm btn-remove-option">
@@ -865,7 +863,6 @@ const addOption = (questionItem) => {
                     class="choice-editor form-control option-input"
                     data-choice-num="${nextCount}" 
                     data-choice-id="${questionNum}-${nextCount}"
-                    contenteditable="true"
                     style="background: #fff;"
                 ></div>
                 <button type="button" class="btn btn-danger btn-sm btn-remove-option">
