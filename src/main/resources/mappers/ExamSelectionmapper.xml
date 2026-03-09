@@ -445,6 +445,13 @@
 		               FROM exam_question q 
 		              WHERE q.exam_id = i.exam_id)
 			END AS totalCount,
+
+			CASE
+				WHEN t.exam_type_code LIKE '%Answer' THEN
+					CONCAT(i.exam_subject, ' - 정답지')
+				ELSE
+					i.exam_subject
+			END AS displaySubject,
 			
              i.created_date,
              f.folder_id
