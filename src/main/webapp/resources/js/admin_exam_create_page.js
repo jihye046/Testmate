@@ -849,6 +849,7 @@ const renderCommonPassageList = () => {
 const addOption = (questionItem) => {
     const optionsDiv = questionItem.querySelector(".option-inputs")
     const currentCount = optionsDiv.querySelectorAll(".option-input").length // input 태그 개수
+    const questionNum = questionItem.dataset.questionNum
     
     let nextCount = currentCount + 1
     if(currentCount >= maxOptions) {
@@ -872,6 +873,7 @@ const addOption = (questionItem) => {
         `
     
         optionsDiv.insertAdjacentHTML('beforeend', output)
+        window.edit_common.initChoiceEditors()
     }
 }
 
