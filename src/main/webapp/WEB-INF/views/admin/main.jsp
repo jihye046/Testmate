@@ -48,7 +48,7 @@
 		    <div class="chart-box todo-container">
 		        <h3>🚨 조치 필요 (정답지 누락)</h3>
 		        <ul id="missingAnswerList" class="todo-list">
-		            <li class="empty-msg">누락된 정답지가 없습니다.</li>
+		            <li class="empty-msg">데이터 불러오는 중...</li>
 		        </ul>
 <!-- 		        <a href="/exam/list?filter=missingAnswer" class="btn-more">전체보기 ></a> -->
 		    </div>

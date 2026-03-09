@@ -1010,7 +1010,7 @@ const ChartHandler = {
                 this._createChart('totalPaperChart', ['등록 완료'], [totalExamCount], ['#4facfe'], ['#3892e0'], 0)
                 this._createChart('missingAnswerChart', ['누락', '정상'], [missingCount, Math.max(0, totalExamCount - missingCount)], ['#ff6b6b', '#f1f2f6'], ['#ff4757', '#e2e5ec'], 4)
                 this._updateChartValue(totalExamCount, missingCount)
-                this._updateMissingList(missingAnswerExams)
+                this._updateMissingList(totalExamCount, missingAnswerExams)
             })
             .catch(error => {
                 console.error('error: ', error)
@@ -1080,17 +1080,25 @@ const ChartHandler = {
     },
 
     // 알림창 업데이트
-    _updateMissingList(missingExams){
+    _updateMissingList(totalExamCount, missingExams){
         const listUl = document.querySelector("#missingAnswerList")
         if(!listUl) return
 
         listUl.innerHTML = '' // 기존 내용 초기화
 
+        // 1. 등록된 시험지가 없는 경우
+        if(totalExamCount == 0){
+            listUl.innerHTML = '<li class="empty-msg">등록된 시험지가 없습니다.</li>'
+            return
+        }
+
+        // 2. 누락된 정답지가 없는 경우
         if(!missingExams || missingExams.length == 0){
             listUl.innerHTML = '<li class="empty-msg">🎉 모든 정답지가 등록되었습니다!</li>'
             return
         }
 
+        // 3. 누락된 정답지가 있는 경우
         const displayItems = missingExams.slice(0, 5) // 최대 5개까지만 표시
         displayItems.forEach(exam => {
             const li = document.createElement('li')
