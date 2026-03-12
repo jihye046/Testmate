@@ -18,12 +18,16 @@
 		
         <p class="login-subtitle">로그인 후 오답노트, 학습 관리 등<br>추가 기능을 이용해 보세요.</p>
         
+        <!-- Demo Mode(나중에 false로 바꾸면 일반 로그인 폼 됨) -->
+        <c:set var="isDemo" value="true" />
+        <c:set var="userId" value="${sessionScope.userId ? sessionScope.userId : ''}" /> 
         <form action="login" method="post" class="login-form">
             <div class="input-group">
                 <label for="userId" class="input-label">아이디</label>
+                <!-- value="${userId}" -->
                 <input 
                     type="text" 
-                    value="${userId}" 
+                    value="${isDemo ? 'admin' : userId}"
                     id="userId" 
                     name="userId" 
                     class="input-field" 
@@ -36,6 +40,7 @@
                 <label for="password" class="input-label">비밀번호</label>
                 <input 
                     type="password" 
+                    value="${isDemo ? 'Admin1234!' : ''}"
                     id="password" 
                     name="userPw" 
                     class="input-field" 
