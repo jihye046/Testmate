@@ -115,9 +115,9 @@
 									</div>	
 								</c:forEach>
 							</div>
-	<!-- 	                    <button type="button" class="btn btn-sm btn-outline-primary btn-add-option"> -->
-	<!-- 	                        + 보기 추가 -->
-	<!-- 	                    </button> -->
+	 	                    <button type="button" class="btn btn-sm btn-outline-primary btn-add-option">
+	 	                        + 보기 추가
+	 	                    </button>
 						</div>
 		
 						<div class="form-group answer-group">

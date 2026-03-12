@@ -480,7 +480,10 @@ public class ExamSelectionService implements IExamSelectionService {
 	@Transactional
 	public void updateExamByForm(ExamCreateRequestDto request) {
 		updateQuestion(request.getExamInfo(), request.getQuestion(), request.getFileMap());
-		updateQuestionChoices(request.getQuestion().getQuestionChoices());
+		updateQuestionChoices(
+				request.getExamInfo().getExamId(),
+				request.getQuestion().getQuestionChoices(),
+				request.getQuestion().getQuestionId());
 		answerService.updateQuestionAnswer(
 				request.getQuestion().getQuestionId(),
 				request.getQuestion().getQuestionAnswer(),
@@ -576,10 +579,29 @@ public class ExamSelectionService implements IExamSelectionService {
 		dao.updateQuestion(dto);
 	}
 	
-	private void updateQuestionChoices(List<QuestionChoice> choice) {
+	private void updateQuestionChoices(Integer examId, List<QuestionChoice> choice, Integer questionId) {
 		for(QuestionChoice c : choice) {
-			ExamChoiceDto dto = new ExamChoiceDto(c.getChoiceId(), c.getChoiceText());
-			dao.updateQuestionChoices(dto);
+			String tempId = c.getTempId();
+
+			if(tempId != null && tempId.contains("-") && c.getChoiceId() == 0){
+				String[] label = {"①", "②", "③", "④", "⑤"};
+				ExamChoiceDto dto = new ExamChoiceDto();
+
+				int idx = tempId.indexOf("-");
+				int choiceNum = Integer.valueOf(tempId.substring(idx + 1));
+
+				dto.setExamId(examId);
+				dto.setQuestionId(questionId);
+				dto.setChoiceLabel(label[choiceNum - 1]);
+				dto.setChoiceText(c.getChoiceText());
+				dto.setChoiceImage(null);
+				dto.setChoiceNum(choiceNum);
+
+				dao.saveParsedChoiceInfo(dto);
+			} else {
+				ExamChoiceDto dto = new ExamChoiceDto(c.getChoiceId(), c.getChoiceText());
+				dao.updateQuestionChoices(dto);
+			}
 		}
 	}
 	

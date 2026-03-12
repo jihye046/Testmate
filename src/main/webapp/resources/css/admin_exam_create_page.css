@@ -220,7 +220,8 @@ input::placeholder {
     transition: border-color 0.2s;
 }
 
-.form-control:focus {
+.form-control:focus,
+.choice-editor.ql-container:focus-within {
     border-color: #5D9CEC;
     box-shadow: 0 0 0 3px rgba(93, 156, 236, 0.1);
     outline: none;
