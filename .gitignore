@@ -33,6 +33,9 @@ target/
 sql/
 .idea/
 
+# pdf크롤링(로컬 저장용)
+pdf-download.js
+
 # External tool builders
 .externalToolBuilders/
 
