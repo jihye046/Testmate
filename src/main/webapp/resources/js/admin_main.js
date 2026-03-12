@@ -146,7 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#btn-move-selected").addEventListener('click', showFolderSelectionModal)
 
     // 하단 바(선택항목이동) - 시험지 삭제 버튼 리스너
-    document.querySelector("#btn-delete-selected").addEventListener('click', deleteSelectedExams)
+    document.querySelector("#btn-delete-selected").addEventListener('click', () => {
+        deleteSelectedExams()
+        closeBulkActionBar()
+    })
 
     // 하단 바(선택항목이동) - 닫기 버튼 리스너
     document.querySelector("#folderSelectionModal .modal-close-btn").addEventListener('click', closeFolderSelectionModal)

@@ -159,7 +159,7 @@
                             </span>
                         </div>
                         
-                        <div class="explanation-content">[임시 해설] 데이터 연결 필요</div>
+<%--                        <div class="explanation-content">[임시 해설] 데이터 연결 필요</div>--%>
                         
                         <div class="question-meta-info">
 <!--                             <p>난이도: <span class="difficulty">[추후 확장시 사용]</span></p> -->
