@@ -1,22 +1,15 @@
 package com.my.ex.parser.geomjeong.parse.exam;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.my.ex.dto.ExamChoiceDto;
+import com.my.ex.dto.ExamInfoDto;
+import com.my.ex.parser.common.IExamParser;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.springframework.stereotype.Component;
-
-import com.my.ex.dto.ExamChoiceDto;
-import com.my.ex.dto.ExamInfoDto;
-import com.my.ex.parser.common.IExamParser;
 
 @Component
 public class GeomjeongExamParser implements IExamParser {
@@ -130,33 +123,23 @@ public class GeomjeongExamParser implements IExamParser {
     	if (firstQuestionMatcher.find()) {
             String preamble = firstQuestionMatcher.group(0).trim();
             startText = tempText.substring(firstQuestionMatcher.end()).trim();
-
-            // Preamble(앞부분)에서 지문 범위와 내용을 추출
             Matcher scopeMatcher = Pattern.compile("\\[(\\d+)\\s*[~～]\\s*(\\d+)\\]([\\s\\S]*)", Pattern.DOTALL).matcher(preamble);
             if (scopeMatcher.find()) {
                 currentPassageScope = scopeMatcher.group(1) + "~" + scopeMatcher.group(2); // 예: 23~25
                 String passageContent = scopeMatcher.group(3).trim();
 
-                // 안내 문구 제거
                 passageContent = passageContent.replaceAll("다음 (글|자료)을 읽고 물음에 답하시오[\\.:]?", "").trim();
                 passageContent = passageContent.replaceAll("([가-힣\\s]+)을 읽고 물음에 답하시오[\\.:]?", "").trim();
 
                 currentCommonPassage = passageContent;
-//                System.out.println(">>> 초기 지문 블록 추출 (Scope: " + currentPassageScope + ")");
             } else {
-                // 첫 문제 전에 지문 범위가 없지만 텍스트가 있는 경우, 공통 지문으로 간주
-                if (!preamble.isEmpty()) {
-                     currentCommonPassage = preamble;
-                }
+				currentCommonPassage = "";
             }
     	}
     	
-	    // 문제 단위 분리
 	    String questionDelimiter = "(?=\\n\\s*\\d+\\.\\s*)"; // 문제 번호 패턴 (1. 2. 3.)
-	    // 공통 지문 관련 변수 초기화
 	    String[] questionBlocks = startText.split(questionDelimiter);
 
-	    // 다음 지문 블록에 대한 정보를 임시로 저장할 변수
 	    String nextCommonPassage = "";
 	    String nextPassageScope = "";
 
@@ -180,26 +163,18 @@ public class GeomjeongExamParser implements IExamParser {
 	            String contentPart = numMatcher.group(2).trim();
 
 	            // 3. 문제 블록의 꼬리에 다음 공통 지문이 붙어있는지 확인 (예: 10번 문제 끝에 [11~13]이 붙은 경우)
-	            // *해당 로직은 다음 문제의 지문을 찾아서 `nextCommonPassage`에 저장하는 역할만 함*
 	            Matcher scopeSeparatorMatcher = Pattern.compile("(\\s*\\[\\d+[~～]\\d+\\][\\s\\S]*)$", Pattern.DOTALL).matcher(contentPart);
 	            if(scopeSeparatorMatcher.find()) {
 	            	String passageBlock = scopeSeparatorMatcher.group(1).trim();
 	            	Matcher scopeOnlyMatcher = Pattern.compile("\\[(\\d+)\\s*[~～]\\s*(\\d+)\\]", Pattern.DOTALL).matcher(passageBlock);
 	            	if (scopeOnlyMatcher.find()) {
-
-	            		// **다음 문제에 사용될 변수에 저장**
 						nextPassageScope = scopeOnlyMatcher.group(1) + "~" + scopeOnlyMatcher.group(2);
 						int scopeEndIndex = scopeOnlyMatcher.end();
 						String contentAfterScope = passageBlock.substring(scopeEndIndex).trim();
 						
-                        // 안내 문구 제거 로직 단순화
 						String finalPassageContent = contentAfterScope.replaceAll("다음 (글|자료)을 읽고 물음에 답하시오[\\.:]?", "").trim();
 						finalPassageContent = finalPassageContent.replaceAll("([가-힣\\s]+)을 읽고 물음에 답하시오[\\.:]?", "").trim();
 						nextCommonPassage = finalPassageContent; // **다음 문제에 사용될 지문 저장**
-                        
-                        // 공통 지문이 바뀌었으므로 현재 지문 정보 초기화
-//                        currentCommonPassage = "";
-//                        currentPassageScope = "";
 	            	}
 	            	
 	            	// 4. 공통 지문 부분을 제거하여 contentPart를 정리 (현재 문제 내용만 남김)
@@ -207,12 +182,7 @@ public class GeomjeongExamParser implements IExamParser {
 
 //	            	System.out.println(">>> 지문 블록 (Scope: " + nextPassageScope + ") - 문제 " + questionNum + "번 끝에서 분리, 다음 문제에 적용 예정");
 	            }
-	            
-	            // --- 문제 파싱 로직 ---
-	            String contentBlock = contentPart; 
-
-//	            System.out.println(">>> 문제 블록 " + questionNum + "번");
-
+	            String contentBlock = contentPart;
 	            Map<String, Object> questionData = parseQuestionBlock(
 	                questionNum,
 	                contentBlock,
@@ -220,24 +190,6 @@ public class GeomjeongExamParser implements IExamParser {
 	                currentPassageScope	  // 현재 저장된 지문 범위 전달
 	            );
 	            questions.add(questionData);
-	            
-	            // 해당 문제가 지문의 마지막 문제였는지 확인하고, 맞다면 공통 지문 정보를 초기화
-	            /*
-                if (!currentPassageScope.isEmpty()) {
-                    try {
-                        String[] range = currentPassageScope.split("~");
-                        int end = Integer.parseInt(range[1]);
-                        
-                        if (questionNum == end) {
-//                            System.out.println(">>> 지문 범위 마지막 문제(" + end + "번) 완료. 공통 지문 초기화.");
-                            currentCommonPassage = "";
-                            currentPassageScope = "";
-                        }
-                    } catch (NumberFormatException e) {
-                        // 숫자로 파싱 실패 시, 무시하고 다음 문제로 진행
-                    }
-                }
-                */
 	        }
 	    }
 
@@ -276,39 +228,19 @@ public class GeomjeongExamParser implements IExamParser {
 	    }
 
 	    // 3. 'preChoiceText' (질문 + 지문) 덩어리를 분리
-	    int splitIndex = -1;
-	    int questionMarkIndex = preChoiceText.indexOf('?');
+		int firstLineBreak = preChoiceText.indexOf('\n');
 
-	    if (questionMarkIndex != -1) {
-	        splitIndex = preChoiceText.indexOf('\n', questionMarkIndex + 1);
-	    }
-	    
-	    // ?가 없는 경우를 대비하여 마침표(.) 또는 콜론(:) 다음 줄바꿈을 확인
-	    if (splitIndex == -1 && questionMarkIndex == -1) {
-	    	int lastPunctuationIndex = Math.max(preChoiceText.lastIndexOf('.'), preChoiceText.lastIndexOf(':'));
-	    	
-	    	if (lastPunctuationIndex != -1) {
-	    		// 마지막 구두점 이후의 첫 번째 줄바꿈을 찾음
-	    		int potentialSplitIndex = preChoiceText.indexOf('\n', lastPunctuationIndex + 1);
-	    		if (potentialSplitIndex != -1) {
-	    			splitIndex = potentialSplitIndex;
-	    		}
-	    	}
-	    	
-	    }
+		if (firstLineBreak != -1) {
+			questionText = preChoiceText.substring(0, firstLineBreak).trim();
+			questionPassageText = preChoiceText.substring(firstLineBreak).trim();
+		} else {
+			questionText = preChoiceText.trim();
+			questionPassageText = "";
+		}
 
-	    if (splitIndex != -1) {
-	        questionText = preChoiceText.substring(0, splitIndex).trim();
-	        questionPassageText = preChoiceText.substring(splitIndex).trim();
-	    } else {
-	        questionText = preChoiceText.trim();
-	        questionPassageText = "";
-	    }
-	    
-	    questionText = questionText.replaceFirst("^\\d+\\.\\s*", "").trim();
+		questionText = questionText.replaceFirst("^\\d+\\.\\s*", "").trim();
 	    
 	    // 4. 선택지 덩어리를 개별 선택지로 분리
-//	    List<Map<String, Object>> optionsList = new LinkedList<>();
 	    List<ExamChoiceDto> optionsList = new LinkedList<>();
 	    if(!choicesText.isEmpty()) {
 	        String[] options = choicesText.split(choiceDelimiter);
@@ -327,17 +259,11 @@ public class GeomjeongExamParser implements IExamParser {
 	            String choiceLabel = labels[index];
 	            int choiceNum = nums[index]; 
 	            
-	            // 선택지 내용에서 불필요한 줄바꿈/구분자(예: //) 제거 및 공백 정규화
 	            String choiceText = trimmedOption
 	                                .replaceAll("(\r?\n)", " ") 
 	                                .replaceAll("//\\s*", "")   
 	                                .replaceAll("\\s{2,}", " ") 
 	                                .trim();
-	            /*
-	            Map<String, Object> choice = new HashMap<>();
-	            choice.put("choiceLabel", choiceLabel);
-	            choice.put("choiceText", choiceText);
-	            */
 	            optionsList.add(new ExamChoiceDto(choiceLabel, choiceText, choiceNum));
 
 	            index++;
@@ -362,7 +288,6 @@ public class GeomjeongExamParser implements IExamParser {
 	    	questionData.put("useCommonPassage", "Y");
 	    	questionData.put("commonPassage", commonPassageText);
 	    }
-//	    questionData.put("questionPassage", finalPassage);
 	    questionData.put("passageScope", passageScope);
 	    questionData.put("options", optionsList);
 	    
@@ -382,13 +307,8 @@ public class GeomjeongExamParser implements IExamParser {
 
 	// 시험 기본 정보 추출 (회차, 교시, 과목)
 	private String cleanAndExtractInfo(String fullText) {
-		// 오타 치환 먼저 수행
 		String cleanedText = replaceMistypedWords(fullText);
-		
-		// 1. 페이지 헤더 제거
 		cleanedText = PAGE_HEADER_PATTERN.matcher(cleanedText).replaceAll("");
-		
-		// 2. 시험 기본 정보 추출 및 설정
 		Matcher infoMatcher = INFO_BLOCK_PATTERN.matcher(cleanedText);
 		if(infoMatcher.find()) {
 			// 그룹 1: "2025년도 제1회 중학교 졸업학력 검정고시"
@@ -403,18 +323,14 @@ public class GeomjeongExamParser implements IExamParser {
 			// 그룹 5: 과목명 공백 제거 ("국 어" -> "국어")
 			String subject = infoMatcher.group(5).replaceAll("\\s+", "").trim();
 			
-			// ExamInfo 객체 생성
-//			this.examInfo = new ExamInfoDto(round, subject, sessionNo);
 			this.examInfo = new ExamInfoDto(round, subject);
 			
-			// 추출된 기본 정보 블록을 텍스트에서 제거
 			cleanedText = infoMatcher.replaceAll("");
 		} else {
 			System.err.println("Warning: GED 시험 정보를 추출하지 못해 null로 설정");
 			this.examInfo = new ExamInfoDto(null, null, null);
 		}
 		
-		// 3. 과도한 공백 및 줄바꿈 정리
 		cleanedText = cleanedText.replaceAll("(\r?\n){3,}", "\n\n");
 		cleanedText = cleanedText.replaceAll("\\s{2,}", " ");
 		
@@ -423,7 +339,6 @@ public class GeomjeongExamParser implements IExamParser {
 	
 	private String replaceMistypedWords(String text) {
 	    String correctedText = text;
-	    // Map에 정의된 모든 키-값 쌍에 대해 반복하여 치환
 	    for (Map.Entry<String, String> entry : CORRECTION_MAP.entrySet()) {
 	        String regex = Pattern.quote(entry.getKey());
 	        correctedText = correctedText.replaceAll(regex, entry.getValue());
