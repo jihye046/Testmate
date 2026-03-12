@@ -482,6 +482,7 @@ const QuestionEditHandler = {
             this.questionObj.questionChoices = choices.map(c => ({
                 choiceId: c.choiceId,
                 choiceText: c.choiceText,
+                tempId: null
                 // choiceNum: c.choiceNum,
                 // choiceLabel: c.choiceLabel
             }))
@@ -582,7 +583,6 @@ const QuestionEditHandler = {
             this.questionObj.useCommonPassage = 'N'
             this.questionObj.commonPassage = null
         }
-
         return true
     },
 
@@ -601,22 +601,38 @@ const QuestionEditHandler = {
 
     _collectChoices(optionsGroup){
         const divs = optionsGroup.querySelectorAll(".choice-editor")
+        if(divs.length < 4){
+            alert(`현재 선택지가 ${divs.length}개입니다. 시험 문항은 최소 4개 이상의 선택지가 필요합니다.`)
+            return false
+        }
+
         for(const div of divs){
             const choiceId = div.dataset.choiceId
             const choiceText = ExamEditor.getChoiceContent(choiceId)
-            if(!choiceText || choiceText.trim() === ''){
+            
+            // HTML 태그를 모두 제거하고 순수 텍스트만 남김
+            const plainText = choiceText.replace(/<[^>]*>?/gm, '').trim()
+            
+            if(!plainText || plainText.trim() === ''){
                 alert('선택지를 작성해주세요.')
                 div.focus()
                 return false
-            }
+            } 
 
-            const choice = this.questionObj.questionChoices.find(c => c.choiceId == choiceId)
-            if(!choice){
-                alert('새로고침 후 다시 시도해주세요.')
-                return false
+            const existingChoice = this.questionObj.questionChoices.find(c => c.choiceId == choiceId)
+            if(existingChoice){
+                // 기존에 있던 선택지는 텍스트만 업데이트
+                existingChoice.choiceText = choiceText
+            } else {
+                // 새로 추가된 선택지인 경우 새 객체 생성
+                this.questionObj.questionChoices.push(
+                    {
+                        choiceId: null,
+                        choiceText: choiceText,
+                        tempId: choiceId
+                    }
+                )
             }
-
-            choice.choiceText = choiceText
         }
 
         return true

@@ -1,11 +1,10 @@
 package com.my.ex.dto.request;
 
-import java.util.List;
-import java.util.Map;
-
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Data;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class ExamCreateRequestDto {
@@ -65,6 +64,8 @@ public class ExamCreateRequestDto {
 			private int choiceNum;
 			private String choiceText;
 			private String choiceLabel;
+
+			private String tempId; // 선택지 임시 id(ex."1-1")
 		}
 		
 		@Data
