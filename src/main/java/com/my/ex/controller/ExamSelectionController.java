@@ -7,28 +7,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.ex.config.EnvironmentConfig;
 import com.my.ex.dto.*;
 import com.my.ex.dto.request.ExamCreateRequestDto;
-import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.request.ExamCreateRequestDto.CreateExamInfo;
 import com.my.ex.dto.request.ExamCreateRequestDto.Question;
+import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
-import com.my.ex.dto.response.ChartStatisticsDto;
-import com.my.ex.dto.response.ExamInfoGroup;
-import com.my.ex.dto.response.ExamPageDto;
-import com.my.ex.dto.response.ExamPdfPreview;
-import com.my.ex.dto.response.ExamTitleDto;
+import com.my.ex.dto.response.*;
 import com.my.ex.parser.geomjeong.parse.exam.GeomjeongExamParser;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -174,22 +173,35 @@ public class ExamSelectionController {
 	
 	@GetMapping("/getExamImagePath")
 	@ResponseBody
-	public Resource getExamImagePath(
+	public Object getExamImagePath(
 		@RequestParam(required = false, defaultValue = "") String examType,
 		@RequestParam(required = false, defaultValue = "") String examRound,
 		@RequestParam(required = false, defaultValue = "") String examSubject,
 		@RequestParam String filename)
 	{
-		Path filePath;
 		String baseDir = config.getImageUploadPath();
-		
-		if(examType.isEmpty() && examRound.isEmpty() && examSubject.isEmpty()) {
-			filePath = Paths.get(baseDir, "temp", filename);
-		} else {
-			filePath = Paths.get(baseDir, examType, examRound, examSubject, filename);
+		boolean isTemp = examType.isEmpty() && examRound.isEmpty() && examSubject.isEmpty();
+
+		// 1. GCS 환경일 경우: 주소 반환
+		if(baseDir != null && baseDir.startsWith("http")){
+			String fullUrl = isTemp ?
+					String.join("/", baseDir, "temp", filename) :
+					String.join("/", baseDir, examType, examRound, examSubject, filename);
+
+			URI encodedUri = UriComponentsBuilder.fromHttpUrl(fullUrl)
+					.build()
+					.encode()
+					.toUri();
+			return ResponseEntity.status(HttpStatus.FOUND)
+					.location(encodedUri)
+					.build();
 		}
-		
-		// C:\server_program\project\testmate\images\2025년도 제1회\국어
+
+		// 2. 로컬/운영 환경일 경우: 파일 리소스 반환
+		Path filePath = isTemp ?
+				Paths.get(baseDir, "temp", filename) :
+				Paths.get(baseDir, examType, examRound, examSubject, filename);
+
 		File file = filePath.toFile();
 		if (file.exists()) {
 			return new FileSystemResource(file); // file자체를 보내는 것은 X, HTTP 본문 응답으로 자동 변환해주는 API(FileSystemResource())를 이용해서 보내야 함
