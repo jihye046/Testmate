@@ -197,6 +197,10 @@ body {
     background-color: #ffffff;
 }
 
+.option-item p{
+    margin: 0
+}
+
 /* 정답/오답 표시를 위한 클래스 (현재 DTO에 없으므로 비활성화된 디자인) */
 .option-item.is-correct {
     background-color: #e6f7ee; /* 연한 초록색 배경 */
