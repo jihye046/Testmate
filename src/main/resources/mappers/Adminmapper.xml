@@ -60,6 +60,7 @@
 			SELECT count(*)
 			  FROM exam_info i
 			 WHERE f.folder_id = i.folder_id
+			   AND i.isdeleted = 'N'
 		) AS examCount
 		  FROM exam_folder f
 		 WHERE f.folder_id != #{excludeFolderId}
