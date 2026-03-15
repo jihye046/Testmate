@@ -19,7 +19,7 @@
 PDF 파싱 기술을 이용한 시험 콘텐츠의 신속한 디지털화 지원
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/c9e1ab60-b0e7-4c35-85fc-0e9ee7840682" width="70%" />
+  <img src="https://github.com/user-attachments/assets/c9e1ab60-b0e7-4c35-85fc-0e9ee7840682" width="80%" />
   <br>
   <em>▲ PDF 자동 파싱 등록 프로세스</em>
 </p>
@@ -30,7 +30,7 @@ PDF 파싱 기술을 이용한 시험 콘텐츠의 신속한 디지털화 지원
 직관적인 에디터를 활용한 문항 직접 작성 및 세밀한 구성 기능 제공
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/9276b421-ab80-47ed-a063-2056c1caa0a4" width="70%" />
+  <img src="https://github.com/user-attachments/assets/9276b421-ab80-47ed-a063-2056c1caa0a4" width="80%" />
   <br>
   <em>▲ 에디터 직접 작성 등록 프로세스</em>
 </p>
@@ -41,7 +41,7 @@ PDF 파싱 기술을 이용한 시험 콘텐츠의 신속한 디지털화 지원
 정답지 누락 등 불완전 시험 데이터 실시간 탐지 및 대시보드 내 즉각적인 정합성 복구 지원
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f3f732c3-cef3-4b17-907e-15b77a1fdade" width="70%" />
+  <img src="https://github.com/user-attachments/assets/f3f732c3-cef3-4b17-907e-15b77a1fdade" width="80%" />
   <br>
   <em>▲ Chart.js 기반 등록 현황 모니터링 및 누락 정답지 즉시 매핑</em>
 </p>
@@ -52,7 +52,7 @@ PDF 파싱 기술을 이용한 시험 콘텐츠의 신속한 디지털화 지원
 실제 시험 환경과 유사한 UX 환경 구축 및 제출 즉시 서버 사이드 채점 결과와 동적 시각적 피드백 제공
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/48e3124d-5799-4c9f-be8e-0ff1e34b5a6a" width="70%" />
+  <img src="https://github.com/user-attachments/assets/48e3124d-5799-4c9f-be8e-0ff1e34b5a6a" width="80%" />
   <br>
   <em>▲ 사용자 응시 프로세스 및 Canvas API 기반 동적 피드백 연출</em>
 </p>
