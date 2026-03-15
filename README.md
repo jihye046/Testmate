@@ -75,7 +75,7 @@ PDF 파싱 기술을 이용한 시험 콘텐츠의 신속한 디지털화 지원
 ---
 
 ## ⚖️ License
-© 2025 Jihye. All Rights Reserved.
+© 2026 Jihye. All Rights Reserved.
 
 The source code in this repository is publicly available for personal study and reference only.  
 Unauthorized copying, distribution, or commercial use is strictly prohibited.
