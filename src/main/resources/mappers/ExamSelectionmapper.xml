@@ -16,7 +16,6 @@
 		         FROM exam_info paper
 		         JOIN exam_info ans ON paper.exam_round = ans.exam_round 
 		                           AND paper.exam_subject = ans.exam_subject
-		                           AND paper.folder_id = ans.folder_id
 		         JOIN exam_type ans_type ON ans.exam_type_id = ans_type.exam_type_id
 		        WHERE paper.isdeleted = 'N'
 		          AND ans.isdeleted = 'N'
