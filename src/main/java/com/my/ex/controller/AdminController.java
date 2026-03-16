@@ -1,33 +1,20 @@
 package com.my.ex.controller;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.my.ex.dto.ExamAnswerDto;
-import com.my.ex.dto.ExamChoiceDto;
-import com.my.ex.dto.ExamFolderDto;
-import com.my.ex.dto.ExamQuestionDto;
-import com.my.ex.dto.ExamTypeDto;
+import com.my.ex.dto.*;
 import com.my.ex.dto.request.MoveExamsToFolderDto;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.service.IAdminService;
 import com.my.ex.service.IExamAnswerService;
 import com.my.ex.service.IExamSelectionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 // 관리자 페이지에서 수행하는 관리 영역
 @RequestMapping("/admin")
@@ -109,8 +96,11 @@ public class AdminController {
 	 */
 	@GetMapping("/examList")
 	@ResponseBody
-	public List<ExamTitleDto> getExamList(@RequestParam int folderId){
-		return examService.getAllExamTitlesByFolderId(folderId);
+	public List<ExamTitleDto> getExamList(
+			@RequestParam int folderId,
+			@RequestParam(required = false, defaultValue = "1") int page){
+
+		return examService.getAllExamTitlesByFolderId(folderId, page);
 	}
 
 	/**

@@ -151,6 +151,12 @@
 			
 			<!-- 시험지 목록 섹션 -->
 			<div class="exam-card-grid"><!-- 폴더 클릭 시 동적으로 생성 --></div>
+
+			<!-- 무한 스크롤 감지 지점 -->
+			<div id="scroll-sentinel" style="height: 20px;"></div>
+			<div id="list-loader" style="display: none; text-align: center; padding: 20px;">
+				<i class="fas fa-spinner fa-spin"></i> 데이터를 불러오는 중입니다...
+			</div>
 			
 			<!-- 페이징 -->
 			<!-- <div class="pagination-area">

@@ -3,6 +3,11 @@ let activeFolderId = null
 let activeFolderName = null
 let defaultFolderId = 1
 
+// 무한 스크롤
+let currentPage = 1 // 현재 페이지
+let isLoading = false // 중복 요청 방지
+let hasMore = true // 더 가져올 데이터가 있는지
+
 // PDF 분석 완료 여부
 let isAnalyzed = false
 
@@ -237,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         location.href = `/admin/createExamPage?folderId=${activeFolderId}`
     })
 
+    initScroll()
     ChartHandler.init()
 })
 
@@ -540,10 +546,10 @@ const loadBulkActionBtn = () => {
 }
 
 // 폴더 내 시험지 목록 UI
-const renderExamList = (exaxmList, noDataMessage) => {
+const renderExamList = (examList, noDataMessage) => {
     let output = ''
 
-    if(exaxmList.length == 0){
+    if(examList.length == 0 && noDataMessage != null){
         output += 
         `
             <div class="no-exams-message">
@@ -552,7 +558,7 @@ const renderExamList = (exaxmList, noDataMessage) => {
             </div>
         `
     } else {
-        exaxmList.forEach((examTitleDto) => {
+        examList.forEach((examTitleDto) => {
 
             output += 
             `
@@ -594,6 +600,8 @@ const renderExamList = (exaxmList, noDataMessage) => {
 
 // 폴더 내 시험지 목록 UI 로드 함수
 const loadExamListData = (folderId) => {
+    currentPage = 1
+    isLoading = true
 
     // 시험지 이동 버튼 컨테이너
     const listAction = document.querySelector(".exam-list-actions")
@@ -612,11 +620,67 @@ const loadExamListData = (folderId) => {
     axios.get('/admin/examList', { params })
         .then(response => {
             examCard.innerHTML = renderExamList(response.data, '등록된 시험지 목록이 없습니다. 새로운 시험지를 등록해주세요.')
+            if(response.data.length < 9){
+                hasMore = false
+            } 
         })
         .catch(error => {
             console.error('error: ', error)
         })
+        .finally(() => {
+            isLoading = false
+        })
 }
+
+const initScroll = () => {
+    const sentinel = document.querySelector("#scroll-sentinel")
+    if(!sentinel) return
+
+    const observer = new IntersectionObserver((entries) => {
+        if(entries[0].isIntersecting && hasMore && activeFolderId){
+            loadMoreExams(activeFolderId)
+        }
+    })
+
+    observer.observe(sentinel)
+}
+
+const loadMoreExams = (folderId) => {
+    if(isLoading || !hasMore) return
+
+    isLoading = true // 중복 요청 방지를 위한 로딩 잠금
+
+    const loadMessage = document.querySelector("#list-loader")
+    loadMessage.style.display = 'block'
+
+    const params = {
+        folderId: folderId,
+        page: currentPage
+    }
+    
+    setTimeout(() => {
+        axios.get('/admin/examList', { params })
+        .then(response => {
+                const newExamList = response.data
+                const examCard = document.querySelector(".exam-card-grid")
+                examCard.insertAdjacentHTML("beforeend", renderExamList(newExamList, null))
+
+                if(newExamList.length < 9){
+                    hasMore = false
+                } else {
+                    currentPage++
+                }
+            })
+            .catch(error => {
+                console.error('error: ', error)
+            })
+            .finally(() => {
+                loadMessage.style.display = 'none'
+                isLoading = false // 데이터 로딩 완료 후 잠금 해제
+            })
+    }, 800);
+}
+
 
 // 시험지 상세보기 페이지로 이동하는 함수
 const viewExam = (examId, examTypeCode, examTypeName, examRound, examSubject) => {
@@ -1169,6 +1233,11 @@ const clearSelections = () => {
 
     // 폴더 id 초기화
     activeFolderId = null
+
+    // 무한 스크롤 관련 변수 초기화
+    currentPage = 1
+    isLoading = false
+    hasMore = true
 
     ChartHandler.init()
 }

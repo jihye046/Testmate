@@ -1,18 +1,17 @@
 package com.my.ex.dao;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.session.SqlSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
 import com.my.ex.dto.ExamTypeDto;
 import com.my.ex.dto.request.ExamSearchDto;
 import com.my.ex.dto.response.ExamTitleDto;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ExamSelectionDao implements IExamSelectionDao {
@@ -48,8 +47,8 @@ public class ExamSelectionDao implements IExamSelectionDao {
 	}
 	
 	@Override
-	public List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId) {
-		return session.selectList(NAMESPACE + "getAllExamTitlesByFolderId", folderId);
+	public List<ExamTitleDto> getAllExamTitlesByFolderId(Map<String, Object> map) {
+		return session.selectList(NAMESPACE + "getAllExamTitlesByFolderId", map);
 	}
 	
 	@Override
