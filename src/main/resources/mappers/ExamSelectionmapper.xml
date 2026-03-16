@@ -123,42 +123,48 @@
 	</select>
 	
 	<!-- 특정 폴더에 있는 모든 시험지/정답지 정보 가져옴 -->
-	<select id="getAllExamTitlesByFolderId" resultType="ExamTitleDto">
-		SELECT
-			 i.exam_type_id AS examTypeId,
-			 t.exam_type_code AS examTypeCode,
-			 t.exam_type_name AS examTypeName, 
-		     
-		     i.exam_id AS examId,
-		     i.exam_round AS examRound,
-		     i.exam_subject AS examSubject,
-		     
-		     CASE
-		     	WHEN t.exam_type_code LIKE '%Answer' THEN
-		     	    (SELECT COUNT(*) 
-		               FROM exam_answer a 
-		              WHERE a.exam_id = i.exam_id)
-		        ELSE
-				    (SELECT COUNT(*) 
-		               FROM exam_question q 
-		              WHERE q.exam_id = i.exam_id)
-			END AS totalCount,
+	<select id="getAllExamTitlesByFolderId" parameterType="java.util.HashMap" resultType="ExamTitleDto">
+		SELECT * FROM (
+			SELECT a.*, ROWNUM AS rnum FROM (
+				(SELECT
+					 i.exam_type_id AS examTypeId,
+					 t.exam_type_code AS examTypeCode,
+					 t.exam_type_name AS examTypeName,
 
-			CASE
-				WHEN t.exam_type_code LIKE '%Answer' THEN
-					CONCAT(i.exam_subject, ' - 정답지')
-				ELSE
-					i.exam_subject
-			END AS displaySubject,
-			
-             i.created_date,
-             f.folder_id
-		  FROM exam_info i
-		  JOIN exam_type t ON i.exam_type_id = t.exam_type_id
-		  JOIN exam_folder f ON i.folder_id = f.folder_id
-		  WHERE f.folder_id = #{folderId}
-		    AND i.isdeleted = 'N'
-		  ORDER BY i.created_date DESC
+					 i.exam_id AS examId,
+					 i.exam_round AS examRound,
+					 i.exam_subject AS examSubject,
+
+					 CASE
+						WHEN t.exam_type_code LIKE '%Answer' THEN
+							(SELECT COUNT(*)
+							   FROM exam_answer a
+							  WHERE a.exam_id = i.exam_id)
+						ELSE
+							(SELECT COUNT(*)
+							   FROM exam_question q
+							  WHERE q.exam_id = i.exam_id)
+					END AS totalCount,
+
+					CASE
+						WHEN t.exam_type_code LIKE '%Answer' THEN
+							CONCAT(i.exam_subject, ' - 정답지')
+						ELSE
+							i.exam_subject
+					END AS displaySubject,
+
+					 i.created_date,
+					 f.folder_id
+				  FROM exam_info i
+				  JOIN exam_type t ON i.exam_type_id = t.exam_type_id
+				  JOIN exam_folder f ON i.folder_id = f.folder_id
+				  WHERE f.folder_id = #{folderId}
+					AND i.isdeleted = 'N'
+				  ORDER BY i.created_date DESC)
+			) a
+			WHERE ROWNUM &lt;= #{endRow}
+		)
+		WHERE rnum &gt;= #{startRow}
 	</select>
 		
 	<!-- 중복 시험 여부 확인 -->

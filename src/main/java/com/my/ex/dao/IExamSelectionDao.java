@@ -16,7 +16,7 @@ public interface IExamSelectionDao {
 	List<ExamTypeDto> getExamPaperTypes();
 	List<String> getExamRounds(String examTypeCode);
 	List<String> getSubjectsByExamRound(Map<String, String> map);
-	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId);
+	List<ExamTitleDto> getAllExamTitlesByFolderId(Map<String, Object> map);
 	int checkExistingExamInfo(ExamInfoDto examInfo);
 	void saveParsedExamInfo(ExamInfoDto examInfo);
 	void saveParsedQuestionInfo(Map<String, Object> question);

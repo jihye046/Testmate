@@ -1,12 +1,5 @@
 package com.my.ex.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import com.my.ex.dto.ExamChoiceDto;
 import com.my.ex.dto.ExamInfoDto;
 import com.my.ex.dto.ExamQuestionDto;
@@ -17,6 +10,12 @@ import com.my.ex.dto.response.ChartStatisticsDto;
 import com.my.ex.dto.response.ExamPageDto;
 import com.my.ex.dto.response.ExamTitleDto;
 import com.my.ex.dto.service.ParsedExamData;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface IExamSelectionService {
 	List<ExamTypeDto> getExamTypes();
@@ -24,7 +23,7 @@ public interface IExamSelectionService {
 	List<ExamTypeDto> getExamPaperTypes();
 	List<String> getExamRounds(String examTypeCode);
 	List<String> getSubjectsByExamRound(String examTypeCode, String examRound);
-	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId);
+	List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId, int page);
 	boolean saveParsedExamData(ExamInfoDto examInfo, List<Map<String, Object>> questions);
 	String getExamtypename(String examType);
 	List<ExamQuestionDto> getExamQuestions(String examType, String examRound, String examSubject);
