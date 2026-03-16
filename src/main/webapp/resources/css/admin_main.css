@@ -600,6 +600,13 @@ body {
 .tag-영어 { background-color: #D6EAF8; color: #1A5276; } 
 .tag-사회 { background-color: #FADBD8; color: #922B21; } 
 .tag-과학 { background-color: #E8DAEF; color: #6C3483; }
+.tag-도덕 { background-color: #E1F5FE; color: #01579B; }
+.tag-기술·가정 { background-color: #F3E5F5; color: #7B1FA2; }
+.tag-체육 { background-color: #E8F5E9; color: #1B5E20; }
+.tag-음악 { background-color: #FFF3E0; color: #E65100; }
+.tag-미술 { background-color: #E0F2F1; color: #004D40; }
+.tag-정보 { background-color: #ECEFF1; color: #37474F; }
+.tag-한국사 { background-color: #EFEBE9; color: #4E342E; }
 
 .card-title {
     font-size: 1.3em;
