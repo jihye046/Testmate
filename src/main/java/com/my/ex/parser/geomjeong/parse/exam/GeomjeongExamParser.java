@@ -326,11 +326,13 @@ public class GeomjeongExamParser implements IExamParser {
 			this.examInfo = new ExamInfoDto(round, subject);
 			
 			cleanedText = infoMatcher.replaceAll("");
-		} else {
+		}
+
+		if(this.examInfo == null){
 			System.err.println("Warning: GED 시험 정보를 추출하지 못해 null로 설정");
 			this.examInfo = new ExamInfoDto(null, null, null);
 		}
-		
+
 		cleanedText = cleanedText.replaceAll("(\r?\n){3,}", "\n\n");
 		cleanedText = cleanedText.replaceAll("\\s{2,}", " ");
 		
