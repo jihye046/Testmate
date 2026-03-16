@@ -127,15 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    // 시험지 이동 버튼 리스너
+    // 편집 모드 버튼 리스너
     document.querySelector(".exam-list-actions").addEventListener('click', (e) => {
-        const examMoveBtn = e.target.closest('#btn-toggle-move-mode') // 시험지 이동 버튼
+        const examMoveBtn = e.target.closest('#btn-toggle-move-mode') // 편집 모드 버튼
         if(examMoveBtn){
             toggleMoveMode() // 체크 박스 활성화
         }
     })
 
-    // 시험지 이동 모드에서 체크박스 선택 감지 리스너
+    // 편집 모드에서 체크박스 선택 감지 리스너
     document.querySelector(".exam-card-grid").addEventListener('change', (e) => {
         if(e.target.classList.contains('exam-select-checkbox')){
             updateBulkActionBar()
@@ -524,7 +524,7 @@ const loadPdfFile = () => {
         })
 }
 
-// 일괄 선택 버튼 로드 함수
+// 편집 모드 버튼 동적 생성 함수
 const loadBulkActionBtn = () => {
     const listAction = document.querySelector(".exam-list-actions")
     let output = ''
@@ -734,7 +734,39 @@ const toggleMoveMode = () => {
         box.checked = false // 모드 전환 시 초기화
     })
 
+    // '편집 모드' 클릭 시 '일괄 선택/해제' 버튼 생성
+    if(moveModeActive){
+        const div = document.querySelector(".exam-list-actions")
+        const bulkBtn = 
+        `<button id="btn-bulk-select" class="btn btn-outline-secondary ms-2">
+            <i class="fas fa-tasks"></i> 일괄 선택
+        </button>` 
+        
+        div.insertAdjacentHTML('beforeend', bulkBtn)
+        document.querySelector("#btn-bulk-select").addEventListener('click', toggleBulkSelection)
+    } else {
+        const bulkBtn = document.querySelector("#btn-bulk-select")
+        if(bulkBtn) bulkBtn.remove()
+    }
+
     updateBulkActionBar() // 모드 전환 후 상태 업데이트
+}
+
+// 일괄 선택/해제 버튼
+const toggleBulkSelection = () => {
+    const checkboxesInput = document.querySelectorAll(".exam-select-checkbox")
+    const isAllChecked = Array.from(checkboxesInput).every(box => box.checked)
+    checkboxesInput.forEach((box) => {
+        box.checked = !isAllChecked
+    })
+    
+    const isNowAllChecked = !isAllChecked
+    const bulkBtn = document.querySelector("#btn-bulk-select")
+    bulkBtn.innerHTML = isNowAllChecked ? 
+                        `<i class="fas fa-tasks"></i> 일괄 해제` : 
+                        `<i class="fas fa-tasks"></i> 일괄 선택`
+
+    updateBulkActionBar()
 }
 
 // 하단 일괄 처리 바 표시/숨김 함수
