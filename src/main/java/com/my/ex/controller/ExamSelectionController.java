@@ -356,7 +356,7 @@ public class ExamSelectionController {
 				return new ExamPdfPreview(false, '"' + folderName + '"' + " 폴더에 이미 등록된 문서입니다.", null);
 			}
 			
-			return new ExamPdfPreview(true, "파일이 등록되었습니다.", questions); 
+			return new ExamPdfPreview(true, "파일이 등록되었습니다. 데이터 분석 과정에서 오차가 발생할 수 있으니 내용을 확인하고 수정해 주세요.", questions);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ExamPdfPreview(false, "잘못된 입력값입니다.", null);
