@@ -309,7 +309,8 @@ public class ExamSelectionController {
 			
 			boolean result = false;
 			List<Map<String, Object>> questions = null;
-			
+			int expectedSize = "수학".equals(examSubject) ? 20 : 25;
+
 			// 검정고시 시험지인 경우
 			if(examTypeCode.endsWith("geomjeong")) {
 				// 1. 시험지 PDF 텍스트 추출 후 파싱된 전체 문제 리스트를 반환
@@ -318,6 +319,12 @@ public class ExamSelectionController {
 					String message = 
 							"PDF에서 시험지를 추출할 수 없습니다. \n" +
 							"정답지 PDF를 업로드하려면 시험 유형을 '정답지'로 선택해주세요.";
+					return new ExamPdfPreview(false, message, null);
+				} else if(questions.size() != expectedSize){
+					String message =
+							"현재 PDF에서 문항을 정확히 읽어오지 못했습니다. \n" +
+							"❌ 추출된 문항: " + questions.size() + "개 / 예상: " + expectedSize +"개 \n\n" +
+							"텍스트 선택이 가능한 PDF인지 확인해 주시고, 지속적으로 실패할 경우 [시험지 직접 등록] 메뉴를 통해 진행해 주시기 바랍니다.";
 					return new ExamPdfPreview(false, message, null);
 				}
 				
