@@ -51,6 +51,7 @@
 		) AS examCount
 		FROM exam_folder f
 	   WHERE f.isDeleted = 'N'
+	   ORDER BY folder_id
 	</select>
 	
 	<!-- 현재 폴더를 제외한 폴더 리스트 조회 -->
