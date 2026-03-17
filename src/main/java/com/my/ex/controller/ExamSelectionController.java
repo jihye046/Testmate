@@ -317,8 +317,14 @@ public class ExamSelectionController {
 				questions = service.parsePdfToQuestions(pdfFile);
 				if(questions == null || questions.isEmpty()) {
 					String message = 
-							"PDF에서 시험지를 추출할 수 없습니다. \n" +
-							"정답지 PDF를 업로드하려면 시험 유형을 '정답지'로 선택해주세요.";
+							"🔍 PDF 분석 결과 문항을 찾을 수 없습니다.\n\n" +
+							"✅ 다음 사항을 확인해 주세요:\n" +
+							"• 선택한 [시험 유형]과 [파일]이 일치하는지\n" +
+							"  (시험지 파일 ➔ '... 검정고시' 선택)\n" +
+							"  (정답지 파일 ➔ '... 정답표' 선택)\n" +
+							"• 텍스트 드래그(선택)가 가능한 PDF 파일인지\n\n" +
+							"위 사항을 확인 후 다시 시도해 보시고,\n" +
+							"추출이 계속 안 된다면 [시험지 직접 작성]을 이용해 주세요";
 					return new ExamPdfPreview(false, message, null);
 				} else if(questions.size() != expectedSize){
 					String message =
