@@ -8,6 +8,9 @@ let currentPage = 1 // 현재 페이지
 let isLoading = false // 중복 요청 방지
 let hasMore = true // 더 가져올 데이터가 있는지
 
+let currentSearchPage = 1
+let isSearching = false
+
 // PDF 분석 완료 여부
 let isAnalyzed = false
 
@@ -96,7 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#searchForm").addEventListener('submit', (e) => {
         // 엔터키와 검색 버튼 클릭 모두 감지
         e.preventDefault()
-        handleSearch()
+        currentSearchPage = 1
+        const searchParams = handleSearch()
+        fetchSearchExams(searchParams)
     })
 
     // 새 폴더 모달 닫기 버튼 리스너
@@ -638,11 +643,48 @@ const initScroll = () => {
 
     const observer = new IntersectionObserver((entries) => {
         if(entries[0].isIntersecting && hasMore && activeFolderId){
-            loadMoreExams(activeFolderId)
+            if(isSearching){
+                const searchParams = handleSearch()
+                loadMoreSearchExams(searchParams)
+            } else {
+                loadMoreExams(activeFolderId)
+            }
         }
     })
 
     observer.observe(sentinel)
+}
+
+const loadMoreSearchExams = (params) => {
+    if(isLoading || !hasMore) return
+
+    isLoading = true // 중복 요청 방지를 위한 로딩 잠금
+
+    const loadMessage = document.querySelector("#list-loader")
+    loadMessage.style.display = 'block'
+
+    setTimeout(() => {
+        axios.get('/exam/searchExams', { params })
+        .then(response => {
+                const newExamSearchList = response.data
+                const examCard = document.querySelector(".exam-card-grid")
+                examCard.insertAdjacentHTML("beforeend", renderExamList(newExamSearchList, null))
+
+                if(newExamSearchList.length < 9){
+                    hasMore = false
+                    isSearching = false
+                } else {
+                    currentSearchPage++
+                }
+            })
+            .catch(error => {
+                console.error('error: ', error)
+            })
+            .finally(() => {
+                loadMessage.style.display = 'none'
+                isLoading = false // 데이터 로딩 완료 후 잠금 해제
+            })
+    }, 800);
 }
 
 const loadMoreExams = (folderId) => {
@@ -723,6 +765,7 @@ const handleSearch = () => {
     const subject = form.querySelector("#searchSubject").value
     const year = form.querySelector("#searchYear").value
     const round = form.querySelector("#searchRound").value
+    const page = currentSearchPage
     
     if(!keyword && !type && !subject && !year && !round){
         alert("최소 하나 이상의 검색 조건을 선택하거나 키워드를 입력해주세요.")
@@ -735,25 +778,39 @@ const handleSearch = () => {
         subject,
         year,
         round,
-        activeFolderId
+        activeFolderId,
+        page
     }
 
-    fetchSearchExams(params)
+    return params
+    // fetchSearchExams(params)
 }
 
 // 검색 조건에 맞는 시험지 목록 요청 함수
 const fetchSearchExams = (params) => {
+    isSearching = true
+    isLoading = true
+    
     const examCard = document.querySelector(".exam-card-grid")
     axios.get('/exam/searchExams', { params })
         .then(response => {
             examCard.innerHTML = renderExamList(response.data, "검색 결과가 없습니다.")
-
+            
+            if(response.data.length < 9){
+                hasMore = false
+                isSearching = false
+            } else {
+                currentSearchPage++
+            }
             folderView.style.display = 'none'               // 폴더 뷰 숨김
             examListView.style.display = 'block'            // 시험지 뷰 표시
             btnCreateExam.style.display = 'inline-flex'     // 새 시험지 등록 버튼 표시
         })
         .catch(error => {
             console.error('error: ', error)
+        })
+        .finally(() => {
+            isLoading = false
         })
 }
 
@@ -1235,9 +1292,14 @@ const clearSelections = () => {
     activeFolderId = null
 
     // 무한 스크롤 관련 변수 초기화
+    // 메인 페이지 리스트
     currentPage = 1
     isLoading = false
     hasMore = true
+
+    // 검색 페이지 리스트
+    currentSearchPage = 1
+    isSearching = false
 
     ChartHandler.init()
 }

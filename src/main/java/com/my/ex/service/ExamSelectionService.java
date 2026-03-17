@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class ExamSelectionService implements IExamSelectionService {
+	// 한 페이지당 보여줄 게시글 수
+	private final int COUNT = 9;
 
 	@Autowired
 	private ExamSelectionDao dao;
@@ -85,22 +87,16 @@ public class ExamSelectionService implements IExamSelectionService {
 
 	@Override
 	public List<ExamTitleDto> getAllExamTitlesByFolderId(int folderId, int page) {
-		// 한 페이지당 보여줄 게시글 수
-		final int COUNT = 9;
-
-		int endRow = page * COUNT;
-		int startRow = endRow - (COUNT - 1);
-
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = calculateOffset(page);
 		map.put("folderId", folderId);
-		map.put("startRow", startRow);
-		map.put("endRow", endRow);
 
 		return dao.getAllExamTitlesByFolderId(map);
 	}
 
 	@Override
-	public boolean saveParsedExamData(ExamInfoDto examInfo, List<Map<String, Object>> questions) {
+	@Transactional
+	public boolean
+	saveParsedExamData(ExamInfoDto examInfo, List<Map<String, Object>> questions) {
 		// 과목명으로 subject_id 조회 및 set
 		Map<String, Object> map = new HashMap<>();
 		map.put("examSubject", examInfo.getExamSubject());
@@ -633,6 +629,10 @@ public class ExamSelectionService implements IExamSelectionService {
 
 	@Override
 	public List<ExamTitleDto> searchExams(ExamSearchDto dto) {
+		Map<String, Object> map = calculateOffset(dto.getPage());
+		dto.setStartRow((Integer) map.get("startRow"));
+		dto.setEndRow((Integer) map.get("endRow"));
+
 		return dao.searchExams(dto);
 	}
 
@@ -642,6 +642,17 @@ public class ExamSelectionService implements IExamSelectionService {
 				dao.getTotalExamCount(),
 				dao.getMissingAnswerExams()
 		);
+	}
+
+	private Map<String, Object> calculateOffset(int page){
+		int endRow = page * COUNT;
+		int startRow = endRow - (COUNT - 1);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("startRow", startRow);
+		map.put("endRow", endRow);
+
+		return map;
 	}
 
 }
