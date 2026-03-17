@@ -22,8 +22,9 @@
                 <span><i class="fas fa-book"></i> 과목: ${examPageDto.examSubject}</span>
                 <span><i class="fas fa-tag"></i> 유형/회차: ${examPageDto.examRound}</span>
                 <button class="btn btn-back" 
-                	onclick="location.href='/admin/main?folderId=${folderDto.folderId}&folderName=${folderDto.folderName}'"
-               	>
+                    onclick="location.href='/admin/main?folderId=${folderDto.folderId}&folderName=' + encodeURIComponent('${folderDto.folderName}'.trim())"
+                >
+                <!-- onclick="location.href='/admin/main?folderId=${folderDto.folderId}&folderName=${folderDto.folderName}'" -->
                 	<i class="fas fa-list-ul"></i> 목록으로
                	</button>
             </div>
