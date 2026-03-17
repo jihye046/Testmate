@@ -210,6 +210,7 @@ public class ExamSelectionService implements IExamSelectionService {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteExams(List<Integer> examIds) {
 		return dao.deleteExams(examIds) > 0;
 	}

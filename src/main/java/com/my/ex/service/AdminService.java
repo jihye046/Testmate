@@ -1,14 +1,13 @@
 package com.my.ex.service;
 
-import java.util.List;
-
+import com.my.ex.dao.AdminDao;
+import com.my.ex.dto.ExamFolderDto;
+import com.my.ex.dto.request.MoveExamsToFolderDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.my.ex.dao.AdminDao;
-import com.my.ex.dto.ExamFolderDto;
-import com.my.ex.dto.request.MoveExamsToFolderDto;
+import java.util.List;
 
 @Service
 public class AdminService implements IAdminService {
@@ -18,6 +17,7 @@ public class AdminService implements IAdminService {
 	
 	// 새 폴더 생성
 	@Override
+	@Transactional
 	public boolean saveFolder(String folderName) {
 		return dao.saveFolder(folderName) > 0;
 	}
@@ -30,12 +30,14 @@ public class AdminService implements IAdminService {
 	
 	// 삭제된 폴더인지 확인
 	@Override
+	@Transactional
 	public boolean isDeleted(String folderName) {
 		return dao.isDeleted(folderName) > 0;
 	}
 	
 	// 삭제된 폴더 복구
 	@Override
+	@Transactional
 	public boolean restoreFolder(String folderName) {
 		return dao.restoreFolder(folderName) > 0;
 	}
@@ -62,6 +64,7 @@ public class AdminService implements IAdminService {
 
 	// 선택된 시험지를 지정된 폴더로 이동
 	@Override
+	@Transactional
 	public boolean moveExamsToFolder(MoveExamsToFolderDto dto) {
 		return dao.moveExamsToFolder(dto) > 0;
 	}

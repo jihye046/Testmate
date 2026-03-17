@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.my.ex.dao.UserDao;
 import com.my.ex.dto.UserDto;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService implements IUserService {
@@ -13,6 +14,7 @@ public class UserService implements IUserService {
 	private UserDao dao;
 	
 	@Override
+	@Transactional
 	public boolean signup(UserDto dto) {
 		return dao.signup(dto) > 0;
 	}

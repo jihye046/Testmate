@@ -1,16 +1,5 @@
 package com.my.ex.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.my.ex.dao.ExamAnswerDao;
 import com.my.ex.dao.ExamSelectionDao;
 import com.my.ex.dto.ExamAnswerDto;
@@ -21,6 +10,13 @@ import com.my.ex.dto.response.ExamPassPolicy;
 import com.my.ex.dto.response.ExamResultDto;
 import com.my.ex.parser.geomjeong.parse.answer.GeomjeongAnswerParser;
 import com.my.ex.parser.geomjeong.upload.answer.UploadedGeomjeongAnswerPdfTextExtractor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ExamAnswerService implements IExamAnswerService {
@@ -59,7 +55,7 @@ public class ExamAnswerService implements IExamAnswerService {
 	}
 
 	@Override
-//	@Transactional
+	@Transactional
 	public boolean saveParsedAnswerData(ExamInfoDto examInfo, List<ExamAnswerDto> answers) {
 		// 중복 답안지 정보 확인
 		if(examSelectionDao.checkExistingExamInfo(examInfo) > 0) return false;
@@ -144,6 +140,7 @@ public class ExamAnswerService implements IExamAnswerService {
 	}
 
 	@Override
+	@Transactional
 	public boolean updateAnswers(List<ExamAnswerDto> answers) {
 		int successCount = 0;
 		for(ExamAnswerDto answer : answers) {
@@ -162,7 +159,8 @@ public class ExamAnswerService implements IExamAnswerService {
 	public ExamAnswerDto getAnswerByQuestionId(Integer questionId) {
 		return dao.getAnswerByQuestionId(questionId);
 	}
-	
+
+	@Transactional
 	public void updateQuestionAnswer(Integer questionId, QuestionAnswer answer, Integer examId) {
 		Integer answerId = answer.getAnswerId();
 		int correctAnswer = answer.getCorrectAnswer();
