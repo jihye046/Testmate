@@ -611,6 +611,7 @@ const loadExamListData = (folderId) => {
     currentPage = 1
     isLoading = true
     hasMore = true
+    isSearching = false
 
     // 시험지 이동 버튼 컨테이너
     const listAction = document.querySelector(".exam-list-actions")
