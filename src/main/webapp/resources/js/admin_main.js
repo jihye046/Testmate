@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector(".chart-container").classList.toggle("hidden")
 
             loadExamList(activeFolderId, activeFolderName)
+            fetchGetExamTypes()
             return // btn-delete까지 타지 않도록 return
         }
 
@@ -101,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault()
         currentSearchPage = 1
         const searchParams = handleSearch()
+        if(!searchParams) return
+
         fetchSearchExams(searchParams)
     })
 
@@ -607,6 +610,7 @@ const renderExamList = (examList, noDataMessage) => {
 const loadExamListData = (folderId) => {
     currentPage = 1
     isLoading = true
+    hasMore = true
 
     // 시험지 이동 버튼 컨테이너
     const listAction = document.querySelector(".exam-list-actions")
@@ -627,7 +631,9 @@ const loadExamListData = (folderId) => {
             examCard.innerHTML = renderExamList(response.data, '등록된 시험지 목록이 없습니다. 새로운 시험지를 등록해주세요.')
             if(response.data.length < 9){
                 hasMore = false
-            } 
+            } else {
+                currentPage++
+            }
         })
         .catch(error => {
             console.error('error: ', error)
@@ -672,7 +678,6 @@ const loadMoreSearchExams = (params) => {
 
                 if(newExamSearchList.length < 9){
                     hasMore = false
-                    isSearching = false
                 } else {
                     currentSearchPage++
                 }
@@ -769,7 +774,7 @@ const handleSearch = () => {
     
     if(!keyword && !type && !subject && !year && !round){
         alert("최소 하나 이상의 검색 조건을 선택하거나 키워드를 입력해주세요.")
-        return
+        return 
     }
 
     const params = {
@@ -783,13 +788,13 @@ const handleSearch = () => {
     }
 
     return params
-    // fetchSearchExams(params)
 }
 
 // 검색 조건에 맞는 시험지 목록 요청 함수
 const fetchSearchExams = (params) => {
     isSearching = true
     isLoading = true
+    hasMore = true
     
     const examCard = document.querySelector(".exam-card-grid")
     axios.get('/exam/searchExams', { params })
@@ -798,7 +803,6 @@ const fetchSearchExams = (params) => {
             
             if(response.data.length < 9){
                 hasMore = false
-                isSearching = false
             } else {
                 currentSearchPage++
             }
