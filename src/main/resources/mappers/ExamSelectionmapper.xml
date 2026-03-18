@@ -414,6 +414,17 @@
 			   passage_scope = #{passageScope}
 		 WHERE question_id = #{questionId}
 	</update>
+
+	<update id="updateCommonPassageRange" parameterType="ExamQuestionDto">
+			UPDATE exam_question
+			   SET commonpassage = #{commonPassage},
+				   passage_scope = #{passageScope}
+			 WHERE exam_id = #{examId}
+			   AND question_num IN
+		       <foreach collection="rangeArray" item="num" open="(" separator="," close=")">
+				   #{num}
+			   </foreach>
+	</update>
 	
 	<!-- 시험지 단일 문항 선택지 수정 -->
 	<update id="updateQuestionChoices" parameterType="ExamChoiceDto">
