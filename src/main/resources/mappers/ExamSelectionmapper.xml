@@ -529,6 +529,7 @@
 		    JOIN exam_type t2 ON t2.exam_type_id = i2.exam_type_id
 		    WHERE t2.exam_type_code LIKE '%Answer'
 		    AND i2.isdeleted = 'N'
+			AND t2.exam_type_code = CONCAT(t.exam_type_code, 'Answer')
 		    AND i.exam_round = i2.exam_round
 		    AND i.exam_subject = i2.exam_subject
 		)
