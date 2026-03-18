@@ -1306,6 +1306,9 @@ const clearSelections = () => {
     currentSearchPage = 1
     isSearching = false
 
+    // 시험지 검색 form
+    document.querySelector("#searchForm").reset()
+    
     ChartHandler.init()
 }
 
