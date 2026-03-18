@@ -587,14 +587,19 @@ const QuestionEditHandler = {
     },
 
     _collectQuestion(questionGroup){
+        // const textarea = questionGroup.querySelector("textarea")
+        // const textareaValue = textarea ? textarea.value.trim() : ''
+        // if(!textareaValue){
+        //     alert('문항 내용을 작성해주세요.')
+        //     textarea.focus()
+        //     return false
+        // }
+
+        // this.questionObj.questionText = textareaValue
+        // return true
+
         const textarea = questionGroup.querySelector("textarea")
         const textareaValue = textarea ? textarea.value.trim() : ''
-        if(!textareaValue){
-            alert('문항 내용을 작성해주세요.')
-            textarea.focus()
-            return false
-        }
-
         this.questionObj.questionText = textareaValue
         return true
     },

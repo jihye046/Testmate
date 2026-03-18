@@ -1009,24 +1009,38 @@ const saveExam = () => {
         }
 
         // 4. 문항 내용
+        // const questionTextarea = card.querySelector("textarea.question-text")
+        // const questionText = questionTextarea ? questionTextarea.value.trim() : ''
+        // if(!questionText){
+        //     alert(`${questionNum}번 문항 내용을 작성해주세요.`)
+        //     return
+        // }
+        // questionObj.questionText = questionText
+
         const questionTextarea = card.querySelector("textarea.question-text")
         const questionText = questionTextarea ? questionTextarea.value.trim() : ''
-        if(!questionText){
-            alert(`${questionNum}번 문항 내용을 작성해주세요.`)
-            return
-        }
         questionObj.questionText = questionText
 
         // 5. 선택지
         let choices = []
 
         const divs = card.querySelectorAll(".choice-editor")
+        if(divs.length < 4){
+            alert(`현재 선택지가 ${divs.length}개입니다. 시험 문항은 최소 4개 이상의 선택지가 필요합니다.`)
+            return false
+        }
+        
         const choiceLabels = ['①', '②', '③', '④', '⑤']
         for(const div of divs){
             const choiceId = div.dataset.choiceId
             const choiceContent = window.edit_common.getChoiceContent(choiceId)
-            if(!choiceContent || choiceContent.trim() === ''){
+
+            // HTML 태그를 모두 제거하고 순수 텍스트만 남김
+            const plainText = choiceContent.replace(/<[^>]*>?/gm, '').trim()
+
+            if(!plainText || plainText.trim() === ''){
                 alert(`${questionNum}번 문항의 선택지를 입력해주세요.`)
+                div.focus()
                 return
             }
 
