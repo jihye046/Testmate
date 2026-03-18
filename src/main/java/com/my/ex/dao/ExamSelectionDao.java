@@ -186,4 +186,9 @@ public class ExamSelectionDao implements IExamSelectionDao {
 		return session.selectList(NAMESPACE + "getMissingAnswerExams");
 	}
 
+	@Override
+	public void updateCommonPassageRange(ExamQuestionDto dto) {
+		session.update(NAMESPACE + "updateCommonPassageRange", dto);
+	}
+
 }

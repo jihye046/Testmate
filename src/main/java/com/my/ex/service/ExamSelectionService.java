@@ -503,6 +503,7 @@ public class ExamSelectionService implements IExamSelectionService {
 		String examType = i.getTypeKor();
 		String examRound = i.getRound();
 		String examSubject = i.getSubject();
+		Integer examId = i.getExamId();
 
 		// 시험지
 		Integer questionid = q.getQuestionId();
@@ -512,6 +513,7 @@ public class ExamSelectionService implements IExamSelectionService {
 
 		// 시험지 객체에 데이터 파싱
 		ExamQuestionDto dto = new ExamQuestionDto();
+		dto.setExamId(examId);
 		dto.setQuestionId(questionid);
 		dto.setQuestionText(questionText);
 		if(useCommonPassage == 'Y') {
@@ -519,6 +521,7 @@ public class ExamSelectionService implements IExamSelectionService {
 			String type = commonPassage.getType();
 			String content = commonPassage.getContent();
 			String rangeText = commonPassage.getRangeText();
+			int[] rangeArray = commonPassage.getRangeArray();
 
 			String newContent = content;
 			if(type.equals("image")) {
@@ -548,6 +551,9 @@ public class ExamSelectionService implements IExamSelectionService {
 			}
 			dto.setCommonPassage(newContent);
 			dto.setPassageScope(rangeText);
+			dto.setRangeArray(rangeArray);
+
+			dao.updateCommonPassageRange(dto);
 		}
 
 		if(useIndividualPassage == 'Y') {

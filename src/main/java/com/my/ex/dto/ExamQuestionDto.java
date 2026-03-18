@@ -14,4 +14,5 @@ public class ExamQuestionDto {
 	private String individualPassage; 	// 단독 지문
 	private String commonPassage;		// 공통 지문
 	private String passageScope; 		// 지문 적용 범위 (예: [11~13])
+	private int[] rangeArray;
 }

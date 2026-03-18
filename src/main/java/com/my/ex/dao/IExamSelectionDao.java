@@ -44,4 +44,5 @@ public interface IExamSelectionDao {
 	List<ExamTitleDto> searchExams(ExamSearchDto dto);
 	int getTotalExamCount();
 	List<ExamInfoDto> getMissingAnswerExams();
+	void updateCommonPassageRange(ExamQuestionDto dto);
 }
