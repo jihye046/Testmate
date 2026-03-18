@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         analysisOptionsSection.style.display = hasFile ? 'block' : 'none'
 
         // 전체 초기화
-        clearPdfUploadSelectbox()
+        // clearPdfUploadSelectbox()
         
         // 파일 변경 시 시험 유형 옵션 다시 불러오기
         if(hasFile){
@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PDF 시험지 정보 설정 
     fetchGetExamTypes() 
+
     selectExamType.addEventListener('change', (e) => {
         const selectedType = e.target.value 
 
@@ -514,8 +515,17 @@ const loadPdfFile = () => {
                 
                 // 시험지 목록 새로고침(특정 폴더 내에서 등록한 경우만 해당 폴더 시험지 목록 새로고침)
                 // 메인 페이지에서 바로 등록한 경우에는 폴더 리스트만 새로고침
+                
                 if(activeFolderId){
-                    loadExamListData(activeFolderId)
+                    if(isSearching){
+                        currentSearchPage = 1
+                        const searchParams = handleSearch()
+                        if(!searchParams) return
+    
+                        fetchSearchExams(searchParams)
+                    } else {
+                        loadExamListData(activeFolderId)
+                    }
                 }
 
                 // 폴더 리스트 새로고침
@@ -750,7 +760,15 @@ const fetchExamDelete = (examIds) => {
         .then(response => {
             if(response.data){
                 // 1. 시험지 목록 UI 업데이트
-                loadExamListData(activeFolderId)
+                if(isSearching){
+                    currentSearchPage = 1
+                    const searchParams = handleSearch()
+                    if(!searchParams) return
+
+                    fetchSearchExams(searchParams)
+                } else {
+                    loadExamListData(activeFolderId)
+                }
 
                 // 2. 폴더 목록 UI 업데이트
                 fetchFolderList()
@@ -1129,8 +1147,16 @@ const validateExamInfo = () => {
 const fetchGetExamTypes = () => {
     axios.get('/exam/getAllExamTypes')
         .then(response => {
-            selectExamType.innerHTML = updateExamTypes(response.data)
-            searchType.innerHTML = updateExamTypes(response.data)
+            const currentSelectVal = selectExamType.value
+            const currentSearchVal = searchType.value
+
+            if(!currentSearchVal || !isSearching){
+                searchType.innerHTML = updateExamTypes(response.data)
+            }
+
+            if(!currentSelectVal){
+                selectExamType.innerHTML = updateExamTypes(response.data)
+            }
         })
         .catch(error => {
             console.error('error: ', error)
