@@ -19,10 +19,11 @@
 	<div class="answer-container">
 	    <div class="header">
 	        <h2><i class="fas fa-key"></i> 정답지 등록/검토</h2>
-	        <button class="btn btn-secondary back-to-folders" 
-				onclick="location.href='/admin/main?folderId=${folderDto.folderId}&folderName=${folderDto.folderName}'"
+	        <button class="btn btn-secondary back-to-folders"
+					onclick="location.href='/admin/main?folderId=${folderDto.folderId}&folderName=' + encodeURIComponent('${folderDto.folderName}'.trim())"
 			>목록으로
 			</button>
+<%--			onclick="location.href='/admin/main?folderId=${folderDto.folderId}&folderName=${folderDto.folderName}'"--%>
 	    </div>
 	
 	    <div class="summary-bar">
