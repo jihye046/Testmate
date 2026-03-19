@@ -60,6 +60,7 @@
 		    		   AND i.exam_round = i2.exam_round
 		       		   AND i.exam_subject = i2.exam_subject
 		   )
+		 ORDER BY exam_round DESC
 	</select>
 	
 	<!-- examId로 시험지 정보 조회 -->
