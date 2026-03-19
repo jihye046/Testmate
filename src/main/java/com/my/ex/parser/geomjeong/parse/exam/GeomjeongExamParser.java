@@ -152,6 +152,18 @@ public class GeomjeongExamParser implements IExamParser {
 	        Matcher numMatcher = Pattern.compile("^(\\d+)\\.\\s*([\\s\\S]*)", Pattern.DOTALL).matcher(trimmedBlock);
 	        
 	        if(numMatcher.find()) {
+	        	int targetNum = Integer.parseInt(numMatcher.group(1));
+	        	
+	        	String[] scopeParts = currentPassageScope.split("[~～]");
+	        	// 현재 문제 번호가 지문 적용 범위를 벗어나면 공통 지문 초기화
+	            if (scopeParts.length == 2) {
+	                int scopeEnd = Integer.parseInt(scopeParts[1].trim());
+	                if (targetNum > scopeEnd) {
+	                    currentCommonPassage = "";
+	                    currentPassageScope = "";
+	                }
+	            }
+	        	
 	            if (!nextCommonPassage.isEmpty()) {
 	                currentCommonPassage = nextCommonPassage;
 	                currentPassageScope = nextPassageScope;
