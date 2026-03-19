@@ -522,7 +522,7 @@ const QuestionEditHandler = {
             const type = individualActiveBtn.dataset.type
             if(type == 'text'){
                 const textarea = passageGroup.querySelector(`textarea[id="passage-text-${qNum}"]`)
-                const textareaValue = textarea ? textarea.value.trim() : '' 
+                const textareaValue = textarea ? textarea.value.replace(/<[^>]*>?/gm, '').trim() : '' 
                 if(!textareaValue){
                     alert(`${qNum}번 문항의 개별 지문을 작성해주세요.`)
                     textarea.focus()

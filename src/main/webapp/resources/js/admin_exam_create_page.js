@@ -971,14 +971,13 @@ const saveExam = () => {
         const activePassageBtn = controls.querySelector(".btn-passage-type.active")
 
         if(activePassageBtn){
-            questionObj.useIndividualPassage = 'Y'
             const dataType = activePassageBtn.getAttribute("data-type")
             const contentContainer = card.querySelector(".passage-content")
             let individualPassage = {}
 
             if(dataType == 'text'){
                 const passageTextarea = contentContainer.querySelector("textarea.passage-text")
-                const textareaValue = passageTextarea ? passageTextarea.value.trim() : ''
+                const textareaValue = passageTextarea ? passageTextarea.value.replace(/<[^>]*>?/gm, '').trim() : ''
                 if(!textareaValue){
                     alert(`${questionNum}번 문항의 개별 지문을 작성해주세요.`)
                     return
@@ -1002,6 +1001,7 @@ const saveExam = () => {
                 formData.append(`question_${questionNum}_individual_image`, fileInput.files[0])
             }
 
+            questionObj.useIndividualPassage = 'Y'
             questionObj.individualPassage = individualPassage
         } else {
             questionObj.useIndividualPassage = 'N'
