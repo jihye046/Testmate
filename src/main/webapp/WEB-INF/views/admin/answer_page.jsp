@@ -6,12 +6,17 @@
 <head>
 <meta charset="UTF-8">
 <title>관리자 검토 페이지</title>
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/admin_answer_page.css"/>" rel="stylesheet">
+
 <!-- 아이콘 및 폰트 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <!-- 차트 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- axios -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>

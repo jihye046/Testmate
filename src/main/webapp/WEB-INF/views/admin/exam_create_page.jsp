@@ -6,6 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>시험지 등록 페이지</title>
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/admin_exam_create_page.css"/>" rel="stylesheet">
 
 <!-- axios -->

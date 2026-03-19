@@ -6,7 +6,10 @@
 <meta charset="UTF-8">
 <title>로그인</title>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/login.css"/>" rel="stylesheet">
+
 <!-- axios -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>

@@ -7,6 +7,8 @@
 <head>
 <meta charset="UTF-8">
 <title>시험지 수정 페이지</title>
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/admin_exam_create_page.css"/>" rel="stylesheet">
 <link href="<c:url value="/resources/css/admin_exam_edit_page.css"/>" rel="stylesheet">
 
