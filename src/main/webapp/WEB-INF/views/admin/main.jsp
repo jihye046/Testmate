@@ -7,6 +7,12 @@
 <head>
 <meta charset="UTF-8">
 <title>관리자 메인 페이지</title>
+
+<!-- font -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
+<link href="<c:url value="/resources/css/font.css"/>" rel="stylesheet">
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/admin_main.css"/>" rel="stylesheet">
 
 <!-- axios -->

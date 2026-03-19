@@ -7,7 +7,14 @@
 <head>
 <meta charset="UTF-8">
 <title>관리자 검토 페이지</title>
+
+<!-- font -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
+<link href="<c:url value="/resources/css/font.css"/>" rel="stylesheet">
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/admin_exam_page.css"/>" rel="stylesheet">
+
 <!-- axios -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>

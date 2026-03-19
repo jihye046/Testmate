@@ -4,9 +4,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>시험 선택 | 자동 채점 서비스</title>
+<title>자동 채점 서비스</title>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!-- font -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
+<link href="<c:url value="/resources/css/font.css"/>" rel="stylesheet">
+
+<!-- .css -->
 <link href="<c:url value="/resources/css/main.css"/>" rel="stylesheet">
+
 <!-- axios -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
