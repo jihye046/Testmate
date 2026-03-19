@@ -12,6 +12,24 @@ document.addEventListener('DOMContentLoaded', () => {
             location.href = `/exam/editQuestion/${questionId}/${examId}`
         })
     })
-    
+
+    // 맨 위로 버튼
+    const topBtn = document.querySelector("#btn-back-to-top")
+
+    // 스크롤 감지: 300px 이상 내려오면 버튼 표시
+    window.onscroll = () => {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            topBtn.style.display = "flex";
+        } else {
+            topBtn.style.display = "none";
+        }
+    }
+
+    topBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    })
 })
 

@@ -178,6 +178,10 @@
             </c:forEach>
         </div>
         
+        <button id="btn-back-to-top" title="맨 위로 이동">
+		    <i class="fas fa-arrow-up"></i>
+		</button>
+        
     </div>
 
     <script src="<c:url value='/resources/js/admin_exam_page.js'/>"></script>
