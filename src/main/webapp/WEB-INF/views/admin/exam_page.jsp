@@ -17,6 +17,9 @@
 
 <!-- axios -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- font-awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="review-container">
@@ -179,7 +182,7 @@
         </div>
         
         <button id="btn-back-to-top" title="맨 위로 이동">
-		    <i class="fas fa-arrow-up"></i>
+		    <i class="fas fa-chevron-up"></i>
 		</button>
         
     </div>
